@@ -41,7 +41,8 @@
     "rxjs": "^7.2.0",
     "shortid-fix": "^2.2.15",
     "ssl-commerz-node": "^1.0.4",
-    "sslcommerz": "^1.7.0"
+    "sslcommerz": "^1.7.0",
+    "playwright": "^1.27.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^9.0.0",
