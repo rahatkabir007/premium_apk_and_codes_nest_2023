@@ -10,10 +10,35 @@ export type APKDocument = APK & Document;
 @Schema({ timestamps: true })
 export class APK {
     @Prop({ required: true })
-    name: string;
+    title: string;
 
     @Prop({ required: true })
-    description: string;
+    imgSrc: string;
+
+    @Prop({ required: true })
+    createdAt: string;
+
+    @Prop({ required: true })
+    categories: string;
+
+    @Prop({ required: true })
+    version: string;
+
+    @Prop({ required: true })
+    fileSize: string;
+
+    @Prop({ required: true })
+    allText: string;
+
+    // @Prop({ required: true })
+    // downloadFile: {
+    //     type: [
+    //       {
+    //         href:  String,
+    //         innerText:String
+    //       }
+    //     ]
+    //   }
 
 }
 
