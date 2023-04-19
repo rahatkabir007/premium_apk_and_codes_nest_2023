@@ -17,7 +17,7 @@ export class CodesService {
 
   async create(createCodeDto: CreateCodeDto) {
     const code = await this.codeModel.create({
-      name: "hello code 2",
+      name: "hello code",
       description: "bye"
     })
     return code;
