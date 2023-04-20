@@ -17,6 +17,7 @@ export const codeScrapping = () => {
             // for (var i = parsedPageNumber; i < 2; i++){
             for (var i = parsedPageNumber; ; i++) {
                 await page.goto(`https://codelist.cc/pgs/${i}/`);
+                await page.waitForTimeout(2000)
                 const codeDatas = await page.$$eval('.post--vertical', (codeData) => {
                     return codeData.map((el) => {
 
@@ -36,6 +37,7 @@ export const codeScrapping = () => {
                 writeFileSync("./pageNumber", i.toString())
                 for (var j = 0; j < codeDatas.length; j++) {
                     const codeObj: any = {}
+                    await page.waitForTimeout(2000)
                     await page.goto(codeDatas[j].url)
                     await page.waitForTimeout(2000)
                     const title = codeDatas[j].title;
@@ -43,6 +45,7 @@ export const codeScrapping = () => {
                     const img = codeDatas[j].imgSrc;
                     const category = codeDatas[j].category;
                     const date = codeDatas[j].date;
+                    const url = codeDatas[j].url
                     const downloadLinks = await page.evaluate(() => {
                         //@ts-ignore
                         const downloadLinksArr = document.getElementsByClassName('quote')[0].innerText.split("\n")
@@ -53,6 +56,7 @@ export const codeScrapping = () => {
                     codeObj.img = img;
                     codeObj.category = category;
                     codeObj.date = date;
+                    codeObj.url = url
                     codeObj.downloadLinks = downloadLinks;
                     codeDatasArray.push(codeObj)
                 }
