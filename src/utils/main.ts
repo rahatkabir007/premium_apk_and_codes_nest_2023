@@ -36,14 +36,15 @@ export const main =() => {
             return metaTags;
           });
 
-          for (var j = 0; j < allReadMoreHref.length; j++) {
+          // for (var j = 0; j < allReadMoreHref.length; j++) {
+            for (var j = 0; j < 1; j++) {
             var apkObj: any = {}
         
 
             await page.goto(allReadMoreHref[j])
   
             const title = await page.locator('.post-title h1').innerText() || ''
-            const imgSrc = await page.locator('.attachment-featured_image').getAttribute('src') || ''
+            const imgSrc = await page.locator('.attachment-featured_image').getAttribute('data-src') || ''
             const createdAt = await page.locator('.post-date').innerText() || ''
 
             const categoriesInnerText = await page.$eval('.entry_categories', (element) => {
@@ -66,26 +67,27 @@ export const main =() => {
             const developer = fileVersionsSizeDeveloper[2] ||'';
 
             const parentInnerText = await page.$eval('.post_content.entry-content', (element) => {
-              // Get all the child elements under the parent element
               const children = Array.from(element.children);
-              // Filter out child elements with class "wp-caption" or "hatom-extra"
               const filteredChildren = children.filter((child) => !child.classList.contains('wp-caption') && !child.classList.contains('hatom-extra'));
-              // Extract the innerText from the filtered child elements
-              const innerTextArray = filteredChildren.map((child) => child.textContent.trim() ||'');
+              const innerTextArray = filteredChildren.flatMap((child) => child.textContent.trim().split('\n')) || '';
               // Join the innerText values with commas
-              return innerTextArray.join(',');
+              // return innerTextArray.join(',');
+              return innerTextArray;
             });
       
             console.log('innerTexts', parentInnerText); // Output the innerTexts to the console
-        
-            // // megamind
-            //  const imgSrcs = await page.$$eval('.post_content.entry-content img', imgs => imgs.map(img => img.getAttribute('src')));
 
-            // // Concatenate the img srcs with commas
-            // const imgSrcsString = imgSrcs.join(',');
-
-            // console.log(imgSrcsString);
-   
+            const imgSrcAll = await page.evaluate(() => {
+              var imgs = document.getElementsByClassName('post_content')[0].getElementsByTagName('img')
+              var srcs = [];
+              for (var i = 0; i < imgs.length; i++) {
+                srcs.push(imgs[i].getAttribute('data-src'));
+              }               
+              return srcs
+            }
+            )
+            console.log('imgSrcAll', imgSrcAll);
+            
             const downloadButtons = await page.$$('.download_button');
             // Click on the first download button
             if (downloadButtons.length > 0) {
@@ -116,6 +118,7 @@ export const main =() => {
               apkObj.fileSize = fileSize
               apkObj.developer = developer
               apkObj.allText = parentInnerText
+              apkObj.imgSrcAll =imgSrcAll
               apkObj.downloadFile = newPageExtractedMetaTags
               metaTags.push(apkObj)
             }
