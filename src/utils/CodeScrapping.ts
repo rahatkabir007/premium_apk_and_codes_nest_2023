@@ -9,7 +9,7 @@ export const codeScrapping = () => {
             const browser = await chromium.launch({ headless: false });
             const context = await browser.newContext();
             const page = await context.newPage();
-            let pageNumber = readFileSync("./pageNumber").toString()
+            let pageNumber = readFileSync("./codePageNumber").toString()
             let parsedPageNumber = parseInt(pageNumber)
             if (pageNumber === "") {
                 parsedPageNumber = 1
@@ -34,7 +34,7 @@ export const codeScrapping = () => {
                 if (codeDatas.length === 0) {
                     break;
                 }
-                writeFileSync("./pageNumber", i.toString())
+                writeFileSync("./codePageNumber", i.toString())
                 for (var j = 0; j < codeDatas.length; j++) {
                     const codeObj: any = {}
                     await page.waitForTimeout(2000)
