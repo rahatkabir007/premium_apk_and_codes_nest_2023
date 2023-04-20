@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Code, CodeDocument } from './schemas/code.schema';
 import { Model } from 'mongoose';
 import { DATABASE_CONNECTION } from 'src/utils/DatabaseConstants';
+import { codeScrapping } from 'src/utils/CodeScrapping';
 
 @Injectable()
 export class CodesService {
@@ -16,13 +17,15 @@ export class CodesService {
 
 
   async create(createCodeDto: CreateCodeDto) {
-    const code = await this.codeModel.create({
-      name: "hello code",
-      description: "bye"
-    })
-    return code;
-  }
+    try {
+      const result = await codeScrapping();
+      console.log('codeArray', result);
 
+      return result
+    } catch (error) {
+      console.error(error);
+    }
+  }
   findAll() {
     return `This action returns all codes`;
   }

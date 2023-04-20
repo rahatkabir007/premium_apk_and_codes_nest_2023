@@ -5,7 +5,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { DATABASE_CONNECTION } from 'src/utils/DatabaseConstants';
 import { APK, APKDocument } from './schemas/apk.schema';
-import { main } from 'src/utils/main';
+import { main } from 'src/utils/ApkScrapping';
 
 @Injectable()
 export class ApksService {
@@ -18,7 +18,7 @@ export class ApksService {
   async create(createApkDto: CreateApkDto) {
     try {
       const result = await main(); // Call the main function and capture the return value
-      console.log('apkObj',result); // Output the return value to the console
+      console.log('apkObj', result); // Output the return value to the console
     } catch (error) {
       console.error(error);
     }
