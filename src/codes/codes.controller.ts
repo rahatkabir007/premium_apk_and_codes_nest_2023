@@ -1,8 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { CodesService } from './codes.service';
 import { CreateCodeDto } from './dto/create-code.dto';
 import { UpdateCodeDto } from './dto/update-code.dto';
 
+interface QueryData {
+  page?: string,
+  limit?: string
+}
 @Controller('codes')
 export class CodesController {
   constructor(private readonly codesService: CodesService) { }
@@ -13,8 +17,9 @@ export class CodesController {
   }
 
   @Get('/findAllCodes')
-  findAllCodes() {
-    return this.codesService.findAllCodeDatas();
+  findAllCodes(@Query() queries: QueryData) {
+    console.log("🚀 ~ file: codes.controller.ts:21 ~ CodesController ~ findAllCodes ~ queries:", queries)
+    return this.codesService.findAllCodeDatas(queries);
   }
 
   @Get('/findOneCode/:id')
