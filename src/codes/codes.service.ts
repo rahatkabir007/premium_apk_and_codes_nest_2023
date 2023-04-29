@@ -49,20 +49,13 @@ export class CodesService {
     }
   }
 
-  async findAllCodeDatas(query) {
-    let limit = parseInt(query.limit) || 3;
+  async findAllCodeDatas(query: { page: number }) {
+    let limit = 8;
     // let limit = 10
-    const page = parseInt(query.page) || 1;
+    const page = query.page || 1;
     // const page = 1;
-    if (limit === -1) {
-      limit = 0;
-    }
-    // const usersPortfolios = await this.portfolioModel.find(finalQueryObj)
-    //   .limit(limit)
-    //   .skip((page - 1) * limit)
-    //   .sort({ createdAt: "asc" })
-    //   .exec();
-    const codes = await this.codeModel.find().limit(limit).skip((page - 1) * limit).exec();
+
+    const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).exec();
     const totalCodeLength = await this.codeModel.count()
     const pageCountNumber = Math.ceil(totalCodeLength / limit)
     return { codes, pageCountNumber }
