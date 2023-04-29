@@ -16,8 +16,13 @@ export class CodesController {
     return this.codesService.createCodeDatas();
   }
 
-  @Get('/findAllCodes')
-  findAllCodes(@Query() queries: { page: number }) {
+  @Get('/findTrendingCodes')
+  findTrendingCodes() {
+    return this.codesService.findTrendingCodes()
+  }
+
+  @Get('/findAllCodesPaginated')
+  findAllCodesPaginated(@Query() queries: { page: number }) {
     console.log("🚀 ~ file: codes.controller.ts:21 ~ CodesController ~ findAllCodes ~ queries:", queries)
     return this.codesService.findAllCodeDatas(queries);
   }
