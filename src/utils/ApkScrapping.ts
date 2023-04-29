@@ -1,42 +1,39 @@
 import { chromium } from "playwright";
 
-const metaTags: any = [];
-export const main = () => {
+const apkScrapDataArray: any = [];
+export const apkScrapping = () => {
   return new Promise(async (resolve, reject) => {
     try {
-      //get browser instance
       const browser = await chromium.launch({ headless: false });
-      // Create a new browser context
       const context = await browser.newContext();
-
-      // Create a new page
       const page = await context.newPage();
-      // const page = await browser.newPage();
 
-      for (var i = 1; i < 2; i++) {
+      // for (var i=1420; ; i++) {
+      // for (var i = 1;i<=1420 ; i++) {
+        for (var i=1;i<2; i++) {
+        console.log('iindex',i)
         await page.goto(`https://www.revdl.com/page/${i}/`);
         const allReadMoreHref = await page.evaluate(() => {
-          const metaTags = [];
-          const metaTagElements = document.querySelectorAll('.tpcrn-read-more');
-          console.log('metaTagElements', metaTagElements);
-          metaTagElements.forEach(metaTagElement => {
-            const href = metaTagElement.getAttribute('href') || '';
-            console.log('href', href)
-            metaTags.push(href);
+          const readMoreArray = [];
+          const readMoreElements = document.querySelectorAll('.tpcrn-read-more');
+          console.log('metaTagElements', readMoreElements);
+          readMoreElements.forEach(readMoreElement => {
+            const href = readMoreElement.getAttribute('href') || '';
+            readMoreArray.push(href);
           });
-          return metaTags;
+          return readMoreArray;
         });
-
+        // if (allReadMoreHref.length === 0) {
+        //   console.log('break')
+        //   break;
+        // }
         for (var j = 0; j < allReadMoreHref.length; j++) {
+          // for (var j = 0; j < 1; j++) {
           var apkObj: any = {}
-
-
           await page.goto(allReadMoreHref[j])
-
           const title = await page.locator('.post-title h1').innerText() || ''
-          const imgSrc = await page.locator('.attachment-featured_image').getAttribute('src') || ''
+          const imgSrc = await page.locator('.attachment-featured_image').getAttribute('data-src') || ''
           const createdAt = await page.locator('.post-date').innerText() || ''
-
           const categoriesInnerText = await page.$eval('.entry_categories', (element) => {
             const anchors = Array.from(element.querySelectorAll('a'));
             const innerTextArray = anchors.map((anchor) => anchor.innerText || '');
@@ -44,60 +41,58 @@ export const main = () => {
             console.log('concatenatedText', concatenatedText)
             return concatenatedText;
           });
-
+      
           const fileVersionsSizeDeveloper = await page.$$eval('.dl-size', (elements) => {
             return elements.map(element => {
               const secondSpan = element.querySelector('span:nth-child(2)');
               return secondSpan ? secondSpan.textContent.trim() : '';
             });
-          });
+          }); 
+          const version = fileVersionsSizeDeveloper[0] ||'';
+          const fileSize = fileVersionsSizeDeveloper[1] ||'';
+          const developer = fileVersionsSizeDeveloper[2] ||'';
 
-          const version = fileVersionsSizeDeveloper[0] || '';
-          const fileSize = fileVersionsSizeDeveloper[1] || '';
-          const developer = fileVersionsSizeDeveloper[2] || '';
-
-          const parentInnerText = await page.$eval('.post_content.entry-content', (element) => {
-            // Get all the child elements under the parent element
+          const allInnerDescription = await page.$eval('.post_content.entry-content', (element) => {
             const children = Array.from(element.children);
-            // Filter out child elements with class "wp-caption" or "hatom-extra"
             const filteredChildren = children.filter((child) => !child.classList.contains('wp-caption') && !child.classList.contains('hatom-extra'));
-            // Extract the innerText from the filtered child elements
-            const innerTextArray = filteredChildren.map((child) => child.textContent.trim() || '');
-            // Join the innerText values with commas
-            return innerTextArray.join(',');
-          });
-
-          console.log('innerTexts', parentInnerText); // Output the innerTexts to the console
-
-          // // megamind
-          //  const imgSrcs = await page.$$eval('.post_content.entry-content img', imgs => imgs.map(img => img.getAttribute('src')));
-
-          // // Concatenate the img srcs with commas
-          // const imgSrcsString = imgSrcs.join(',');
-
-          // console.log(imgSrcsString);
-
+            const innerTextArray = filteredChildren.flatMap((child) => child.textContent.trim().split('\n')) || '';
+            // return innerTextArray.join(',');
+            return innerTextArray;
+          });   
+          console.log('innerTexts', allInnerDescription); // Output the innerTexts to the console
+          const imgSrcAll = await page.evaluate(() => {
+            var imgs = document.getElementsByClassName('post_content')[0].getElementsByTagName('img')
+            var srcs = [];
+            for (var i = 0; i < imgs.length; i++) {
+              srcs.push(imgs[i].getAttribute('data-src')||'');
+            }               
+            return srcs
+          }
+          )
+          console.log('imgSrcAll', imgSrcAll);
+          
           const downloadButtons = await page.$$('.download_button');
-          // Click on the first download button
           if (downloadButtons.length > 0) {
             await downloadButtons[0].click();
-            // Wait for navigation to complete with an increased timeout value of 30 seconds
             await page.waitForTimeout(10000); // Add a delay to allow time for new tab to open
-
             // Get the newly opened page
             const pages = await context.pages();
             const newPage = pages[pages.length - 1];
 
+            const requiredAndroid = await newPage.evaluate(() => {
+              var androidVersions = document?.getElementsByClassName('dl-version')[0]?.getElementsByTagName('span')[1]?.innerText ||''
+              return androidVersions
+            })
             const newPageExtractedMetaTags = await newPage.evaluate(() => {
-              const metaTagsArr: any = [];
-              const metaTagElements = document.querySelectorAll('.dl a');
-              metaTagElements.forEach(metaTagElement => {
-                const metaTag: any = {};
-                metaTag.href = metaTagElement.getAttribute('href') || '';
-                metaTag.innerText = metaTagElement.textContent.trim() || '';
-                metaTagsArr.push(metaTag);
+              const downloadLinkDetailArr: any = [];
+              const downloadLinkDetail = document.querySelectorAll('.dl a');
+              downloadLinkDetail.forEach(downloadLink => {
+                const downloadLinkObj: any = {};
+                downloadLinkObj.href = downloadLink.getAttribute('href') || '';
+                downloadLinkObj.innerText = downloadLink.textContent.trim() || '';
+                downloadLinkDetailArr.push(downloadLinkObj);
               });
-              return metaTagsArr;
+              return downloadLinkDetailArr;
             });
             apkObj.title = title
             apkObj.imgSrc = imgSrc
@@ -106,21 +101,24 @@ export const main = () => {
             apkObj.version = version
             apkObj.fileSize = fileSize
             apkObj.developer = developer
-            apkObj.allText = parentInnerText
+            apkObj.allText = allInnerDescription
+            apkObj.imgSrcAll = imgSrcAll
+            apkObj.requiredAndroid=requiredAndroid
             apkObj.downloadFile = newPageExtractedMetaTags
-            metaTags.push(apkObj)
+            apkScrapDataArray.push(apkObj)
           }
           // page.waitForTimeout(20000)
         }
       }
-      resolve(metaTags)
+      resolve(apkScrapDataArray)
+      // browser.close()
     }
-
     catch (error) {
-      reject('error')
+      resolve(apkScrapDataArray)
+      // reject('error')
       console.log('eeee', error)
+      
     }
-
   })
 }
 
