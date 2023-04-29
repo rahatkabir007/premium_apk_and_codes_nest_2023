@@ -24,6 +24,7 @@ export const codeScrapping = () => {
                         const url = el.querySelector('.post__thumb a').getAttribute('href');
                         const title = el.querySelector('.post__text .post__title a').textContent.trim();
                         const description = el.querySelector('.post__text .post__excerpt').textContent.trim();
+                        // const imgSrc = await page.locator('.attachment-featured_image').getAttribute('data-src') || ''
                         const imgSrc = el.querySelector('img').src;
                         const category = el.querySelector('.post__text .post__meta span a').textContent.trim();
                         const date = el.querySelector('.post__text .post__meta a time').textContent.trim();
@@ -66,7 +67,6 @@ export const codeScrapping = () => {
 
         catch (error) {
             resolve(codeDatasArray)
-            reject('error')
             console.log('eeee', error)
         }
 
