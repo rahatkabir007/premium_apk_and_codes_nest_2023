@@ -7,9 +7,19 @@ import { UpdateCodeDto } from './dto/update-code.dto';
 export class CodesController {
   constructor(private readonly codesService: CodesService) { }
 
-  @Post('/test')
-  test(@Body() createCode: CreateCodeDto) {
-    return this.codesService.create(createCode);
+  @Post('/postCodes')
+  postCodes() {
+    return this.codesService.createCodeDatas();
+  }
+
+  @Get('/findAllCodes')
+  findAllCodes() {
+    return this.codesService.findAllCodeDatas();
+  }
+
+  @Get('/findOneCode/:id')
+  findOneCode(@Param('id') id: string) {
+    return this.codesService.findOneCodeData(id);
   }
 
   @Post()

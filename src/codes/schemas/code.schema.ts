@@ -10,10 +10,25 @@ export type CodeDocument = Code & Document;
 @Schema({ timestamps: true })
 export class Code {
     @Prop({ required: true })
-    name: string;
+    title: string;
 
     @Prop({ required: true })
     description: string;
+
+    @Prop({ required: true })
+    img: string;
+
+    @Prop({ required: true })
+    category: string;
+
+    @Prop({ required: true })
+    date: string;
+
+    @Prop({ required: true })
+    url: string;
+
+    @Prop({ required: true })
+    downloadLinks: Array<string>;
 
 }
 

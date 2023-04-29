@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { ApksService } from './apks.service';
 import { CreateApkDto } from './dto/create-apk.dto';
 import { UpdateApkDto } from './dto/update-apk.dto';
@@ -15,18 +15,18 @@ export class ApksController {
 
 
   @Post()
-  create(@Body() createApkDto: CreateApkDto) {
-    return this.apksService.create(createApkDto);
+  async create(@Body() createApkDto: CreateApkDto) {
+    return await this.apksService.create(createApkDto);
   }
 
-  @Get()
-  findAll() {
-    return this.apksService.findAll();
+  @Get('/findAllApk')
+  async findAllApkCd( @Query() queries: {page:number}) {
+    return await this.apksService.findAllApkData(queries);
   }
 
-  @Get(':id')
+  @Get('/findOneApk/:id')
   findOne(@Param('id') id: string) {
-    return this.apksService.findOne(+id);
+    return this.apksService.findOneApk(id);
   }
 
   @Patch(':id')

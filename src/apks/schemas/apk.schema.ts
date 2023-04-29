@@ -28,17 +28,20 @@ export class APK {
     fileSize: string;
 
     @Prop({ required: true })
-    allText: string;
+    developer: string;
 
-    // @Prop({ required: true })
-    // downloadFile: {
-    //     type: [
-    //       {
-    //         href:  String,
-    //         innerText:String
-    //       }
-    //     ]
-    //   }
+    @Prop({ required: true })
+    allText:Array<string>;
+
+    @Prop({ required: true })
+    imgSrcAll: Array<string>;
+
+   
+    @Prop({ required: true })
+    requiredAndroid: string;
+    
+    @Prop({ required: true })
+    downloadFile: Array<{href:string,innerText:string}>;
 
 }
 
