@@ -64,7 +64,8 @@ export class CodesService {
     //   .exec();
     const codes = await this.codeModel.find().limit(limit).skip((page - 1) * limit).exec();
     const totalCodeLength = await this.codeModel.count()
-    return { codes, totalCodeLength }
+    const pageCountNumber = Math.ceil(totalCodeLength / limit)
+    return { codes, pageCountNumber }
   }
 
   async findOneCodeData(id) {
