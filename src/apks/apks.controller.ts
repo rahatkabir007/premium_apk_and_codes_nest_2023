@@ -24,6 +24,11 @@ export class ApksController {
     return await this.apksService.findAllApkData(queries);
   }
 
+  @Get('/findAllApkSearch')
+  async findAllApkS( @Query() queries: {search:string, page:number}) {
+    return await this.apksService.findAllApkDataSearch(queries);
+  }
+
   @Get('/findOneApk/:id')
   findOne(@Param('id') id: string) {
     return this.apksService.findOneApk(id);
