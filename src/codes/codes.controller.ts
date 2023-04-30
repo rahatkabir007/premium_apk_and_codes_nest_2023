@@ -32,6 +32,11 @@ export class CodesController {
     return await this.codesService.findAllSearchCodes(queries);
   }
 
+  @Get('/findAllCategorizedCodes')
+  async findAllCategorizedCodes(@Query() queries: { category: string, page: number }) {
+    return await this.codesService.findAllCategorizedCodes(queries);
+  }
+
   @Get('/findOneCode/:id')
   findOneCode(@Param('id') id: string) {
     return this.codesService.findOneCodeData(id);

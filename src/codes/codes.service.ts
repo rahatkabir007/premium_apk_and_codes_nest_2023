@@ -86,6 +86,16 @@ export class CodesService {
     return { searchedCodes, pageCountNumber }
   }
 
+  async findAllCategorizedCodes(query: { category: string, page: number }) {
+    const limit = 8;
+    const categoryValue = query.category;
+    const page = query.page;
+    const categorizedCodes = await this.codeModel.find({ category: categoryValue }).limit(limit).skip(((page as number) - 1) * (limit))
+    const categorizedCodesLength = await this.codeModel.find({ category: categoryValue }).count()
+    const pageCountNumber = Math.ceil(categorizedCodesLength / limit)
+    return { categorizedCodes, pageCountNumber }
+  }
+
 
 
   async findOneCodeData(id) {
