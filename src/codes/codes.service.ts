@@ -90,8 +90,8 @@ export class CodesService {
     const limit = 8;
     const categoryValue = query.category;
     const page = query.page;
-    const categorizedCodes = await this.codeModel.find({ category: categoryValue }).limit(limit).skip(((page as number) - 1) * (limit))
-    const categorizedCodesLength = await this.codeModel.find({ category: categoryValue }).count()
+    const categorizedCodes = await this.codeModel.find({ "category": { $regex: categoryValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
+    const categorizedCodesLength = await this.codeModel.find({ "category": { $regex: categoryValue, $options: 'i' } }).count()
     const pageCountNumber = Math.ceil(categorizedCodesLength / limit)
     return { categorizedCodes, pageCountNumber }
   }
