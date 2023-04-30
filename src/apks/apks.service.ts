@@ -35,9 +35,22 @@ export class ApksService {
     const limit = 4;
     const page = query.page;
     const apkAllData = await this.apkModel.find().limit(limit).skip(((page as number) - 1) * (limit))
-    const apkAllDataLength = (await this.apkModel.find()).length
+    const apkAllDataLength =await this.apkModel.find().count()
     console.log('apkAllDataLenght',apkAllDataLength)
     return { apkAllData, apkAllDataLength }
+  }
+
+  async findAllApkDataSearch(query: {search:string,page:number}) {
+    console.log('query',query.search)
+    console.log('page',query.page)
+    const limit = 4;
+    const searchValue = query.search;
+    const page = query.page;
+    const apkAllDataSearch = await this.apkModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
+    const apkAllDataLengthSearch = await this.apkModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
+    console.log('apkAllDataLenght', apkAllDataLengthSearch)
+    console.log('apkAllDataSearch',apkAllDataSearch)
+    return { apkAllDataSearch, apkAllDataLengthSearch }
   }
 
   async findOneApk(id: string) {
