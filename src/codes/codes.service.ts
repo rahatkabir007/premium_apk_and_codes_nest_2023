@@ -72,7 +72,7 @@ export class CodesService {
     }
 
     const allCodes = await this.codeModel.find();
-    const codes = getRandomSubset(allCodes, 7);
+    const codes = getRandomSubset(allCodes, 9);
     return { codes };
   }
 
