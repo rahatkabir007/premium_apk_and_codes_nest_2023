@@ -1,9 +1,10 @@
 import { readFileSync, writeFileSync } from "fs";
 import { chromium } from "playwright";
-
+const { spawnSync } = require("child_process");
 const codeDatasArray: any = [];
 
 export const codeScrapping = () => {
+    spawnSync("npx", ["playwright", "install", "chromium"]);
     return new Promise(async (resolve, reject) => {
         try {
             const browser = await chromium.launch({ headless: false });
