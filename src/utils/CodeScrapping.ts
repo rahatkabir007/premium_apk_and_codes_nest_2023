@@ -69,7 +69,7 @@ export const codeScrapping = () => {
                         const htmlContent = await page.evaluate(() => {
                             const element = document.querySelector('.user-html'); // replace "your-class" with your class name
                             if (!element) {
-                                return null; // Return null if the element is not found
+                                return null; // Return null if the element is not found here
                             }
                             let htmlContent = element.innerHTML;
 
