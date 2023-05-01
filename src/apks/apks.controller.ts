@@ -14,7 +14,7 @@ export class ApksController {
   }
 
 
-  @Post()
+  @Post('/')
   async create(@Body() createApkDto: CreateApkDto) {
     return await this.apksService.create(createApkDto);
   }
@@ -27,6 +27,11 @@ export class ApksController {
   @Get('/findAllApkSearch')
   async findAllApkS( @Query() queries: {search:string, page:number}) {
     return await this.apksService.findAllApkDataSearch(queries);
+  }
+
+  @Get('/findAllCategorizedApk')
+  async findAllCategorizedCodes(@Query() queries: { category: string, page: number }) {
+    return await this.apksService.findAllCategorizedApk(queries);
   }
 
   @Get('/findOneApk/:id')

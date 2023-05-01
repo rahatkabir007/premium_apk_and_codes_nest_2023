@@ -1,12 +1,48 @@
 import { chromium } from "playwright";
 
 const apkScrapDataArray: any = [];
+var catSubcat: any = [];
 export const apkScrapping = () => {
   return new Promise(async (resolve, reject) => {
     try {
       const browser = await chromium.launch({ headless: false });
       const context = await browser.newContext();
       const page = await context.newPage();
+      await page.goto('https://www.revdl.com/category/apps/');
+      await page.waitForTimeout(5000);
+
+      catSubcat = await page.evaluate(() => {
+      var obj = {}
+      var as = document.getElementsByTagName('a')
+      for (var i=0; i<as.length; i++) {	
+      if(as[i].href.split("/").length === 6) {
+		  const rrr = new RegExp("https:\/\/www\.revdl\.com\/category\/(.*)\/")
+		  const re = rrr.exec(as[i].href)
+		  const catName = re[1]
+		  obj[catName] = []
+      }
+      else if(as[i].href.split("/").length === 7) {
+          const rrr = new RegExp("https:\/\/www\.revdl\.com\/category\/(.*)\/(.*)\/")
+		  const re = rrr.exec(as[i].href)
+		  console.log(re.length)
+		  const catName = re[1]
+		  const subCatName = re[2]
+		  obj[catName].push(subCatName)
+      }
+    }
+
+    const keys = Object.keys(obj)
+    const arr = []
+    for (var i=0; i<keys.length; i++) {
+    const data = {}
+    data["catagory"] = keys[i]
+    
+    const values = obj[keys[i]]
+    data["subcatagory"] = values
+    arr.push(data)
+        }
+    return arr
+    })
 
       // for (var i=1420; ; i++) {
       // for (var i = 1;i<=1420 ; i++) {
@@ -33,7 +69,7 @@ export const apkScrapping = () => {
           await page.goto(allReadMoreHref[j])
           const title = await page.locator('.post-title h1').innerText() || ''
           const imgSrc = await page.locator('.attachment-featured_image').getAttribute('data-src') || ''
-          const createdAt = await page.locator('.post-date').innerText() || ''
+          const created = await page.locator('.post-date').innerText() || ''
           const categoriesInnerText = await page.$eval('.entry_categories', (element) => {
             const anchors = Array.from(element.querySelectorAll('a'));
             const innerTextArray = anchors.map((anchor) => anchor.innerText || '');
@@ -96,7 +132,7 @@ export const apkScrapping = () => {
             });
             apkObj.title = title
             apkObj.imgSrc = imgSrc
-            apkObj.createdAt = createdAt
+            apkObj.created = created
             apkObj.categories = categoriesInnerText
             apkObj.version = version
             apkObj.fileSize = fileSize
@@ -110,12 +146,16 @@ export const apkScrapping = () => {
           // page.waitForTimeout(20000)
         }
       }
+      const objj:any= {}
+      objj.catSub = catSubcat
+      console.log('objj',objj)
+      apkScrapDataArray.push(objj)
+      console.log('apkScrapDataArray',apkScrapDataArray)
       resolve(apkScrapDataArray)
       // browser.close()
     }
     catch (error) {
       resolve(apkScrapDataArray)
-      // reject('error')
       console.log('eeee', error)
       
     }

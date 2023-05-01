@@ -35,9 +35,12 @@ export class ApksService {
     const limit = 4;
     const page = query.page;
     const apkAllData = await this.apkModel.find().limit(limit).skip(((page as number) - 1) * (limit))
-    const apkAllDataLength =await this.apkModel.find().count()
-    console.log('apkAllDataLenght',apkAllDataLength)
-    return { apkAllData, apkAllDataLength }
+    const apkAllDataLength = (await this.apkModel.find().count())-1
+    const catSubLastObj = await this.apkModel.findOne({title:null});
+    const catSub=catSubLastObj.catSub
+    console.log('catSubLastObj',catSubLastObj.catSub)
+    console.log('apkAllDataLength',apkAllDataLength)
+    return { apkAllData, apkAllDataLength, catSub }
   }
 
   async findAllApkDataSearch(query: {search:string,page:number}) {
@@ -48,14 +51,33 @@ export class ApksService {
     const page = query.page;
     const apkAllDataSearch = await this.apkModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
     const apkAllDataLengthSearch = await this.apkModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
+    const catSubLastObj = await this.apkModel.findOne({title:null});
+    const catSub=catSubLastObj.catSub
     console.log('apkAllDataLenght', apkAllDataLengthSearch)
     console.log('apkAllDataSearch',apkAllDataSearch)
-    return { apkAllDataSearch, apkAllDataLengthSearch }
+    return { apkAllDataSearch, apkAllDataLengthSearch,catSub }
+  }
+
+  async findAllCategorizedApk(query: { category: string, page: number }) {
+    const limit = 4;
+    const apkValue = query.category;
+    const page = query.page;
+    const categorizedApk = await this.apkModel.find({ "categories": { $regex: apkValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
+    const apkAllDataLengthCategorized = await this.apkModel.find({ "categories": { $regex: apkValue, $options: 'i' } }).count()
+    // const pageCountNumber = Math.ceil(categorizedCodesLength / limit)
+    const catSubLastObj = await this.apkModel.findOne({title:null});
+    const catSub = catSubLastObj.catSub
+    console.log('categorizedApk',categorizedApk)
+    console.log('apkAllDataLengthCategorized',apkAllDataLengthCategorized)
+    return { categorizedApk, apkAllDataLengthCategorized,catSub}
   }
 
   async findOneApk(id: string) {
     const apkOne = await this.apkModel.findOne({ _id: id })
-    return apkOne
+    const catSubLastObj = await this.apkModel.findOne({title:null})
+    const catSub=catSubLastObj.catSub
+    console.log('catSubLastObj',catSubLastObj.catSub)
+    return { apkOne, catSub }
   }
 
   update(id: number, updateApkDto: UpdateApkDto) {
