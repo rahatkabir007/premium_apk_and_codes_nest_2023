@@ -27,6 +27,9 @@ export class Code {
     @Prop({ required: true })
     url: string;
 
+    @Prop()
+    htmlContent: string;
+
     @Prop({ required: true })
     downloadLinks: Array<string>;
 

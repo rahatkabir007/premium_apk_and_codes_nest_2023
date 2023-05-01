@@ -61,7 +61,7 @@ export const codeScrapping = () => {
                         return link.textContent;
                     });
                     await page.waitForTimeout(2000);
-                    if (linkText.includes("codecanyon")) {
+                    if (linkText.includes("https://codecanyon.net")) {
 
                         await page.goto(linkText);
                         await page.waitForTimeout(2000);
@@ -90,16 +90,18 @@ export const codeScrapping = () => {
                         codeObj.downloadLinks = downloadLinks;
                         codeObj.htmlContent = htmlContent || "";
                         codeDatasArray.push(codeObj)
+                        // codecanyon scrap
                     }
-                    // codecanyon scrap
-                    codeObj.title = title;
-                    codeObj.description = description;
-                    codeObj.img = img;
-                    codeObj.category = category;
-                    codeObj.date = date;
-                    codeObj.url = linkText
-                    codeObj.downloadLinks = downloadLinks;
-                    codeDatasArray.push(codeObj)
+                    else {
+                        codeObj.title = title;
+                        codeObj.description = description;
+                        codeObj.img = img;
+                        codeObj.category = category;
+                        codeObj.date = date;
+                        codeObj.url = linkText
+                        codeObj.downloadLinks = downloadLinks;
+                        codeDatasArray.push(codeObj)
+                    }
                 }
             }
             resolve(codeDatasArray)
