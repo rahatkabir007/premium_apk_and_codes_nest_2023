@@ -17,6 +17,7 @@ export const codeScrapping = () => {
             }
             // for (var i = parsedPageNumber; i < 2; i++){
             for (var i = parsedPageNumber; ; i++) {
+                await page.waitForTimeout(10000)
                 await page.goto(`https://codelist.cc/pgs/${i}/`);
                 await page.waitForTimeout(2000)
                 const codeDatas = await page.$$eval('.post--vertical', (codeData) => {
@@ -60,27 +61,37 @@ export const codeScrapping = () => {
                         return link.textContent;
                     });
                     await page.waitForTimeout(2000);
-                    await page.goto(linkText);
-                    await page.waitForTimeout(4000);
+                    if (linkText.includes("codecanyon")) {
 
-                    const htmlContent = await page.evaluate(() => {
-                        const element = document.querySelector('.user-html'); // replace "your-class" with your class name
-                        if (!element) {
-                            return null; // Return null if the element is not found
-                        }
-                        let htmlContent = element.innerHTML;
+                        await page.goto(linkText);
+                        await page.waitForTimeout(2000);
 
-                        // Replace newline characters with <br/>
-                        htmlContent = htmlContent.replace(/\n/g, '');
+                        const htmlContent = await page.evaluate(() => {
+                            const element = document.querySelector('.user-html'); // replace "your-class" with your class name
+                            if (!element) {
+                                return null; // Return null if the element is not found
+                            }
+                            let htmlContent = element.innerHTML;
 
-                        // Replace <span> elements with <img> elements
-                        htmlContent = htmlContent.replace(/<span([^>]*)data-src="([^"]*)"([^>]*)data-alt="([^"]*)"[^>]*><\/span>/g, '<img$1src="$2"$3alt="$4">');
+                            // Replace newline characters with <br/>
+                            htmlContent = htmlContent.replace(/\n/g, '');
 
-                        return htmlContent || "";
-                    });
+                            // Replace <span> elements with <img> elements
+                            htmlContent = htmlContent.replace(/<span([^>]*)data-src="([^"]*)"([^>]*)data-alt="([^"]*)"[^>]*><\/span>/g, '<img$1src="$2"$3alt="$4">');
 
+                            return htmlContent || "";
+                        });
+                        codeObj.title = title;
+                        codeObj.description = description;
+                        codeObj.img = img;
+                        codeObj.category = category;
+                        codeObj.date = date;
+                        codeObj.url = linkText
+                        codeObj.downloadLinks = downloadLinks;
+                        codeObj.htmlContent = htmlContent || "";
+                        codeDatasArray.push(codeObj)
+                    }
                     // codecanyon scrap
-
                     codeObj.title = title;
                     codeObj.description = description;
                     codeObj.img = img;
@@ -88,7 +99,6 @@ export const codeScrapping = () => {
                     codeObj.date = date;
                     codeObj.url = linkText
                     codeObj.downloadLinks = downloadLinks;
-                    codeObj.htmlContent = htmlContent || "";
                     codeDatasArray.push(codeObj)
                 }
             }

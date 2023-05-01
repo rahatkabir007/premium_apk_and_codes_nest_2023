@@ -40,11 +40,11 @@ export class CodesService {
   async createCodeDatas() {
     try {
       const result: any = await codeScrapping();
-      // for (let i = 0; i < result?.length; i++) {
-      //   await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
-      // }
-      // return "Inserted To DB"
-      return result
+      for (let i = 0; i < result?.length; i++) {
+        await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
+      }
+      return "Inserted To DB"
+      // return result
     } catch (error) {
       console.error(error);
     }
@@ -56,7 +56,7 @@ export class CodesService {
     const page = query.page || 1;
     // const page = 1;
 
-    const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).exec();
+    const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).sort({ date: -1 }).exec();
     const totalCodeLength = await this.codeModel.count()
     const pageCountNumber = Math.ceil(totalCodeLength / limit)
     return { codes, pageCountNumber }
