@@ -85,7 +85,7 @@ export const codeScrapping = () => {
                     codeObj.img = img;
                     codeObj.category = category;
                     codeObj.date = date;
-                    codeObj.url = url
+                    codeObj.url = linkText
                     codeObj.downloadLinks = downloadLinks;
                     codeObj.htmlContent = htmlContent || "";
                     codeDatasArray.push(codeObj)
