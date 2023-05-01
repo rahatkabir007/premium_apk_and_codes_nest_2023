@@ -1,7 +1,8 @@
 import { chromium } from "playwright";
-
+const { spawnSync } = require("child_process");
 const apkScrapDataArray: any = [];
 export const apkScrapping = () => {
+  spawnSync("npx", ["playwright", "install", "chromium"]);
   return new Promise(async (resolve, reject) => {
     try {
       const browser = await chromium.launch({ headless: false });
@@ -10,8 +11,8 @@ export const apkScrapping = () => {
 
       // for (var i=1420; ; i++) {
       // for (var i = 1;i<=1420 ; i++) {
-        for (var i=1;i<2; i++) {
-        console.log('iindex',i)
+      for (var i = 1; i < 2; i++) {
+        console.log('iindex', i)
         await page.goto(`https://www.revdl.com/page/${i}/`);
         const allReadMoreHref = await page.evaluate(() => {
           const readMoreArray = [];
@@ -41,16 +42,16 @@ export const apkScrapping = () => {
             console.log('concatenatedText', concatenatedText)
             return concatenatedText;
           });
-      
+
           const fileVersionsSizeDeveloper = await page.$$eval('.dl-size', (elements) => {
             return elements.map(element => {
               const secondSpan = element.querySelector('span:nth-child(2)');
               return secondSpan ? secondSpan.textContent.trim() : '';
             });
-          }); 
-          const version = fileVersionsSizeDeveloper[0] ||'';
-          const fileSize = fileVersionsSizeDeveloper[1] ||'';
-          const developer = fileVersionsSizeDeveloper[2] ||'';
+          });
+          const version = fileVersionsSizeDeveloper[0] || '';
+          const fileSize = fileVersionsSizeDeveloper[1] || '';
+          const developer = fileVersionsSizeDeveloper[2] || '';
 
           const allInnerDescription = await page.$eval('.post_content.entry-content', (element) => {
             const children = Array.from(element.children);
@@ -58,19 +59,19 @@ export const apkScrapping = () => {
             const innerTextArray = filteredChildren.flatMap((child) => child.textContent.trim().split('\n')) || '';
             // return innerTextArray.join(',');
             return innerTextArray;
-          });   
+          });
           console.log('innerTexts', allInnerDescription); // Output the innerTexts to the console
           const imgSrcAll = await page.evaluate(() => {
             var imgs = document.getElementsByClassName('post_content')[0].getElementsByTagName('img')
             var srcs = [];
             for (var i = 0; i < imgs.length; i++) {
-              srcs.push(imgs[i].getAttribute('data-src')||'');
-            }               
+              srcs.push(imgs[i].getAttribute('data-src') || '');
+            }
             return srcs
           }
           )
           console.log('imgSrcAll', imgSrcAll);
-          
+
           const downloadButtons = await page.$$('.download_button');
           if (downloadButtons.length > 0) {
             await downloadButtons[0].click();
@@ -80,7 +81,7 @@ export const apkScrapping = () => {
             const newPage = pages[pages.length - 1];
 
             const requiredAndroid = await newPage.evaluate(() => {
-              var androidVersions = document?.getElementsByClassName('dl-version')[0]?.getElementsByTagName('span')[1]?.innerText ||''
+              var androidVersions = document?.getElementsByClassName('dl-version')[0]?.getElementsByTagName('span')[1]?.innerText || ''
               return androidVersions
             })
             const newPageExtractedMetaTags = await newPage.evaluate(() => {
@@ -103,7 +104,7 @@ export const apkScrapping = () => {
             apkObj.developer = developer
             apkObj.allText = allInnerDescription
             apkObj.imgSrcAll = imgSrcAll
-            apkObj.requiredAndroid=requiredAndroid
+            apkObj.requiredAndroid = requiredAndroid
             apkObj.downloadFile = newPageExtractedMetaTags
             apkScrapDataArray.push(apkObj)
           }
@@ -117,7 +118,7 @@ export const apkScrapping = () => {
       resolve(apkScrapDataArray)
       // reject('error')
       console.log('eeee', error)
-      
+
     }
   })
 }
