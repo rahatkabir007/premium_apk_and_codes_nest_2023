@@ -7,7 +7,7 @@ export const codeScrapping = () => {
     spawnSync("npx", ["playwright", "install", "chromium"]);
     return new Promise(async (resolve, reject) => {
         try {
-            const browser = await chromium.launch({ headless: false });
+            const browser = await chromium.launch({ headless: true });
             const context = await browser.newContext();
             const page = await context.newPage();
             let pageNumber = readFileSync("./codePageNumber").toString()
@@ -48,7 +48,6 @@ export const codeScrapping = () => {
                     const img = codeDatas[j].imgSrc;
                     const category = codeDatas[j].category;
                     const date = codeDatas[j].date;
-                    const url = codeDatas[j].url
                     const downloadLinks = await page.evaluate(() => {
                         //@ts-ignore
                         const downloadLinksArr = document.getElementsByClassName('quote')[0].innerText.split("\n")
