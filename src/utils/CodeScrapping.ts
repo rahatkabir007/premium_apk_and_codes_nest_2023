@@ -52,6 +52,34 @@ export const codeScrapping = () => {
                         const downloadLinksArr = document.getElementsByClassName('quote')[0].innerText.split("\n")
                         return downloadLinksArr.filter((item) => item !== "");
                     })
+
+                    //codecanyon scrap
+                    const linkText = await page.evaluate(() => {
+                        const link = document.querySelector('.single-body a');
+                        return link.textContent;
+                    });
+                    await page.waitForTimeout(2000);
+                    await page.goto(linkText);
+                    await page.waitForTimeout(4000);
+
+                    const htmlContent = await page.evaluate(() => {
+                        const element = document.querySelector('.user-html'); // replace "your-class" with your class name
+                        if (!element) {
+                            return null; // Return null if the element is not found
+                        }
+                        let htmlContent = element.innerHTML;
+
+                        // Replace newline characters with <br/>
+                        htmlContent = htmlContent.replace(/\n/g, '');
+
+                        // Replace <span> elements with <img> elements
+                        htmlContent = htmlContent.replace(/<span([^>]*)data-src="([^"]*)"([^>]*)data-alt="([^"]*)"[^>]*><\/span>/g, '<img$1src="$2"$3alt="$4">');
+
+                        return htmlContent || "";
+                    });
+
+                    // codecanyon scrap
+
                     codeObj.title = title;
                     codeObj.description = description;
                     codeObj.img = img;
@@ -59,6 +87,7 @@ export const codeScrapping = () => {
                     codeObj.date = date;
                     codeObj.url = url
                     codeObj.downloadLinks = downloadLinks;
+                    codeObj.htmlContent = htmlContent || "";
                     codeDatasArray.push(codeObj)
                 }
             }

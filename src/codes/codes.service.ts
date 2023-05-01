@@ -40,10 +40,11 @@ export class CodesService {
   async createCodeDatas() {
     try {
       const result: any = await codeScrapping();
-      for (let i = 0; i < result?.length; i++) {
-        await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
-      }
-      return "Inserted To DB"
+      // for (let i = 0; i < result?.length; i++) {
+      //   await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
+      // }
+      // return "Inserted To DB"
+      return result
     } catch (error) {
       console.error(error);
     }
