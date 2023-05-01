@@ -1,7 +1,8 @@
 import { chromium } from "playwright";
-
+const { spawnSync } = require("child_process");
 const apkScrapDataArray: any = [];
 export const apkScrapping = () => {
+  spawnSync("npx", ["playwright", "install", "chromium"]);
   return new Promise(async (resolve, reject) => {
     try {
       const browser = await chromium.launch({ headless: true });
