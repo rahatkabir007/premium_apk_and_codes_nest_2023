@@ -1,7 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res } from '@nestjs/common';
 import { ApksService } from './apks.service';
 import { CreateApkDto } from './dto/create-apk.dto';
 import { UpdateApkDto } from './dto/update-apk.dto';
+import { Response } from 'express';
+let isWorking = false;
 
 @Controller('apks')
 export class ApksController {
@@ -9,15 +11,30 @@ export class ApksController {
 
 
   @Post('/test')
-  test(@Body() createApk: CreateApkDto) {
-    return this.apksService.create(createApk);
+async test(@Res() res: Response) {
+    if (isWorking) {
+      //@ts-ignore
+    return res.status(409).json({ message: 'Work in progress' });
+  }
+  isWorking = true
+    return await this.apksService.create(res,isWorking);
   }
 
+  // @Post('/test')
+  // test(@Body() createApk: CreateApkDto) {
+  //   return this.apksService.create(createApk);
+  // }
 
-  @Post('/')
-  async create(@Body() createApkDto: CreateApkDto) {
-    return await this.apksService.create(createApkDto);
-  }
+
+  // @Post('/')
+  // async create(@Res() res: Response) {
+  //   if (isWorking) {
+  //     //@ts-ignore
+  //   return res.status(409).json({ message: 'Work in progress' });
+  // }
+  // isWorking = true
+  //   return await this.apksService.create(res,isWorking);
+  // }
 
   @Get('/findAllApk')
   async findAllApkCd( @Query() queries: {page:number}) {
@@ -30,7 +47,7 @@ export class ApksController {
   }
 
   @Get('/findAllCategorizedApk')
-  async findAllCategorizedCodes(@Query() queries: { category: string, page: number }) {
+  async findAllCategorizedCodes(@Query() queries: { category: string, page: number,subCat:string }) {
     return await this.apksService.findAllCategorizedApk(queries);
   }
 

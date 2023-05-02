@@ -6,7 +6,7 @@ export const apkScrapping = () => {
   spawnSync("npx", ["playwright", "install", "chromium"]);
   return new Promise(async (resolve, reject) => {
     try {
-      const browser = await chromium.launch({ headless: true });
+      const browser = await chromium.launch({ headless: false });
       const context = await browser.newContext();
       const page = await context.newPage();
       await page.goto('https://www.revdl.com/category/apps/');
@@ -46,8 +46,9 @@ export const apkScrapping = () => {
     })
 
       // for (var i=1420; ; i++)  {
+      // for (var i = 1; ; i++) {
       // for (var i = 1;i<=1420 ; i++) {
-      for (var i = 1; i < 2; i++) {
+      for (var i = 1; i < 4; i++) {
         console.log('iindex', i)
         await page.goto(`https://www.revdl.com/page/${i}/`);
         const allReadMoreHref = await page.evaluate(() => {
@@ -60,10 +61,10 @@ export const apkScrapping = () => {
           });
           return readMoreArray;
         });
-        // if (allReadMoreHref.length === 0) {
-        //   console.log('break')
-        //   break;
-        // }
+        if (allReadMoreHref.length === 0) {
+          console.log('break')
+          break;
+        }
         for (var j = 0; j < allReadMoreHref.length; j++) {
           // for (var j = 0; j < 1; j++) {
           var apkObj: any = {}
@@ -147,11 +148,11 @@ export const apkScrapping = () => {
           // page.waitForTimeout(20000)
         }
       }
-      const objj:any= {}
-      objj.catSub = catSubcat
-      console.log('objj',objj)
-      apkScrapDataArray.push(objj)
-      console.log('apkScrapDataArray',apkScrapDataArray)
+      // const objj:any= {}
+      // objj.catSub = catSubcat
+      // console.log('objj',objj)
+      // apkScrapDataArray.push(objj)
+      // console.log('apkScrapDataArray',apkScrapDataArray)
       resolve(apkScrapDataArray)
       // browser.close()
     }

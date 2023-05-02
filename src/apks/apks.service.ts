@@ -15,69 +15,101 @@ export class ApksService {
     // eslint-disable-next-line no-empty-function
   ) { }
 
-  async create(createApkDto: CreateApkDto) {
-    try {
+  
+    // async create(createApkDto: CreateApkDto) {
+    // try {
+    //   const result:any = await apkScrapping(); // Call the main function and capture the return value
+    //   console.log('apkObj', result); // Output the return value to the console
+    //   //  for (let i = 0; i < result?.length; i++) {
+    //   //   await this.apkModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
+    //   // }
+    //   const promises = result.map(async (data) => {
+    //     await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+    //   });
+    //   await Promise.all(promises);
+    //   return `Inserted To DB ${result}`
+    // } catch (error) {
+    //   console.error(error);
+    //   return error
+    //   }
+    // }
+
+ async create(res, isWorking) {
+    res.send('Scrapping Initiated');
+    console.log("route hit");
+    setTimeout(async () => {
+      try {
+      console.log('Timeout hit');
       const result:any = await apkScrapping(); // Call the main function and capture the return value
-      console.log('apkObj', result); // Output the return value to the console
-       for (let i = 0; i < result?.length; i++) {
-        await this.apkModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
-      }
-      return `Inserted To DB ${result}`
+      const promises = result.map(async (data) => {
+        await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+      });
+      
+      await Promise.all(promises);
+      console.log('DB insert');
+      isWorking = false
+      return "Inserted to DB"
+      // res.send("Inserted to DB")
+        
     } catch (error) {
       console.error(error);
-      return error
+      isWorking = false
+      res.status(500).send('Error occurred during scraping');
     }
-  
+    }, 3000);
   }
+ 
 
   async findAllApkData(query: {page:number}) {
     console.log('query',query.page)
-    const limit = 4;
+    const limit = 8;
     const page = query.page;
     const apkAllData = await this.apkModel.find().limit(limit).skip(((page as number) - 1) * (limit))
-    const apkAllDataLength = (await this.apkModel.find().count())-1
-    const catSubLastObj = await this.apkModel.findOne({title:null});
-    const catSub=catSubLastObj.catSub
-    console.log('catSubLastObj',catSubLastObj.catSub)
+    const apkAllDataLength = (await this.apkModel.find().count())
     console.log('apkAllDataLength',apkAllDataLength)
-    return { apkAllData, apkAllDataLength, catSub }
+    return { apkAllData, apkAllDataLength }
   }
 
   async findAllApkDataSearch(query: {search:string,page:number}) {
     console.log('query',query.search)
     console.log('page',query.page)
-    const limit = 4;
+    const limit = 8;
     const searchValue = query.search;
     const page = query.page;
     const apkAllDataSearch = await this.apkModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
     const apkAllDataLengthSearch = await this.apkModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
-    const catSubLastObj = await this.apkModel.findOne({title:null});
-    const catSub=catSubLastObj.catSub
+    // const catSubLastObj = await this.apkModel.findOne({title:null});
+    // const catSub=catSubLastObj.catSub
     console.log('apkAllDataLenght', apkAllDataLengthSearch)
     console.log('apkAllDataSearch',apkAllDataSearch)
-    return { apkAllDataSearch, apkAllDataLengthSearch,catSub }
+    return { apkAllDataSearch, apkAllDataLengthSearch }
   }
 
-  async findAllCategorizedApk(query: { category: string, page: number }) {
-    const limit = 4;
+  async findAllCategorizedApk(query: { category: string, page: number,subCat:string }) {
+    const limit =8;
     const apkValue = query.category;
     const page = query.page;
-    const categorizedApk = await this.apkModel.find({ "categories": { $regex: apkValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
-    const apkAllDataLengthCategorized = await this.apkModel.find({ "categories": { $regex: apkValue, $options: 'i' } }).count()
+    const subCat = query.subCat || ''
+    console.log('subCat');
+    const categorizedApk = await this.apkModel.find({
+      "categories": { $regex: `.*${apkValue}.* `&& `.*${subCat}.*`, $options: 'i' },
+        // { "categories": { $regex: `.*${subCat}.*${apkValue}.*`, $options: 'i' } },
+    }).limit(limit).skip(((page as number) - 1) * (limit))
+    
+    const apkAllDataLengthCategorized = await this.apkModel.find({
+      "categories": { $regex: `.*${apkValue}.*` && `.*${subCat}.*`, $options: 'i' },
+    }).count()
     // const pageCountNumber = Math.ceil(categorizedCodesLength / limit)
-    const catSubLastObj = await this.apkModel.findOne({title:null});
-    const catSub = catSubLastObj.catSub
+    // const catSubLastObj = await this.apkModel.findOne({title:null});
+    // const catSub = catSubLastObj.catSub
     console.log('categorizedApk',categorizedApk)
     console.log('apkAllDataLengthCategorized',apkAllDataLengthCategorized)
-    return { categorizedApk, apkAllDataLengthCategorized,catSub}
+    return { categorizedApk, apkAllDataLengthCategorized}
   }
 
   async findOneApk(id: string) {
     const apkOne = await this.apkModel.findOne({ _id: id })
-    const catSubLastObj = await this.apkModel.findOne({title:null})
-    const catSub=catSubLastObj.catSub
-    console.log('catSubLastObj',catSubLastObj.catSub)
-    return { apkOne, catSub }
+    return { apkOne}
   }
 
   update(id: number, updateApkDto: UpdateApkDto) {
