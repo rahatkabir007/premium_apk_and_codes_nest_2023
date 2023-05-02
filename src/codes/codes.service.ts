@@ -39,10 +39,12 @@ export class CodesService {
 
   async createCodeDatas() {
     try {
+      console.log("route hit");
       const result: any = await codeScrapping();
       for (let i = 0; i < result?.length; i++) {
         await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
       }
+      console.log("DB insert");
       return "Inserted To DB"
       // return result
     } catch (error) {
