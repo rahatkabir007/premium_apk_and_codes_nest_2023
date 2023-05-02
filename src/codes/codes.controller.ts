@@ -1,8 +1,12 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
 import { CodesService } from './codes.service';
 import { CreateCodeDto } from './dto/create-code.dto';
 import { UpdateCodeDto } from './dto/update-code.dto';
 
+interface QueryData {
+  page?: string,
+  limit?: string
+}
 @Controller('codes')
 export class CodesController {
   constructor(private readonly codesService: CodesService) { }
@@ -12,9 +16,25 @@ export class CodesController {
     return this.codesService.createCodeDatas();
   }
 
-  @Get('/findAllCodes')
-  findAllCodes() {
-    return this.codesService.findAllCodeDatas();
+  @Get('/findAllCodesPaginated')
+  findAllCodesPaginated(@Query() queries: { page: number }) {
+    console.log("🚀 ~ file: codes.controller.ts:21 ~ CodesController ~ findAllCodes ~ queries:", queries)
+    return this.codesService.findAllCodeDatas(queries);
+  }
+
+  @Get('/findTrendingCodes')
+  findTrendingCodes() {
+    return this.codesService.findTrendingCodes()
+  }
+
+  @Get('/findAllSearchCodes')
+  async findAllSearchCodes(@Query() queries: { search: string, page: number }) {
+    return await this.codesService.findAllSearchCodes(queries);
+  }
+
+  @Get('/findAllCategorizedCodes')
+  async findAllCategorizedCodes(@Query() queries: { category: string, page: number }) {
+    return await this.codesService.findAllCategorizedCodes(queries);
   }
 
   @Get('/findOneCode/:id')

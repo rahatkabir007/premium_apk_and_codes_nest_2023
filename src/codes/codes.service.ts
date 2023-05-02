@@ -44,15 +44,60 @@ export class CodesService {
         await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
       }
       return "Inserted To DB"
+      // return result
     } catch (error) {
       console.error(error);
     }
   }
 
-  async findAllCodeDatas() {
-    const codes = await this.codeModel.find()
-    return codes
+  async findAllCodeDatas(query: { page: number }) {
+    let limit = 8;
+    // let limit = 10
+    const page = query.page || 1;
+    // const page = 1;
+
+    const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).sort({ date: -1 }).exec();
+    const totalCodeLength = await this.codeModel.count()
+    const pageCountNumber = Math.ceil(totalCodeLength / limit)
+    return { codes, pageCountNumber }
   }
+
+  async findTrendingCodes() {
+    function getRandomSubset(array, count) {
+      const shuffledArray = array.slice(); // Create a copy of the original array
+      for (let i = shuffledArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+      }
+      return shuffledArray.slice(0, count);
+    }
+
+    const allCodes = await this.codeModel.find();
+    const codes = getRandomSubset(allCodes, 9);
+    return { codes };
+  }
+
+  async findAllSearchCodes(query: { search: string, page: number }) {
+    const limit = 8;
+    const searchValue = query.search;
+    const page = query.page;
+    const searchedCodes = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
+    const searchedCodesLength = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
+    const pageCountNumber = Math.ceil(searchedCodesLength / limit)
+    return { searchedCodes, pageCountNumber }
+  }
+
+  async findAllCategorizedCodes(query: { category: string, page: number }) {
+    const limit = 8;
+    const categoryValue = query.category;
+    const page = query.page;
+    const categorizedCodes = await this.codeModel.find({ "category": { $regex: categoryValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
+    const categorizedCodesLength = await this.codeModel.find({ "category": { $regex: categoryValue, $options: 'i' } }).count()
+    const pageCountNumber = Math.ceil(categorizedCodesLength / limit)
+    return { categorizedCodes, pageCountNumber }
+  }
+
+
 
   async findOneCodeData(id) {
     const code = await this.codeModel.findOne({ _id: id })
