@@ -44,7 +44,7 @@ export const apkScrapping = () => {
     return arr
     })
 
-      // for (var i=1420; ; i++) {
+      // for (var i=1420; ; i++)  {
       // for (var i = 1;i<=1420 ; i++) {
         for (var i=1;i<2; i++) {
         console.log('iindex',i)
