@@ -4,17 +4,19 @@ import { CreateCodeDto } from './dto/create-code.dto';
 import { UpdateCodeDto } from './dto/update-code.dto';
 import { Response } from 'express';
 
-interface QueryData {
-  page?: string,
-  limit?: string
-}
+let isWorking = false;
 @Controller('codes')
 export class CodesController {
   constructor(private readonly codesService: CodesService) { }
 
+
   @Post('/postCodes')
   postCodes(@Res() res: Response) {
-    return this.codesService.createCodeDatas(res);
+    if (isWorking) {
+      return res.status(409).json({ message: 'Work in progress' });
+    }
+    isWorking = true
+    return this.codesService.createCodeDatas(res, isWorking);
   }
 
   @Get('/findAllCodesPaginated')
