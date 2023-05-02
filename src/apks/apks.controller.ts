@@ -11,13 +11,13 @@ export class ApksController {
 
 
   @Post('/test')
-async test(@Res() res: Response) {
+async test(@Res() res: Response,@Query() queries: {page:number}) {
     if (isWorking) {
       //@ts-ignore
     return res.status(409).json({ message: 'Work in progress' });
   }
   isWorking = true
-    return await this.apksService.create(res,isWorking);
+    return await this.apksService.create(res,isWorking, queries);
   }
 
   // @Post('/test')

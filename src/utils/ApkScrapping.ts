@@ -2,7 +2,7 @@ import { chromium } from "playwright";
 const { spawnSync } = require("child_process");
 const apkScrapDataArray: any = [];
 var catSubcat: any = [];
-export const apkScrapping = () => {
+export const apkScrapping = (totaPage) => {
   spawnSync("npx", ["playwright", "install", "chromium"]);
   return new Promise(async (resolve, reject) => {
     try {
@@ -44,11 +44,12 @@ export const apkScrapping = () => {
         }
     return arr
     })
-
+    console.log('page', totaPage)
       // for (var i=1420; ; i++)  {
       // for (var i = 1; ; i++) {
       // for (var i = 1;i<=1420 ; i++) {
-      for (var i = 1; i < 4; i++) {
+      for (var i = 1;i<=totaPage ; i++) {
+      // for (var i = 1; i < 4; i++) {
         console.log('iindex', i)
         await page.goto(`https://www.revdl.com/page/${i}/`);
         const allReadMoreHref = await page.evaluate(() => {

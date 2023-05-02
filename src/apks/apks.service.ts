@@ -34,13 +34,13 @@ export class ApksService {
     //   }
     // }
 
- async create(res, isWorking) {
+ async create(res, isWorking,queries: {page:number}) {
     res.send('Scrapping Initiated');
     console.log("route hit");
     setTimeout(async () => {
       try {
       console.log('Timeout hit');
-      const result:any = await apkScrapping(); // Call the main function and capture the return value
+      const result:any = await apkScrapping(queries.page); // Call the main function and capture the return value
       const promises = result.map(async (data) => {
         await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
       });
@@ -90,14 +90,17 @@ export class ApksService {
     const apkValue = query.category;
     const page = query.page;
     const subCat = query.subCat || ''
-    console.log('subCat');
+    console.log('subCat',subCat,apkValue,page);
     const categorizedApk = await this.apkModel.find({
-      "categories": { $regex: `.*${apkValue}.* `&& `.*${subCat}.*`, $options: 'i' },
-        // { "categories": { $regex: `.*${subCat}.*${apkValue}.*`, $options: 'i' } },
+      "categories": { $regex: `.*${apkValue}.*${subCat}|.*${subCat}.*${apkValue}.*`, $options: 'i' }
+      // "categories": { $regex: `.*${apkValue}.* `&& `.*${subCat}.*`, $options: 'i' },
+        // "categories": { $regex: subCat, $options: 'i' } ,
     }).limit(limit).skip(((page as number) - 1) * (limit))
     
     const apkAllDataLengthCategorized = await this.apkModel.find({
-      "categories": { $regex: `.*${apkValue}.*` && `.*${subCat}.*`, $options: 'i' },
+      "categories": { $regex: `.*${apkValue}.*${subCat}|.*${subCat}.*${apkValue}.*`, $options: 'i' }
+      // "categories": { $regex: `.*${apkValue}.*` && `.*${subCat}.*`, $options: 'i' },
+      // "categories": { $regex: subCat, $options: 'i' } ,
     }).count()
     // const pageCountNumber = Math.ceil(categorizedCodesLength / limit)
     // const catSubLastObj = await this.apkModel.findOne({title:null});
