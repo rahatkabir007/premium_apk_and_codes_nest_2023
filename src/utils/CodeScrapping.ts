@@ -17,7 +17,7 @@ export const codeScrapping = () => {
                 parsedPageNumber = 1
             }
             // for (var i = parsedPageNumber; i < 2; i++){
-            for (var i = parsedPageNumber; i < 2; i++) {
+            for (var i = parsedPageNumber; ; i++) {
                 console.log("Going to the first page");
                 await page.waitForTimeout(10000)
                 await page.goto(`https://codelist.cc/pgs/${i}/`);
