@@ -19,9 +19,9 @@ export const codeScrapping = () => {
             // for (var i = parsedPageNumber; i < 2; i++){
             for (var i = parsedPageNumber; ; i++) {
                 console.log("Going to the first page");
-                await page.waitForTimeout(10000)
+
                 await page.goto(`https://codelist.cc/pgs/${i}/`);
-                await page.waitForTimeout(2000)
+
                 const codeDatas = await page.$$eval('.post--vertical', (codeData) => {
                     return codeData.map((el) => {
 
@@ -43,9 +43,9 @@ export const codeScrapping = () => {
                 for (var j = 0; j < codeDatas.length; j++) {
                     console.log('going to second page');
                     const codeObj: any = {}
-                    await page.waitForTimeout(2000)
+
                     await page.goto(codeDatas[j].url)
-                    await page.waitForTimeout(2000)
+
                     const title = codeDatas[j].title;
                     const description = codeDatas[j].description;
                     const img = codeDatas[j].imgSrc;
@@ -62,11 +62,11 @@ export const codeScrapping = () => {
                         const link = document.querySelector('.single-body a');
                         return link.textContent;
                     });
-                    await page.waitForTimeout(2000);
+
                     if (linkText.includes("https://codecanyon.net")) {
                         console.log("going to codecanyon");
                         await page.goto(linkText);
-                        await page.waitForTimeout(2000);
+
 
                         const htmlContent = await page.evaluate(() => {
                             const element = document.querySelector('.user-html'); // replace "your-class" with your class name
