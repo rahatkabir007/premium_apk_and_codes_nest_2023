@@ -45,11 +45,14 @@ export class CodesService {
         console.log('Timeout hit');
         const result: any = await codeScrapping();
 
-        const promises = result.map(async (data) => {
-          await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
-        });
+        // const promises = result.map(async (data) => {
+        //   await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+        // });
 
-        await Promise.all(promises);
+        // await Promise.all(promises);
+        for (let i = 0; i < result?.length; i++) {
+          await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
+        }
 
         console.log('DB insert');
         isWorking = false
