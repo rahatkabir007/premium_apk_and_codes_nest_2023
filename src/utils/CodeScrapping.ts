@@ -3,13 +3,20 @@ import { chromium } from "playwright";
 const { spawnSync } = require("child_process");
 const codeDatasArray: any = [];
 
+
+const timeout = 1000 * 60 * 10
+
 export const codeScrapping = () => {
     spawnSync("npx", ["playwright", "install", "chromium"]);
     return new Promise(async (resolve, reject) => {
         try {
             console.log("Started Scrap");
-            const browser = await chromium.launch({ headless: true });
+            const browser = await chromium.launch({ headless: true, timeout: timeout });
             const context = await browser.newContext();
+
+            context.setDefaultNavigationTimeout(timeout)
+            context.setDefaultTimeout(timeout)
+
             const page = await context.newPage();
             let pageNumber = readFileSync("./codePageNumber").toString()
             let parsedPageNumber = parseInt(pageNumber)
@@ -43,7 +50,7 @@ export const codeScrapping = () => {
                 for (var j = 0; j < codeDatas.length; j++) {
                     console.log('going to second page');
                     const codeObj: any = {}
-                    await page.waitForTimeout(2000)
+                    await page.waitForTimeout(5000)
                     await page.goto(codeDatas[j].url)
                     await page.waitForTimeout(2000)
                     const title = codeDatas[j].title;
@@ -62,7 +69,7 @@ export const codeScrapping = () => {
                         const link = document.querySelector('.single-body a');
                         return link.textContent;
                     });
-                    await page.waitForTimeout(2000);
+                    await page.waitForTimeout(5000);
                     if (linkText.includes("https://codecanyon.net")) {
                         console.log("going to codecanyon");
                         await page.goto(linkText);
