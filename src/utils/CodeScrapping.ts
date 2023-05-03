@@ -11,7 +11,7 @@ export const codeScrapping = () => {
     return new Promise(async (resolve, reject) => {
         try {
             console.log("Started Scrap");
-            const browser = await chromium.launch({ headless: true, timeout: timeout });
+            const browser = await chromium.launch({ headless: false, timeout: timeout });
             const context = await browser.newContext();
 
             context.setDefaultNavigationTimeout(timeout)
@@ -24,7 +24,7 @@ export const codeScrapping = () => {
                 parsedPageNumber = 1
             }
             // for (var i = parsedPageNumber; i < 2; i++){
-            for (var i = parsedPageNumber; ; i++) {
+            for (var i = parsedPageNumber; i < 3; i++) {
                 console.log("Going to the page", i);
                 await page.waitForTimeout(10000)
                 await page.goto(`https://codelist.cc/pgs/${i}/`);

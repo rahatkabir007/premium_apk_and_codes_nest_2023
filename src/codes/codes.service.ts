@@ -37,7 +37,7 @@ export class CodesService {
     }
   }
 
-  async createCodeDatas(res, isWorking) {
+  async createCodeDatas(res) {
     res.send('Scrapping Initiated');
     console.log("route hit");
     setTimeout(async () => {
@@ -55,11 +55,9 @@ export class CodesService {
         }
 
         console.log('DB insert');
-        isWorking = false
         return "Inserted to DB"
       } catch (error) {
         console.error(error);
-        isWorking = false
         res.status(500).send('Error occurred during scraping');
       }
     }, 3000);

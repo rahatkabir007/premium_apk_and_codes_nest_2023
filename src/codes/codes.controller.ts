@@ -16,7 +16,9 @@ export class CodesController {
       return res.status(409).json({ message: 'Work in progress' });
     }
     isWorking = true
-    return this.codesService.createCodeDatas(res, isWorking);
+    const create = this.codesService.createCodeDatas(res);
+    isWorking = false;
+    return create;
   }
 
   @Get('/findAllCodesPaginated')
