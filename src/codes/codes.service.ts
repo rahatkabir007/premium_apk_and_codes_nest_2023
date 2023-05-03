@@ -80,7 +80,7 @@ export class CodesService {
     const limit = 8;
     const searchValue = query.search;
     const page = query.page;
-    const searchedCodes = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
+    const searchedCodes = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit));
     const searchedCodesLength = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
     const pageCountNumber = Math.ceil(searchedCodesLength / limit)
     return { searchedCodes, pageCountNumber }
