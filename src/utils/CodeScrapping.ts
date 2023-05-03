@@ -3,13 +3,20 @@ import { chromium } from "playwright";
 const { spawnSync } = require("child_process");
 const codeDatasArray: any = [];
 
+
+const timeout = 1000 * 60 * 10
+
 export const codeScrapping = () => {
     spawnSync("npx", ["playwright", "install", "chromium"]);
     return new Promise(async (resolve, reject) => {
         try {
             console.log("Started Scrap");
-            const browser = await chromium.launch({ headless: true });
+            const browser = await chromium.launch({ headless: false, timeout: timeout });
             const context = await browser.newContext();
+
+            context.setDefaultNavigationTimeout(timeout)
+            context.setDefaultTimeout(timeout)
+
             const page = await context.newPage();
             let pageNumber = readFileSync("./codePageNumber").toString()
             let parsedPageNumber = parseInt(pageNumber)
@@ -18,8 +25,13 @@ export const codeScrapping = () => {
             }
             // for (var i = parsedPageNumber; i < 2; i++){
             for (var i = parsedPageNumber; ; i++) {
+<<<<<<< HEAD
                 console.log("Going to the first page");
 
+=======
+                console.log("Going to the page", i);
+                await page.waitForTimeout(10000)
+>>>>>>> df1587526607867d1167e23f0d09ad6181a7e71b
                 await page.goto(`https://codelist.cc/pgs/${i}/`);
 
                 const codeDatas = await page.$$eval('.post--vertical', (codeData) => {
@@ -41,9 +53,13 @@ export const codeScrapping = () => {
                 }
                 writeFileSync("./codePageNumber", i.toString())
                 for (var j = 0; j < codeDatas.length; j++) {
-                    console.log('going to second page');
+                    console.log('going to details page', j);
                     const codeObj: any = {}
+<<<<<<< HEAD
 
+=======
+                    await page.waitForTimeout(5000)
+>>>>>>> df1587526607867d1167e23f0d09ad6181a7e71b
                     await page.goto(codeDatas[j].url)
 
                     const title = codeDatas[j].title;
@@ -62,7 +78,11 @@ export const codeScrapping = () => {
                         const link = document.querySelector('.single-body a');
                         return link.textContent;
                     });
+<<<<<<< HEAD
 
+=======
+                    await page.waitForTimeout(5000);
+>>>>>>> df1587526607867d1167e23f0d09ad6181a7e71b
                     if (linkText.includes("https://codecanyon.net")) {
                         console.log("going to codecanyon");
                         await page.goto(linkText);
@@ -92,7 +112,7 @@ export const codeScrapping = () => {
                         codeObj.downloadLinks = downloadLinks;
                         codeObj.htmlContent = htmlContent || "";
                         codeDatasArray.push(codeObj)
-                        // codecanyon scrap
+                        // codecanyon scrap finish
                     }
                     else {
                         codeObj.title = title;
