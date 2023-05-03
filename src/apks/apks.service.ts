@@ -35,8 +35,8 @@ export class ApksService {
     // }
 
  async create(res, isWorking,queries: {page:number}) {
-    res.send('Scrapping Initiated');
-    console.log("route hit");
+    res.send('Scrapping Initiated Apk');
+    console.log("route hit Apk");
     setTimeout(async () => {
       try {
       console.log('Timeout hit');

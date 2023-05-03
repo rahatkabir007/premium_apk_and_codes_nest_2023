@@ -6,7 +6,7 @@ export const apkScrapping = (totaPage) => {
   spawnSync("npx", ["playwright", "install", "chromium"]);
   return new Promise(async (resolve, reject) => {
     try {
-      const browser = await chromium.launch({ headless: false });
+      const browser = await chromium.launch({ headless: true, timeout:1000*60*30 });
       const context = await browser.newContext();
       const page = await context.newPage();
       await page.goto('https://www.revdl.com/category/apps/');
