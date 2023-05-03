@@ -4,7 +4,7 @@ const { spawnSync } = require("child_process");
 
 const timeout = 1000 * 60 * 10;
 
-export const codeScrapping = async (): Promise<any[]> => {
+export const optimizedCodeScrapping = async (): Promise<any[]> => {
     spawnSync("npx", ["playwright", "install", "chromium"]);
 
     const codeDatasArray: any[] = [];
