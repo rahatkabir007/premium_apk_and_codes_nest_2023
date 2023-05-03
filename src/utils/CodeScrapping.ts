@@ -25,13 +25,8 @@ export const codeScrapping = () => {
             }
             // for (var i = parsedPageNumber; i < 2; i++){
             for (var i = parsedPageNumber; ; i++) {
-<<<<<<< HEAD
-                console.log("Going to the first page");
-
-=======
                 console.log("Going to the page", i);
                 await page.waitForTimeout(10000)
->>>>>>> df1587526607867d1167e23f0d09ad6181a7e71b
                 await page.goto(`https://codelist.cc/pgs/${i}/`);
 
                 const codeDatas = await page.$$eval('.post--vertical', (codeData) => {
@@ -55,11 +50,7 @@ export const codeScrapping = () => {
                 for (var j = 0; j < codeDatas.length; j++) {
                     console.log('going to details page', j);
                     const codeObj: any = {}
-<<<<<<< HEAD
-
-=======
                     await page.waitForTimeout(5000)
->>>>>>> df1587526607867d1167e23f0d09ad6181a7e71b
                     await page.goto(codeDatas[j].url)
 
                     const title = codeDatas[j].title;
@@ -78,11 +69,7 @@ export const codeScrapping = () => {
                         const link = document.querySelector('.single-body a');
                         return link.textContent;
                     });
-<<<<<<< HEAD
-
-=======
                     await page.waitForTimeout(5000);
->>>>>>> df1587526607867d1167e23f0d09ad6181a7e71b
                     if (linkText.includes("https://codecanyon.net")) {
                         console.log("going to codecanyon");
                         await page.goto(linkText);
