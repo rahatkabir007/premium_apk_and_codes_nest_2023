@@ -44,6 +44,7 @@ export class CodesService {
         await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
       }
       return "Inserted To DB"
+      // return result
     } catch (error) {
       console.error(error);
     }
@@ -55,7 +56,7 @@ export class CodesService {
     const page = query.page || 1;
     // const page = 1;
 
-    const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).exec();
+    const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).sort({ date: -1 }).exec();
     const totalCodeLength = await this.codeModel.count()
     const pageCountNumber = Math.ceil(totalCodeLength / limit)
     return { codes, pageCountNumber }
@@ -72,7 +73,7 @@ export class CodesService {
     }
 
     const allCodes = await this.codeModel.find();
-    const codes = getRandomSubset(allCodes, 7);
+    const codes = getRandomSubset(allCodes, 9);
     return { codes };
   }
 
@@ -84,6 +85,16 @@ export class CodesService {
     const searchedCodesLength = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
     const pageCountNumber = Math.ceil(searchedCodesLength / limit)
     return { searchedCodes, pageCountNumber }
+  }
+
+  async findAllCategorizedCodes(query: { category: string, page: number }) {
+    const limit = 8;
+    const categoryValue = query.category;
+    const page = query.page;
+    const categorizedCodes = await this.codeModel.find({ "category": { $regex: categoryValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
+    const categorizedCodesLength = await this.codeModel.find({ "category": { $regex: categoryValue, $options: 'i' } }).count()
+    const pageCountNumber = Math.ceil(categorizedCodesLength / limit)
+    return { categorizedCodes, pageCountNumber }
   }
 
 
