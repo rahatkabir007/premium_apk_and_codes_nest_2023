@@ -99,7 +99,7 @@ export const codeScrapping = () => {
                         codeObj.downloadLinks = downloadLinks;
                         codeObj.htmlContent = htmlContent || "";
                         codeDatasArray.push(codeObj)
-                        // codecanyon scrap
+                        // codecanyon scrap finish
                     }
                     else {
                         codeObj.title = title;
