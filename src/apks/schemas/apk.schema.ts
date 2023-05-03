@@ -16,7 +16,7 @@ export class APK {
     imgSrc: string;
 
     @Prop({ required: true })
-    createdAt: string;
+    created: string;
 
     @Prop({ required: true })
     categories: string;
@@ -41,7 +41,13 @@ export class APK {
     requiredAndroid: string;
     
     @Prop({ required: true })
-    downloadFile: Array<{href:string,innerText:string}>;
+    downloadFile: Array<{ href: string, innerText: string }>;
+
+    @Prop({ required: true })
+    downloadFile: Array<{ href: string, innerText: string }>;
+    
+    @Prop({ required: true })
+    catSub: Array<any>;
 
 }
 

@@ -37,17 +37,30 @@ export class CodesService {
     }
   }
 
-  async createCodeDatas() {
-    try {
-      const result: any = await codeScrapping();
-      for (let i = 0; i < result?.length; i++) {
-        await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
+  async createCodeDatas(res, isWorking) {
+    res.send('Scrapping Initiated');
+    console.log("route hit");
+    setTimeout(async () => {
+      try {
+        console.log('Timeout hit');
+        const result: any = await codeScrapping();
+
+        const promises = result.map(async (data) => {
+          await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+        });
+
+        await Promise.all(promises);
+
+        console.log('DB insert');
+        isWorking = false
+        return "Inserted to DB"
+      } catch (error) {
+        console.error(error);
+        isWorking = false
+        res.status(500).send('Error occurred during scraping');
       }
-      return "Inserted To DB"
-      // return result
-    } catch (error) {
-      console.error(error);
-    }
+    }, 3000);
+
   }
 
   async findAllCodeDatas(query: { page: number }) {

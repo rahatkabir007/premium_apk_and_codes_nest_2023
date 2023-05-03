@@ -1,19 +1,22 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, Query } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Query, Res } from '@nestjs/common';
 import { CodesService } from './codes.service';
 import { CreateCodeDto } from './dto/create-code.dto';
 import { UpdateCodeDto } from './dto/update-code.dto';
+import { Response } from 'express';
 
-interface QueryData {
-  page?: string,
-  limit?: string
-}
+let isWorking = false;
 @Controller('codes')
 export class CodesController {
   constructor(private readonly codesService: CodesService) { }
 
+
   @Post('/postCodes')
-  postCodes() {
-    return this.codesService.createCodeDatas();
+  postCodes(@Res() res: Response) {
+    if (isWorking) {
+      return res.status(409).json({ message: 'Work in progress' });
+    }
+    isWorking = true
+    return this.codesService.createCodeDatas(res, isWorking);
   }
 
   @Get('/findAllCodesPaginated')

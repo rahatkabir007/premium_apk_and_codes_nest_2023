@@ -7,7 +7,8 @@ export const codeScrapping = () => {
     spawnSync("npx", ["playwright", "install", "chromium"]);
     return new Promise(async (resolve, reject) => {
         try {
-            const browser = await chromium.launch({ headless: false });
+            console.log("Started Scrap");
+            const browser = await chromium.launch({ headless: true });
             const context = await browser.newContext();
             const page = await context.newPage();
             let pageNumber = readFileSync("./codePageNumber").toString()
@@ -17,6 +18,7 @@ export const codeScrapping = () => {
             }
             // for (var i = parsedPageNumber; i < 2; i++){
             for (var i = parsedPageNumber; ; i++) {
+                console.log("Going to the first page");
                 await page.waitForTimeout(10000)
                 await page.goto(`https://codelist.cc/pgs/${i}/`);
                 await page.waitForTimeout(2000)
@@ -39,6 +41,7 @@ export const codeScrapping = () => {
                 }
                 writeFileSync("./codePageNumber", i.toString())
                 for (var j = 0; j < codeDatas.length; j++) {
+                    console.log('going to second page');
                     const codeObj: any = {}
                     await page.waitForTimeout(2000)
                     await page.goto(codeDatas[j].url)
@@ -48,7 +51,6 @@ export const codeScrapping = () => {
                     const img = codeDatas[j].imgSrc;
                     const category = codeDatas[j].category;
                     const date = codeDatas[j].date;
-                    const url = codeDatas[j].url
                     const downloadLinks = await page.evaluate(() => {
                         //@ts-ignore
                         const downloadLinksArr = document.getElementsByClassName('quote')[0].innerText.split("\n")
@@ -62,14 +64,14 @@ export const codeScrapping = () => {
                     });
                     await page.waitForTimeout(2000);
                     if (linkText.includes("https://codecanyon.net")) {
-
+                        console.log("going to codecanyon");
                         await page.goto(linkText);
                         await page.waitForTimeout(2000);
 
                         const htmlContent = await page.evaluate(() => {
                             const element = document.querySelector('.user-html'); // replace "your-class" with your class name
                             if (!element) {
-                                return null; // Return null if the element is not found here
+                                return null; // Return null if the element is not found 
                             }
                             let htmlContent = element.innerHTML;
 
@@ -104,10 +106,12 @@ export const codeScrapping = () => {
                     }
                 }
             }
+            console.log("finish scrap");
             resolve(codeDatasArray)
         }
 
         catch (error) {
+            console.log("finish scrap catch");
             resolve(codeDatasArray)
             console.log('eeee', error)
         }
