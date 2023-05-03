@@ -6,7 +6,7 @@ import axios from 'axios';
 export class TasksService {
     private readonly logger = new Logger(TasksService.name);
 
-    @Interval(300000)
+    @Interval(180000)
     async handleInterval() {
         // axios.get("https://premium-apk-and-codes-nest-2023.onrender.com/");
         try {
