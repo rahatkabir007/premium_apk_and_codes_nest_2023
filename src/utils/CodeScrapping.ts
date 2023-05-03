@@ -25,7 +25,7 @@ export const codeScrapping = () => {
             }
             // for (var i = parsedPageNumber; i < 2; i++){
             for (var i = parsedPageNumber; ; i++) {
-                console.log("Going to the first page");
+                console.log("Going to the page", i);
                 await page.waitForTimeout(10000)
                 await page.goto(`https://codelist.cc/pgs/${i}/`);
                 await page.waitForTimeout(2000)
@@ -48,7 +48,7 @@ export const codeScrapping = () => {
                 }
                 writeFileSync("./codePageNumber", i.toString())
                 for (var j = 0; j < codeDatas.length; j++) {
-                    console.log('going to second page');
+                    console.log('going to details page', j);
                     const codeObj: any = {}
                     await page.waitForTimeout(5000)
                     await page.goto(codeDatas[j].url)
