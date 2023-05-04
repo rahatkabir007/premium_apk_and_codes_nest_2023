@@ -18,13 +18,23 @@ export const codeScrapping = () => {
             context.setDefaultTimeout(timeout)
 
             const page = await context.newPage();
-            let pageNumber = readFileSync("./codePageNumber").toString()
-            let parsedPageNumber = parseInt(pageNumber)
-            if (pageNumber === "") {
-                parsedPageNumber = 1
-            }
+            // let pageNumber = readFileSync("./codePageNumber").toString()
+            // let parsedPageNumber = parseInt(pageNumber)
+            // if (pageNumber === "") {
+            //     parsedPageNumber = 1
+            // }
+            await page.goto("https://codelist.cc/en/")
+            await page.waitForTimeout(2000);
+            const lastLinkNumber = await page.$$eval('.bottom-navi .navigations a', (elements) => {
+                const lastLink = elements[elements.length - 1];
+                const lastLinkValue = lastLink.textContent.trim();
+                const lastLinkNumber = parseInt(lastLinkValue, 10);
+                return lastLinkNumber;
+            });
+            console.log("🚀 ~ file: CodeScrapping.ts:34 ~ lastLinkNumber ~ lastLinkNumber:", lastLinkNumber)
+
             // for (var i = parsedPageNumber; i < 2; i++){
-            for (var i = parsedPageNumber; ; i++) {
+            for (var i = 1; i <= lastLinkNumber; i++) {
                 console.log("Going to the page", i);
                 await page.waitForTimeout(10000)
                 await page.goto(`https://codelist.cc/pgs/${i}/`);
@@ -46,7 +56,7 @@ export const codeScrapping = () => {
                 if (codeDatas.length === 0) {
                     break;
                 }
-                writeFileSync("./codePageNumber", i.toString())
+                // writeFileSync("./codePageNumber", i.toString())
                 for (var j = 0; j < codeDatas.length; j++) {
                     console.log('going to details page', j);
                     const codeObj: any = {}
@@ -118,6 +128,7 @@ export const codeScrapping = () => {
         }
 
         catch (error) {
+
             console.log("finish scrap catch");
             resolve(codeDatasArray)
             console.log('eeee', error)

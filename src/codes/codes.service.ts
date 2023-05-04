@@ -16,7 +16,7 @@ export interface codeDataType {
   date: string;
   downloadLinks: string[];
 }
-
+var isWorking = false;
 @Injectable()
 export class CodesService {
   constructor(
@@ -38,6 +38,10 @@ export class CodesService {
   }
 
   async createCodeDatas(res) {
+    if (isWorking) {
+      return res.status(409).json({ message: 'Work in progress' });
+    }
+    isWorking = true
     res.send('Scrapping Initiated');
     console.log("route hit");
     setTimeout(async () => {
@@ -53,11 +57,12 @@ export class CodesService {
         for (let i = 0; i < result?.length; i++) {
           await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
         }
-
         console.log('DB insert');
+        isWorking = false;
         return "Inserted to DB"
       } catch (error) {
         console.error(error);
+        isWorking = false;
         res.status(500).send('Error occurred during scraping');
       }
     }, 3000);
