@@ -31,7 +31,6 @@ export const codeScrapping = (lastDate) => {
                 const lastLinkNumber = parseInt(lastLinkValue, 10);
                 return lastLinkNumber;
             });
-            console.log("🚀 ~ file: CodeScrapping.ts:34 ~ lastLinkNumber ~ lastLinkNumber:", lastLinkNumber)
 
             // for (var i = parsedPageNumber; i < 2; i++){
             for (var i = lastLinkNumber; i >= 1; i--) {
@@ -40,9 +39,7 @@ export const codeScrapping = (lastDate) => {
                 await page.goto(`https://codelist.cc/pgs/${i}/`);
 
                 const NextStep = await page.evaluate(() => {
-
-                    const elements = document.querySelectorAll('.post__text .post__meta a time');
-                    console.log('elements', elements)
+                    const elements = document.querySelectorAll('.post--vertical .post__text .post__meta a time');
                     const texts = [];
                     for (let i = 0; i < elements.length; i++) {
                         texts.push(elements[i].textContent);
@@ -50,13 +47,11 @@ export const codeScrapping = (lastDate) => {
                     console.log(texts);
                     return texts
                 })
-                console.log("🚀 ~ file: CodeScrapping.ts:53 ~ NextStep ~ NextStep:", NextStep)
                 const pageChange = () => {
                     let text = []
                     for (let j = 0; j < NextStep.length; j++) {
                         console.log(NextStep[j]);
                         if (new Date(lastDate) > new Date(NextStep[j] || null)) {
-                            //   console.log('true', new Date(lastDate) > new Date(NextStep[j]))
                             text.push(true)
                         }
                         else {
@@ -73,14 +68,6 @@ export const codeScrapping = (lastDate) => {
                 await page.waitForTimeout(2000)
                 const codeDatas = await page.$$eval('.post--vertical', (codeData) => {
                     return codeData.map((el) => {
-
-                        // const url = el.querySelector('.post__thumb a').getAttribute('href');
-                        // const title = el.querySelector('.post__text .post__title a').textContent.trim();
-                        // const description = el.querySelector('.post__text .post__excerpt').textContent.trim();
-                        // // const imgSrc = await page.locator('.attachment-featured_image').getAttribute('data-src') || ''
-                        // const imgSrc = el.querySelector('img').src;
-                        // const category = el.querySelector('.post__text .post__meta span a').textContent.trim();
-                        // const date = el.querySelector('.post__text .post__meta a time').textContent.trim();
                         const url = el.querySelector('.post__thumb a')?.getAttribute('href') ?? '';
                         const title = el.querySelector('.post__text .post__title a')?.textContent?.trim() ?? '';
                         const description = el.querySelector('.post__text .post__excerpt')?.textContent?.trim() ?? '';
@@ -95,7 +82,7 @@ export const codeScrapping = (lastDate) => {
                     break;
                 }
                 // writeFileSync("./codePageNumber", i.toString())
-                for (var k = codeDatas.length; k > 0; k--) {
+                for (let k = codeDatas.length - 1; k >= 0; k--) {
                     console.log('going to details page', k);
                     const codeObj: any = {}
                     await page.waitForTimeout(5000)
