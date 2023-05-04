@@ -90,6 +90,7 @@ export const apkScrapping = (lastDate) => {
           // for (var j = 0; j < 1; j++) {
           var apkObj: any = {}
           await page.goto(allReadMoreHref[j])
+          await page.waitForLoadState('load');
           await page.waitForTimeout(2000);
 
           
@@ -147,10 +148,12 @@ export const apkScrapping = (lastDate) => {
           const downloadButtons = await page.$$('.download_button');
           if (downloadButtons.length > 0) {
             await downloadButtons[0].click();
-            await page.waitForTimeout(10000); // Add a delay to allow time for new tab to open
+            // await page.waitForTimeout(10000); // Add a delay to allow time for new tab to open
             // Get the newly opened page
             const pages = await context.pages();
             const newPage = pages[pages.length - 1];
+            await newPage.waitForLoadState('load');
+            await newPage.waitForTimeout(5000)
 
             const requiredAndroid = await newPage.evaluate(() => {
               var androidVersions = document?.getElementsByClassName('dl-version')[0]?.getElementsByTagName('span')[1]?.innerText || ''
