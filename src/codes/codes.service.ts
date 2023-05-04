@@ -37,7 +37,7 @@ export class CodesService {
     }
   }
 
-  async createCodeDatas(res, isWorking) {
+  async createCodeDatas(res) {
     res.send('Scrapping Initiated');
     console.log("route hit");
     setTimeout(async () => {
@@ -45,18 +45,19 @@ export class CodesService {
         console.log('Timeout hit');
         const result: any = await codeScrapping();
 
-        const promises = result.map(async (data) => {
-          await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
-        });
+        // const promises = result.map(async (data) => {
+        //   await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+        // });
 
-        await Promise.all(promises);
+        // await Promise.all(promises);
+        for (let i = 0; i < result?.length; i++) {
+          await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
+        }
 
         console.log('DB insert');
-        isWorking = false
         return "Inserted to DB"
       } catch (error) {
         console.error(error);
-        isWorking = false
         res.status(500).send('Error occurred during scraping');
       }
     }, 3000);
@@ -94,7 +95,7 @@ export class CodesService {
     const limit = 8;
     const searchValue = query.search;
     const page = query.page;
-    const searchedCodes = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
+    const searchedCodes = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit));
     const searchedCodesLength = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
     const pageCountNumber = Math.ceil(searchedCodesLength / limit)
     return { searchedCodes, pageCountNumber }
