@@ -6,50 +6,50 @@ export const apkScrapping = (totaPage) => {
   spawnSync("npx", ["playwright", "install", "chromium"]);
   return new Promise(async (resolve, reject) => {
     try {
-      const browser = await chromium.launch({ headless: true, timeout:1000*60*30 });
+      const browser = await chromium.launch({ headless: true, timeout: 1000 * 60 * 30 });
       const context = await browser.newContext();
       const page = await context.newPage();
       await page.goto('https://www.revdl.com/category/apps/');
       await page.waitForTimeout(5000);
 
       catSubcat = await page.evaluate(() => {
-      var obj = {}
-      var as = document.getElementsByTagName('a')
-      for (var i=0; i<as.length; i++) {	
-      if(as[i].href.split("/").length === 6) {
-		  const rrr = new RegExp("https:\/\/www\.revdl\.com\/category\/(.*)\/")
-		  const re = rrr.exec(as[i].href)
-		  const catName = re[1]
-		  obj[catName] = []
-      }
-      else if(as[i].href.split("/").length === 7) {
-          const rrr = new RegExp("https:\/\/www\.revdl\.com\/category\/(.*)\/(.*)\/")
-		  const re = rrr.exec(as[i].href)
-		  console.log(re.length)
-		  const catName = re[1]
-		  const subCatName = re[2]
-		  obj[catName].push(subCatName)
-      }
-    }
-
-    const keys = Object.keys(obj)
-    const arr = []
-    for (var i=0; i<keys.length; i++) {
-    const data = {}
-    data["catagory"] = keys[i]
-    
-    const values = obj[keys[i]]
-    data["subcatagory"] = values
-    arr.push(data)
+        var obj = {}
+        var as = document.getElementsByTagName('a')
+        for (var i = 0; i < as.length; i++) {
+          if (as[i].href.split("/").length === 6) {
+            const rrr = new RegExp("https:\/\/www\.revdl\.com\/category\/(.*)\/")
+            const re = rrr.exec(as[i].href)
+            const catName = re[1]
+            obj[catName] = []
+          }
+          else if (as[i].href.split("/").length === 7) {
+            const rrr = new RegExp("https:\/\/www\.revdl\.com\/category\/(.*)\/(.*)\/")
+            const re = rrr.exec(as[i].href)
+            console.log(re.length)
+            const catName = re[1]
+            const subCatName = re[2]
+            obj[catName].push(subCatName)
+          }
         }
-    return arr
-    })
-    console.log('page', totaPage)
+
+        const keys = Object.keys(obj)
+        const arr = []
+        for (var i = 0; i < keys.length; i++) {
+          const data = {}
+          data["catagory"] = keys[i]
+
+          const values = obj[keys[i]]
+          data["subcatagory"] = values
+          arr.push(data)
+        }
+        return arr
+      })
+      console.log('page', totaPage)
       // for (var i=1420; ; i++)  {
       // for (var i = 1; ; i++) {
       // for (var i = 1;i<=1420 ; i++) {
-      for (var i = 1;i<=totaPage ; i++) {
-      // for (var i = 1; i < 4; i++) {
+      for (var i = 1; i <= totaPage; i++) {
+        // for (var i = 1; i < 4; i++) {
         console.log('iindex', i)
         await page.goto(`https://www.revdl.com/page/${i}/`);
         const allReadMoreHref = await page.evaluate(() => {
