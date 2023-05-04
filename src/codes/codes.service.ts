@@ -6,6 +6,9 @@ import { Code, CodeDocument } from './schemas/code.schema';
 import { Model } from 'mongoose';
 import { DATABASE_CONNECTION } from 'src/utils/DatabaseConstants';
 import { codeScrapping } from 'src/utils/CodeScrapping';
+import { codeScrappingPageNumber } from 'src/utils/CodeScrapping/CodeScrappingPageNumber';
+import { codeScrappingAllItems } from 'src/utils/CodeScrapping/CodeScrappingAllItems';
+import { codeScrappingSingleItem } from 'src/utils/CodeScrapping/CodeScrappingSingleItem';
 
 
 export interface codeDataType {
@@ -37,6 +40,39 @@ export class CodesService {
   //   }
   // }
 
+  // async createCodeDatas(res) {
+  //   if (isWorking) {
+  //     return res.status(409).json({ message: 'Work in progress' });
+  //   }
+  //   isWorking = true
+  //   res.send('Scrapping Initiated');
+  //   console.log("route hit");
+  //   setTimeout(async () => {
+  //     try {
+  //       console.log('Timeout hit');
+  //       const codeLastDate = await this.codeModel.find().sort({ mongoDbDate: -1 })
+  //       const codeLastDt = codeLastDate[0]?.date || ''
+  //       const result: any = await codeScrapping(codeLastDt);
+
+  //       // const promises = result.map(async (data) => {
+  //       //   await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+  //       // });
+
+  //       // await Promise.all(promises);
+  //       for (let i = 0; i < result?.length; i++) {
+  //         await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
+  //       }
+  //       console.log('DB insert');
+  //       isWorking = false;
+  //       return "Inserted to DB"
+  //     } catch (error) {
+  //       console.error(error);
+  //       isWorking = false;
+  //       res.status(500).send('Error occurred during scraping');
+  //     }
+  //   }, 3000);
+
+  // }
   async createCodeDatas(res) {
     if (isWorking) {
       return res.status(409).json({ message: 'Work in progress' });
@@ -49,16 +85,44 @@ export class CodesService {
         console.log('Timeout hit');
         const codeLastDate = await this.codeModel.find().sort({ mongoDbDate: -1 })
         const codeLastDt = codeLastDate[0]?.date || ''
-        const result: any = await codeScrapping(codeLastDt);
+        const { lastLinkNumber, page } = await codeScrappingPageNumber();
+        console.log("🚀 ~ file: codes.service.ts:87 ~ CodesService ~ setTimeout ~ result:", lastLinkNumber)
+        let codeDatas;
+        for (let i = lastLinkNumber; i >= 1; i--) {
+          const result: any = await codeScrappingAllItems(page, codeLastDt, i);
+          if (result === "continue") {
+            continue;
+          }
+          codeDatas = result;
+          if (codeDatas.length === 0) {
+            break;
+          }
+          let codeObjArray = [];
+          for (let j = codeDatas.length - 1; j >= 0; j--) {
+            const objResult: any = await codeScrappingSingleItem(page, codeLastDt, codeDatas, j);
+            if (objResult === "continue") {
+              continue;
+            }
+            console.log("🚀 ~ file: codes.service.ts:98 ~ CodesService ~ setTimeout ~ objResult:", objResult)
+            codeObjArray.push(objResult)
+          }
+          const promises = codeObjArray.map(async (data) => {
+            await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+          });
+
+          await Promise.all(promises);
+          console.log('DB insert', i, "page");
+        }
+        console.log("🚀 ~ file: codes.service.ts:111 ~ CodesService ~ setTimeout ~ codeDatas:", codeDatas)
 
         // const promises = result.map(async (data) => {
         //   await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
         // });
 
         // await Promise.all(promises);
-        for (let i = 0; i < result?.length; i++) {
-          await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
-        }
+        // for (let i = 0; i < result?.length; i++) {
+        //   await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
+        // }
         console.log('DB insert');
         isWorking = false;
         return "Inserted to DB"
@@ -67,6 +131,7 @@ export class CodesService {
         isWorking = false;
         res.status(500).send('Error occurred during scraping');
       }
+
     }, 3000);
 
   }

@@ -11,7 +11,7 @@ import { TasksModule } from './tasks/tasks.module';
 
 @Module({
   imports: [
-    ScheduleModule.forRoot(),
+    // ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     MongooseModule.forRoot(
       process.env.DATABASE_URL_APK ?? "",
@@ -27,7 +27,7 @@ import { TasksModule } from './tasks/tasks.module';
     ),
     ApksModule,
     CodesModule,
-    TasksModule
+    // TasksModule
   ],
   controllers: [AppController],
   providers: [AppService],
