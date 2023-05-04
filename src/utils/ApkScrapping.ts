@@ -148,12 +148,36 @@ export const apkScrapping = (lastDate) => {
           const downloadButtons = await page.$$('.download_button');
           if (downloadButtons.length > 0) {
             await downloadButtons[0].click();
-            // await page.waitForTimeout(10000); // Add a delay to allow time for new tab to open
+            await page.waitForTimeout(20000); // Add a delay to allow time for new tab to open
             // Get the newly opened page
+
+            // //new strt
+            // const pages = await context.pages();
+            // const newPage = pages[pages.length - 1];
+            // const newPagePromise = newPage.waitForLoadState('load');
+            // const requiredAndroidPromise = newPage.evaluate(() => {
+            //   var androidVersions = document?.getElementsByClassName('dl-version')[0]?.getElementsByTagName('span')[1]?.innerText || '';
+            //   return androidVersions;
+            // });
+            // const newPageExtractedMetaTagsPromise = newPage.evaluate(() => {
+            //   const downloadLinkDetailArr: any = [];
+            //   const downloadLinkDetail = document.querySelectorAll('.dl a');
+            //   downloadLinkDetail.forEach(downloadLink => {
+            //     const downloadLinkObj: any = {};
+            //     downloadLinkObj.href = downloadLink.getAttribute('href') || '';
+            //     downloadLinkObj.innerText = downloadLink.textContent.trim() || '';
+            //     downloadLinkDetailArr.push(downloadLinkObj);
+            //   });
+            //   return downloadLinkDetailArr;
+            // });
+            // const [_, requiredAndroid, newPageExtractedMetaTags] = await Promise.all([newPagePromise, requiredAndroidPromise, newPageExtractedMetaTagsPromise]);
+            // //new end
+
+            //early start
             const pages = await context.pages();
             const newPage = pages[pages.length - 1];
             await newPage.waitForLoadState('load');
-            await newPage.waitForTimeout(5000)
+            // await newPage.waitForTimeout(5000)
 
             const requiredAndroid = await newPage.evaluate(() => {
               var androidVersions = document?.getElementsByClassName('dl-version')[0]?.getElementsByTagName('span')[1]?.innerText || ''
@@ -170,6 +194,13 @@ export const apkScrapping = (lastDate) => {
               });
               return downloadLinkDetailArr;
             });
+            //early end
+
+
+            // //new 2 lines
+            // await newPage.close();
+            // await page.bringToFront();
+
             apkObj.title = title
             apkObj.imgSrc = imgSrc
             apkObj.created = created
