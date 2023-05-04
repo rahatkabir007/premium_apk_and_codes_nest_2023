@@ -26,16 +26,16 @@ export class CodesService {
   ) { }
 
 
-  async create(createCodeDto: CreateCodeDto) {
-    try {
-      const result = await codeScrapping();
-      console.log('codeArray', result);
+  // async create(createCodeDto: CreateCodeDto) {
+  //   try {
+  //     const result = await codeScrapping();
+  //     console.log('codeArray', result);
 
-      return result
-    } catch (error) {
-      console.error(error);
-    }
-  }
+  //     return result
+  //   } catch (error) {
+  //     console.error(error);
+  //   }
+  // }
 
   async createCodeDatas(res) {
     if (isWorking) {
@@ -47,7 +47,9 @@ export class CodesService {
     setTimeout(async () => {
       try {
         console.log('Timeout hit');
-        const result: any = await codeScrapping();
+        const codeLastDate = await this.codeModel.find().sort({ mongoDbDate: -1 })
+        const codeLastDt = codeLastDate[0]?.date || ''
+        const result: any = await codeScrapping(codeLastDt);
 
         // const promises = result.map(async (data) => {
         //   await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
@@ -75,7 +77,7 @@ export class CodesService {
     const page = query.page || 1;
     // const page = 1;
 
-    const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).sort({ date: -1 }).exec();
+    const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).sort({ mongoDbDate: -1 }).exec();
     const totalCodeLength = await this.codeModel.count()
     const pageCountNumber = Math.ceil(totalCodeLength / limit)
     return { codes, pageCountNumber }

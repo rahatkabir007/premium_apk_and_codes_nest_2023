@@ -6,7 +6,7 @@ const codeDatasArray: any = [];
 
 const timeout = 1000 * 60 * 10
 
-export const codeScrapping = () => {
+export const codeScrapping = (lastDate) => {
     spawnSync("npx", ["playwright", "install", "chromium"]);
     return new Promise(async (resolve, reject) => {
         try {
@@ -34,21 +34,59 @@ export const codeScrapping = () => {
             console.log("🚀 ~ file: CodeScrapping.ts:34 ~ lastLinkNumber ~ lastLinkNumber:", lastLinkNumber)
 
             // for (var i = parsedPageNumber; i < 2; i++){
-            for (var i = 1; i <= lastLinkNumber; i++) {
+            for (var i = lastLinkNumber; i >= 1; i--) {
                 console.log("Going to the page", i);
                 await page.waitForTimeout(10000)
                 await page.goto(`https://codelist.cc/pgs/${i}/`);
+
+                const NextStep = await page.evaluate(() => {
+
+                    const elements = document.querySelectorAll('.post__text .post__meta a time');
+                    console.log('elements', elements)
+                    const texts = [];
+                    for (let i = 0; i < elements.length; i++) {
+                        texts.push(elements[i].textContent);
+                    }
+                    console.log(texts);
+                    return texts
+                })
+                console.log("🚀 ~ file: CodeScrapping.ts:53 ~ NextStep ~ NextStep:", NextStep)
+                const pageChange = () => {
+                    let text = []
+                    for (let j = 0; j < NextStep.length; j++) {
+                        console.log(NextStep[j]);
+                        if (new Date(lastDate) > new Date(NextStep[j] || null)) {
+                            //   console.log('true', new Date(lastDate) > new Date(NextStep[j]))
+                            text.push(true)
+                        }
+                        else {
+                            text.push(false)
+                        }
+                    }
+                    return text
+                }
+
+                console.log('pageChange()', pageChange())
+                if (pageChange().filter(value => value === true).length === NextStep.length) {
+                    continue
+                }
                 await page.waitForTimeout(2000)
                 const codeDatas = await page.$$eval('.post--vertical', (codeData) => {
                     return codeData.map((el) => {
 
-                        const url = el.querySelector('.post__thumb a').getAttribute('href');
-                        const title = el.querySelector('.post__text .post__title a').textContent.trim();
-                        const description = el.querySelector('.post__text .post__excerpt').textContent.trim();
-                        // const imgSrc = await page.locator('.attachment-featured_image').getAttribute('data-src') || ''
-                        const imgSrc = el.querySelector('img').src;
-                        const category = el.querySelector('.post__text .post__meta span a').textContent.trim();
-                        const date = el.querySelector('.post__text .post__meta a time').textContent.trim();
+                        // const url = el.querySelector('.post__thumb a').getAttribute('href');
+                        // const title = el.querySelector('.post__text .post__title a').textContent.trim();
+                        // const description = el.querySelector('.post__text .post__excerpt').textContent.trim();
+                        // // const imgSrc = await page.locator('.attachment-featured_image').getAttribute('data-src') || ''
+                        // const imgSrc = el.querySelector('img').src;
+                        // const category = el.querySelector('.post__text .post__meta span a').textContent.trim();
+                        // const date = el.querySelector('.post__text .post__meta a time').textContent.trim();
+                        const url = el.querySelector('.post__thumb a')?.getAttribute('href') ?? '';
+                        const title = el.querySelector('.post__text .post__title a')?.textContent?.trim() ?? '';
+                        const description = el.querySelector('.post__text .post__excerpt')?.textContent?.trim() ?? '';
+                        const imgSrc = el.querySelector('img')?.src ?? '';
+                        const category = el.querySelector('.post__text .post__meta span a')?.textContent?.trim() ?? '';
+                        const date = el.querySelector('.post__text .post__meta a time')?.textContent?.trim() ?? '';
 
                         return { url, title, description, imgSrc, category, date };
                     });
@@ -57,17 +95,28 @@ export const codeScrapping = () => {
                     break;
                 }
                 // writeFileSync("./codePageNumber", i.toString())
-                for (var j = 0; j < codeDatas.length; j++) {
-                    console.log('going to details page', j);
+                for (var k = codeDatas.length; k > 0; k--) {
+                    console.log('going to details page', k);
                     const codeObj: any = {}
                     await page.waitForTimeout(5000)
-                    await page.goto(codeDatas[j].url)
+                    await page.goto(codeDatas[k].url)
                     await page.waitForTimeout(2000)
-                    const title = codeDatas[j].title;
-                    const description = codeDatas[j].description;
-                    const img = codeDatas[j].imgSrc;
-                    const category = codeDatas[j].category;
-                    const date = codeDatas[j].date;
+                    const title = codeDatas[k].title;
+                    const description = codeDatas[k].description;
+                    const img = codeDatas[k].imgSrc;
+                    let category = codeDatas[k].category;
+                    if (category.includes("/")) {
+                        const parts = category.split("/");
+                        category = parts[1]
+                    }
+                    const date = codeDatas[k].date;
+                    const nullorTextDate = date || null;
+                    const dateC = new Date(nullorTextDate);
+                    const dateL = new Date(lastDate)
+                    if (dateL > dateC) {
+                        continue;
+                    }
+                    const mongoDbDate = dateC.toISOString();
                     const downloadLinks = await page.evaluate(() => {
                         //@ts-ignore
                         const downloadLinksArr = document.getElementsByClassName('quote')[0].innerText.split("\n")
@@ -80,7 +129,7 @@ export const codeScrapping = () => {
                         return link.textContent;
                     });
                     await page.waitForTimeout(5000);
-                    if (linkText.includes("https://codecanyon.net")) {
+                    if (linkText.includes("codecanyon")) {
                         console.log("going to codecanyon");
                         await page.goto(linkText);
                         await page.waitForTimeout(2000);
@@ -98,13 +147,14 @@ export const codeScrapping = () => {
                             // Replace <span> elements with <img> elements
                             htmlContent = htmlContent.replace(/<span([^>]*)data-src="([^"]*)"([^>]*)data-alt="([^"]*)"[^>]*><\/span>/g, '<img$1src="$2"$3alt="$4">');
 
-                            return htmlContent || "";
+                            return htmlContent === null ? "" : htmlContent;
                         });
                         codeObj.title = title;
                         codeObj.description = description;
                         codeObj.img = img;
                         codeObj.category = category;
                         codeObj.date = date;
+                        codeObj.mongoDbDate = mongoDbDate;
                         codeObj.url = linkText
                         codeObj.downloadLinks = downloadLinks;
                         codeObj.htmlContent = htmlContent || "";
@@ -117,6 +167,7 @@ export const codeScrapping = () => {
                         codeObj.img = img;
                         codeObj.category = category;
                         codeObj.date = date;
+                        codeObj.mongoDbDate = mongoDbDate;
                         codeObj.url = linkText
                         codeObj.downloadLinks = downloadLinks;
                         codeDatasArray.push(codeObj)

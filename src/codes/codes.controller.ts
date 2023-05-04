@@ -41,10 +41,10 @@ export class CodesController {
     return this.codesService.findOneCodeData(id);
   }
 
-  @Post()
-  create(@Body() createCodeDto: CreateCodeDto) {
-    return this.codesService.create(createCodeDto);
-  }
+  // @Post()
+  // create(@Body() createCodeDto: CreateCodeDto) {
+  //   return this.codesService.create(createCodeDto);
+  // }
 
 
 

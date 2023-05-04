@@ -25,6 +25,9 @@ export class Code {
     date: string;
 
     @Prop({ required: true })
+    mongoDbDate: string;
+
+    @Prop({ required: true })
     url: string;
 
     @Prop()
