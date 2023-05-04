@@ -1,57 +1,77 @@
 import { chromium } from "playwright";
+import { ApksService } from "src/apks/apks.service";
 const { spawnSync } = require("child_process");
 const apkScrapDataArray: any = [];
 var catSubcat: any = [];
-export const apkScrapping = (totaPage) => {
+export const apkScrapping = (lastDate) => {
   spawnSync("npx", ["playwright", "install", "chromium"]);
   return new Promise(async (resolve, reject) => {
     try {
-      const browser = await chromium.launch({ headless: true, timeout: 1000 * 60 * 30 });
+      const browser = await chromium.launch({ headless: false, timeout: 1000 * 60 * 30 });
       const context = await browser.newContext();
       const page = await context.newPage();
-      await page.goto('https://www.revdl.com/category/apps/');
+      await page.goto('https://www.revdl.com');
       await page.waitForTimeout(5000);
-
-      catSubcat = await page.evaluate(() => {
-        var obj = {}
-        var as = document.getElementsByTagName('a')
-        for (var i = 0; i < as.length; i++) {
-          if (as[i].href.split("/").length === 6) {
-            const rrr = new RegExp("https:\/\/www\.revdl\.com\/category\/(.*)\/")
-            const re = rrr.exec(as[i].href)
-            const catName = re[1]
-            obj[catName] = []
-          }
-          else if (as[i].href.split("/").length === 7) {
-            const rrr = new RegExp("https:\/\/www\.revdl\.com\/category\/(.*)\/(.*)\/")
-            const re = rrr.exec(as[i].href)
-            console.log(re.length)
-            const catName = re[1]
-            const subCatName = re[2]
-            obj[catName].push(subCatName)
-          }
-        }
-
-        const keys = Object.keys(obj)
-        const arr = []
-        for (var i = 0; i < keys.length; i++) {
-          const data = {}
-          data["catagory"] = keys[i]
-
-          const values = obj[keys[i]]
-          data["subcatagory"] = values
-          arr.push(data)
-        }
-        return arr
+      let totalP = await page.evaluate(() => {
+        const dotsSpan = document.querySelector('.page-numbers.dots');
+        const nextDivText = dotsSpan.nextElementSibling.textContent;
+        console.log('nextDivText', nextDivText)
+        return parseInt(nextDivText.replace(',', ''))
       })
-      console.log('page', totaPage)
-      // for (var i=1420; ; i++)  {
-      // for (var i = 1; ; i++) {
-      // for (var i = 1;i<=1420 ; i++) {
-      for (var i = 1; i <= totaPage; i++) {
-        // for (var i = 1; i < 4; i++) {
+
+      console.log('page', totalP)
+      //from back
+      for (var i = totalP; i >= 1; i--) {
+        //// for (var i = 1; i < 4; i++) {
+        // //from front
+        // for (var i = 1;i<=totalP ; i++) {
         console.log('iindex', i)
         await page.goto(`https://www.revdl.com/page/${i}/`);
+
+        const NextStep = await page.evaluate(() => {
+
+          const elements = document.getElementsByClassName("post-date date updated");
+          console.log('elements', elements)
+          const texts = [];
+          for (let i = 0; i < elements.length; i++) {
+            texts.push(elements[i].textContent);
+          }
+          console.log(texts);
+          return texts
+        })
+        console.log('nextstep', NextStep)
+        // //from front
+        //   for (let k = 0; k < NextStep.length; k++) {
+        //     console.log(NextStep[k]);
+        //     if (new Date(lastDate) > new Date(NextStep[k])) {
+        //       console.log('true', new Date(lastDate) > new Date(NextStep[k]))
+        //       totalP=i
+        //       break
+        //     }
+        //   }
+        console.log('lastDate', lastDate);
+        // from back
+        const pageChange = () => {
+          let text = []
+          for (let k = 0; k < NextStep.length; k++) {
+            console.log(NextStep[k]);
+            if (new Date(lastDate) > new Date(NextStep[k] || null)) {
+              //   console.log('true', new Date(lastDate) > new Date(NextStep[k]))
+              text.push(true)
+            }
+            else {
+              text.push(false)
+            }
+          }
+          return text
+        }
+
+        console.log('pageChange()', pageChange())
+        if (pageChange().filter(value => value === true).length === NextStep.length) {
+          console.log()
+          continue
+        }
+
         const allReadMoreHref = await page.evaluate(() => {
           const readMoreArray = [];
           const readMoreElements = document.querySelectorAll('.tpcrn-read-more');
@@ -70,9 +90,21 @@ export const apkScrapping = (totaPage) => {
           // for (var j = 0; j < 1; j++) {
           var apkObj: any = {}
           await page.goto(allReadMoreHref[j])
-          const title = await page.locator('.post-title h1').innerText() || ''
-          const imgSrc = await page.locator('.attachment-featured_image').getAttribute('data-src') || ''
+          await page.waitForLoadState('load');
+          await page.waitForTimeout(2000);
+
+
+
           const created = await page.locator('.post-date').innerText() || ''
+          const createdN = await page.locator('.post-date').innerText() || null
+          console.log('created', createdN)
+          const dateC = new Date(createdN ? createdN : null);
+          const dateL = new Date(lastDate)
+          if (dateL > dateC) {
+            console.log('hee')
+            continue
+          }
+          const createdDate = dateC.toISOString();
           const categoriesInnerText = await page.$eval('.entry_categories', (element) => {
             const anchors = Array.from(element.querySelectorAll('a'));
             const innerTextArray = anchors.map((anchor) => anchor.innerText || '');
@@ -80,6 +112,9 @@ export const apkScrapping = (totaPage) => {
             console.log('concatenatedText', concatenatedText)
             return concatenatedText;
           });
+
+          const title = await page.locator('.post-title h1').innerText() || ''
+          const imgSrc = await page.locator('.attachment-featured_image').getAttribute('data-src') || ''
 
           const fileVersionsSizeDeveloper = await page.$$eval('.dl-size', (elements) => {
             return elements.map(element => {
@@ -113,10 +148,12 @@ export const apkScrapping = (totaPage) => {
           const downloadButtons = await page.$$('.download_button');
           if (downloadButtons.length > 0) {
             await downloadButtons[0].click();
-            await page.waitForTimeout(10000); // Add a delay to allow time for new tab to open
+            // await page.waitForTimeout(10000); // Add a delay to allow time for new tab to open
             // Get the newly opened page
             const pages = await context.pages();
             const newPage = pages[pages.length - 1];
+            await newPage.waitForLoadState('load');
+            await newPage.waitForTimeout(5000)
 
             const requiredAndroid = await newPage.evaluate(() => {
               var androidVersions = document?.getElementsByClassName('dl-version')[0]?.getElementsByTagName('span')[1]?.innerText || ''
@@ -136,6 +173,7 @@ export const apkScrapping = (totaPage) => {
             apkObj.title = title
             apkObj.imgSrc = imgSrc
             apkObj.created = created
+            apkObj.createdDate = createdDate
             apkObj.categories = categoriesInnerText
             apkObj.version = version
             apkObj.fileSize = fileSize
@@ -144,6 +182,7 @@ export const apkScrapping = (totaPage) => {
             apkObj.imgSrcAll = imgSrcAll
             apkObj.requiredAndroid = requiredAndroid
             apkObj.downloadFile = newPageExtractedMetaTags
+            console.log('apkObjLast', apkObj)
             apkScrapDataArray.push(apkObj)
           }
           // page.waitForTimeout(20000)

@@ -34,26 +34,30 @@ export class ApksService {
     //   }
     // }
 
- async create(res, isWorking,queries: {page:number}) {
+ async create(res) {
     res.send('Scrapping Initiated Apk');
     console.log("route hit Apk");
     setTimeout(async () => {
       try {
-      console.log('Timeout hit');
-      const result:any = await apkScrapping(queries.page); // Call the main function and capture the return value
+        console.log('Timeout hit');    
+        const apkLastDate = await this.apkModel.find().sort({ createdDate: -1 })
+        const apkLastDt=apkLastDate[0]?.created ||''
+        console.log('apkLastDt',apkLastDt)
+      const result:any = await apkScrapping(apkLastDt); // Call the main function and capture the return value
       const promises = result.map(async (data) => {
         await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
       });
       
       await Promise.all(promises);
       console.log('DB insert');
-      isWorking = false
+      // isWorking = false
+      // console.log('iswor',isWorking)
       return "Inserted to DB"
       // res.send("Inserted to DB")
         
     } catch (error) {
       console.error(error);
-      isWorking = false
+      // isWorking = false
       res.status(500).send('Error occurred during scraping');
     }
     }, 3000);
@@ -64,10 +68,22 @@ export class ApksService {
     console.log('query',query.page)
     const limit = 8;
     const page = query.page;
-    const apkAllData = await this.apkModel.find().limit(limit).skip(((page as number) - 1) * (limit))
-    const apkAllDataLength = (await this.apkModel.find().count())
-    console.log('apkAllDataLength',apkAllDataLength)
+    const apkAllData = await this.apkModel.find().sort({ createdDate: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
+    const apkAllDataLength = (await this.apkModel.find().sort({ createdDate: -1 }).count())
+    console.log('apkAllDataLength', apkAllDataLength)
+    console.log('apkAllData',apkAllData)
     return { apkAllData, apkAllDataLength }
+  }
+
+  async findLastDateApk() {
+    // console.log('query',query.page)
+    // const limit = 8;
+    // const page = query.page;
+    const apkAllData = await this.apkModel.find().sort({ createdDate: -1 })
+    // const apkAllDataLength = (await this.apkModel.find().sort({ createdDate: -1 }).count())
+    // console.log('apkAllDataLength', apkAllDataLength)
+    console.log('apkAllData',apkAllData)
+    return apkAllData[0].created
   }
 
   async findAllApkDataSearch(query: {search:string,page:number}) {
