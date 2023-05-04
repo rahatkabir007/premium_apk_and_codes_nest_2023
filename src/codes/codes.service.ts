@@ -5,7 +5,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Code, CodeDocument } from './schemas/code.schema';
 import { Model } from 'mongoose';
 import { DATABASE_CONNECTION } from 'src/utils/DatabaseConstants';
-import { codeScrapping } from 'src/utils/CodeScrapping';
 import { codeScrappingPageNumber } from 'src/utils/CodeScrapping/CodeScrappingPageNumber';
 import { codeScrappingAllItems } from 'src/utils/CodeScrapping/CodeScrappingAllItems';
 import { codeScrappingSingleItem } from 'src/utils/CodeScrapping/CodeScrappingSingleItem';
