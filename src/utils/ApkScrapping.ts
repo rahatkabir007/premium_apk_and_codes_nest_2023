@@ -1,8 +1,8 @@
 import { chromium } from "playwright";
-import { ApksService } from "src/apks/apks.service";
 const { spawnSync } = require("child_process");
 const apkScrapDataArray: any = [];
-var catSubcat: any = [];
+
+
 export const apkScrapping = (lastDate) => {
   spawnSync("npx", ["playwright", "install", "chromium"]);
   return new Promise(async (resolve, reject) => {
@@ -148,7 +148,7 @@ export const apkScrapping = (lastDate) => {
           const downloadButtons = await page.$$('.download_button');
           if (downloadButtons.length > 0) {
             await downloadButtons[0].click();
-            await page.waitForTimeout(2000); // Add a delay to allow time for new tab to open
+            await page.waitForTimeout(5000); // Add a delay to allow time for new tab to open
             // Get the newly opened page
 
 

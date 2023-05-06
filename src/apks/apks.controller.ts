@@ -12,14 +12,15 @@ export class ApksController {
 
   @Post('/test')
 async test(@Res() res: Response) {
-    if (isWorking) {
-      //@ts-ignore
-    return res.status(409).json({ message: 'Work in progress' });
-  }
-  isWorking = true
-  const create = await this.apksService.create(res);
-  isWorking = false
-  return create
+  //   if (isWorking) {
+  //     //@ts-ignore
+  //   return res.status(409).json({ message: 'Work in progress' });
+  // }
+  // isWorking = true
+    // const create =
+      await this.apksService.createApkDatas(res);
+  // isWorking = false
+  // return create
   }
 
   // @Post('/test')
