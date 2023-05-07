@@ -84,7 +84,7 @@ export class CodesService {
         console.log('Timeout hit');
         const codeLastDate = await this.codeModel.find().sort({ mongoDbDate: -1 })
         const codeLastDt = codeLastDate[0]?.date || ''
-        const { lastLinkNumber, page } = await codeScrappingPageNumber();
+        const { lastLinkNumber, page, browser } = await codeScrappingPageNumber();
         console.log("🚀 ~ file: codes.service.ts:87 ~ CodesService ~ setTimeout ~ result:", lastLinkNumber)
         let codeDatas;
         for (let i = lastLinkNumber; i >= 1; i--) {
@@ -113,7 +113,7 @@ export class CodesService {
           console.log('DB insert', i, "page");
         }
         console.log("🚀 ~ file: codes.service.ts:111 ~ CodesService ~ setTimeout ~ codeDatas:", codeDatas)
-
+        await browser.close();
         // const promises = result.map(async (data) => {
         //   await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
         // });
