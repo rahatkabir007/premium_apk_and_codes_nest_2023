@@ -8,7 +8,7 @@ export const codeScrappingPageNumber = async (): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
             console.log("Started Scrap");
-            const timeout = 60000;
+            const timeout = 0;
             const browser = await chromium.launch({
                 headless: true
             });
@@ -18,7 +18,7 @@ export const codeScrappingPageNumber = async (): Promise<any> => {
             context.setDefaultTimeout(timeout)
 
             const page = await context.newPage();
-            await page.goto("https://codelist.cc/", { waitUntil: 'networkidle', timeout: timeout })
+            await page.goto("https://codelist.cc/", { waitUntil: 'load', timeout: timeout })
             await page.waitForTimeout(2000);
             const lastLinkNumber: number = await page.$$eval('.bottom-navi .navigations a', (elements) => {
                 const lastLink = elements[elements.length - 1];
