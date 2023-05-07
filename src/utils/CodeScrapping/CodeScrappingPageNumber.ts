@@ -8,11 +8,11 @@ export const codeScrappingPageNumber = async (): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
             console.log("Started Scrap");
-            const browser = await chromium.launch({ headless: true, timeout: timeout });
+            const browser = await chromium.launch({ headless: true, timeout: 0 });
             const context = await browser.newContext();
 
-            context.setDefaultNavigationTimeout(timeout)
-            context.setDefaultTimeout(timeout)
+            context.setDefaultNavigationTimeout(0)
+            context.setDefaultTimeout(0)
 
             const page = await context.newPage();
             await page.goto("https://codelist.cc/en/")
