@@ -1,29 +1,24 @@
 import { chromium } from "playwright";
-import { getPrivateChromePage } from "../Chromium";
 const { spawnSync } = require("child_process");
 
 
 
-var page = null;
 export const codeScrappingPageNumber = async (): Promise<any> => {
     spawnSync("npx", ["playwright", "install", "chromium"]);
     return new Promise<any>(async (resolve, reject) => {
         try {
             console.log("Started Scrap");
-            if (page === null) {
-                page = await getPrivateChromePage();
-            }
-            // const timeout = 60000;
-            // const browser = await chromium.launch({
-            //     headless: true, timeout: timeout,
-            // });
-            // const context = await browser.newContext();
+            const timeout = 60000;
+            const browser = await chromium.launch({
+                headless: true, timeout: timeout,
+            });
+            const context = await browser.newContext();
 
-            // context.setDefaultNavigationTimeout(timeout)
-            // context.setDefaultTimeout(timeout)
+            context.setDefaultNavigationTimeout(timeout)
+            context.setDefaultTimeout(timeout)
 
-            // const page = await context.newPage();
-            await page.goto("https://codelist.cc/en/")
+            const page = await context.newPage();
+            await page.goto("https://codelist.cc/")
             await page.waitForTimeout(2000);
             const lastLinkNumber: number = await page.$$eval('.bottom-navi .navigations a', (elements) => {
                 const lastLink = elements[elements.length - 1];
