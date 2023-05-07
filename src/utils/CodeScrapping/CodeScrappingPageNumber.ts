@@ -1,21 +1,21 @@
 import { chromium } from "playwright";
 const { spawnSync } = require("child_process");
 
-const timeout = 1000 * 60 * 10;
+
 
 export const codeScrappingPageNumber = async (): Promise<any> => {
     spawnSync("npx", ["playwright", "install", "chromium"]);
     return new Promise<any>(async (resolve, reject) => {
         try {
             console.log("Started Scrap");
+            const timeout = 60000;
             const browser = await chromium.launch({
-                headless: true, timeout: 0,
-                executablePath: `/path/to/Chrome`,
+                headless: true, timeout: timeout,
             });
             const context = await browser.newContext();
 
-            context.setDefaultNavigationTimeout(0)
-            context.setDefaultTimeout(0)
+            context.setDefaultNavigationTimeout(timeout)
+            context.setDefaultTimeout(timeout)
 
             const page = await context.newPage();
             await page.goto("https://codelist.cc/en/")
