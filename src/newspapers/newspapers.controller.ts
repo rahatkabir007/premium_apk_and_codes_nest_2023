@@ -9,8 +9,8 @@ export class NewspapersController {
   constructor(private readonly newspapersService: NewspapersService) { }
 
 
-  @Post('/postNewspaper')
-  async postCodes(@Res() res: Response) {
+  @Post('/postNewspapers')
+  async postNewspaper(@Res() res: Response) {
     return await this.newspapersService.createNewspaperDatas(res);
   }
 

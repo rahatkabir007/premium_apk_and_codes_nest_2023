@@ -3,6 +3,13 @@ const { spawnSync } = require("child_process");
 
 const timeout = 1000 * 60 * 10;
 
+interface newspaperobject {
+    newspaperName: string;
+    img: string;
+    category: string;
+    url: string
+}
+
 export const newspaperDataScrapping = async (): Promise<any> => {
     spawnSync("npx", ["playwright", "install", "chromium"]);
     return new Promise<any>(async (resolve, reject) => {
@@ -17,21 +24,45 @@ export const newspaperDataScrapping = async (): Promise<any> => {
             const page = await context.newPage();
             await page.goto("https://www.allbanglanewspaper.xyz/")
             await page.waitForTimeout(2000);
-            const elements = await page.$$('.allbanglanewspaperslogo');
-            const result = await Promise.all(elements.map((element) => {
-                return page.evaluate((el) => {
-                    const a = el.querySelector('a');
-                    const div = el.querySelector('div');
-                    const img = el.querySelector('img');
-                    const title = img ? img.getAttribute('title') : null;
-                    return { a, div, title };
-                }, element);
-            }));
-            console.log("🚀 ~ file: NewspaperScrapHomepage.ts:30 ~ result ~ result:", result)
+
+            //online newspaper
+            const onlineData = await page.evaluate(() => {
+                const items = Array.from(document.querySelectorAll('.allbanglanewspaperslogo'));
+                const result = [];
+                for (const item of items) {
+                    try {
+                        const divTag = item.querySelector('div');
+                        const newspaperName = divTag.textContent.trim() || "";
+                        const aTag = item.querySelector('a');
+                        const imgTag = aTag.querySelector('img');
+                        const imageUrl = imgTag.getAttribute('src');
+                        const newImageUrl = getImg(imageUrl);
+                        const category = "onlineNewspaper"
+                        const url = imgTag.getAttribute('title')
+                        const newspaper = {
+                            newspaperName,
+                            newImageUrl,
+                            category,
+                            url
+                        }
+                        if (aTag && imgTag && divTag) {
+                            result.push(newspaper)
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+
+                return result;
+            });
+
+            await page.goto("https://www.allbanglanewspaper.xyz/bangladesh/sharebazarnewspaper")
+
+            console.log(onlineData);
 
 
 
-            // resolve(result);
+            // resolve();
 
         } catch (error) {
             console.log("🚀 ~ file: test.ts:29 ~ returnnewPromise ~ error:", error)
@@ -40,4 +71,8 @@ export const newspaperDataScrapping = async (): Promise<any> => {
         }
     })
 
+}
+
+const getImg = (url) => {
+    url.replace('.', 'https://www.allbanglanewspaper.xyz');
 }
