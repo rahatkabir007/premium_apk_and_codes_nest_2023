@@ -28,50 +28,6 @@ export class CodesService {
   ) { }
 
 
-  // async create(createCodeDto: CreateCodeDto) {
-  //   try {
-  //     const result = await codeScrapping();
-  //     console.log('codeArray', result);
-
-  //     return result
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
-  // async createCodeDatas(res) {
-  //   if (isWorking) {
-  //     return res.status(409).json({ message: 'Work in progress' });
-  //   }
-  //   isWorking = true
-  //   res.send('Scrapping Initiated');
-  //   console.log("route hit");
-  //   setTimeout(async () => {
-  //     try {
-  //       console.log('Timeout hit');
-  //       const codeLastDate = await this.codeModel.find().sort({ mongoDbDate: -1 })
-  //       const codeLastDt = codeLastDate[0]?.date || ''
-  //       const result: any = await codeScrapping(codeLastDt);
-
-  //       // const promises = result.map(async (data) => {
-  //       //   await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
-  //       // });
-
-  //       // await Promise.all(promises);
-  //       for (let i = 0; i < result?.length; i++) {
-  //         await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
-  //       }
-  //       console.log('DB insert');
-  //       isWorking = false;
-  //       return "Inserted to DB"
-  //     } catch (error) {
-  //       console.error(error);
-  //       isWorking = false;
-  //       res.status(500).send('Error occurred during scraping');
-  //     }
-  //   }, 3000);
-
-  // }
   async createCodeDatas(res) {
     if (isWorking) {
       return res.status(409).json({ message: 'Work in progress' });

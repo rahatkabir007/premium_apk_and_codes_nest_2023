@@ -1,4 +1,5 @@
 export enum DATABASE_CONNECTION {
     APK = "APK",
-    CODE = "CODE"
+    CODE = "CODE",
+    NEWSPAPER = "NEWSPAPER",
 }

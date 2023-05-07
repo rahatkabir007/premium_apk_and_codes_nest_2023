@@ -8,6 +8,7 @@ import { CodesModule } from './codes/codes.module';
 import { DATABASE_CONNECTION } from './utils/DatabaseConstants';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
+import { NewspapersModule } from './newspapers/newspapers.module';
 
 @Module({
   imports: [
@@ -25,8 +26,15 @@ import { TasksModule } from './tasks/tasks.module';
         connectionName: DATABASE_CONNECTION.CODE
       }
     ),
+    MongooseModule.forRoot(
+      process.env.DATABASE_URL_NEWSPAPER ?? "",
+      {
+        connectionName: DATABASE_CONNECTION.NEWSPAPER
+      }
+    ),
     ApksModule,
     CodesModule,
+    NewspapersModule,
     // TasksModule
   ],
   controllers: [AppController],
