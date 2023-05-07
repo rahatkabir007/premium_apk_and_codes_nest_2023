@@ -1,11 +1,18 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, Res } from '@nestjs/common';
 import { NewspapersService } from './newspapers.service';
 import { CreateNewspaperDto } from './dto/create-newspaper.dto';
 import { UpdateNewspaperDto } from './dto/update-newspaper.dto';
+import { Response } from 'express';
 
 @Controller('newspapers')
 export class NewspapersController {
   constructor(private readonly newspapersService: NewspapersService) { }
+
+
+  @Post('/postNewspaper')
+  async postCodes(@Res() res: Response) {
+    return await this.newspapersService.createNewspaperDatas(res);
+  }
 
   @Post()
   async create(@Body() createNewspaperDto: CreateNewspaperDto) {

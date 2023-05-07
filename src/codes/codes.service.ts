@@ -37,7 +37,7 @@ export class CodesService {
     console.log("route hit");
     setTimeout(async () => {
       try {
-        console.log('Timeout hit');
+        console.log('Set Timeout hit');
         const codeLastDate = await this.codeModel.find().sort({ mongoDbDate: -1 })
         const codeLastDt = codeLastDate[0]?.date || ''
         const { lastLinkNumber, page } = await codeScrappingPageNumber();
