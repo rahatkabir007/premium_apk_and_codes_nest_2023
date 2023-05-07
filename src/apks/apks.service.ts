@@ -51,14 +51,23 @@ export class ApksService {
       try {
         console.log('Timeout hit');
         const apkLastDate = await this.apkModel.find().sort({ createdDate: -1 })
+        const lastPScrap = await this.apkModel.find().sort({ page: 1 })
+        const firstPScrap = await this.apkModel.find().sort({ page: -1 })
         const apkLastDt = apkLastDate[0]?.created || ''
+
+        const lastPageScrap = lastPScrap[0]?.page || 0
+        const firstPageScrap = firstPScrap[0]?.page || 0
+        const pageGap = (firstPageScrap - lastPageScrap) || 0
+        console.log('last page scrap', lastPageScrap)
+        console.log('first page scrap', firstPageScrap)
+        console.log('pageGap', pageGap)
         console.log('apkLastDt', apkLastDt)
         const { totalP, page, context } = await apkScrappingPageNumber();
 
         console.log('totalP page', totalP)
 
         let allReadMoreHref;
-        for (let i = totalP; i >= 1; i--) {
+        for (let i = totalP - pageGap; i >= 1; i--) {
           const result: any = await apkScrappingAllItems(page, apkLastDt, i);
           if (result === "continue") {
             continue;
@@ -74,6 +83,8 @@ export class ApksService {
               continue;
             }
             console.log("🚀 ~ file: codes.service.ts:98 ~ CodesService ~ setTimeout ~ objResult:", objResult)
+            objResult.page = i
+            console.log('objResult', objResult)
             apkObjArray.push(objResult)
           }
 
