@@ -4,7 +4,7 @@ export const codeScrappingAllItems = async (page, lastDate, i): Promise<any> => 
         try {
             console.log("Going to the page", i);
             await page.waitForTimeout(10000)
-            await page.goto(`https://codelist.cc/pgs/${i}/`);
+            await page.goto(`https://codelist.cc/pgs/${i}/`, { waitUntil: 'load', timeout: 0 });
 
             const NextStep = await page.evaluate(() => {
                 const elements = document.querySelectorAll('.post--vertical .post__text .post__meta a time');
