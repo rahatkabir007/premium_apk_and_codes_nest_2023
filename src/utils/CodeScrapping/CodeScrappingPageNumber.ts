@@ -8,7 +8,10 @@ export const codeScrappingPageNumber = async (): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
             console.log("Started Scrap");
-            const browser = await chromium.launch({ headless: true, timeout: 0 });
+            const browser = await chromium.launch({
+                headless: true, timeout: 0,
+                executablePath: `/path/to/Chrome`,
+            });
             const context = await browser.newContext();
 
             context.setDefaultNavigationTimeout(0)
