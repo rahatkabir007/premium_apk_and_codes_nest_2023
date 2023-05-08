@@ -6,7 +6,6 @@ import { Code, CodeDocument } from './schemas/code.schema';
 import { Model } from 'mongoose';
 import { DATABASE_CONNECTION } from 'src/utils/DatabaseConstants';
 import { codeScrapping } from 'src/utils/CodeScrapping';
-import { optimizedCodeScrapping } from 'src/utils/OptimizedCodeScrapping';
 
 
 export interface codeDataType {
@@ -44,8 +43,7 @@ export class CodesService {
     setTimeout(async () => {
       try {
         console.log('Timeout hit');
-        // const result: any = await codeScrapping();
-        const result: any = await optimizedCodeScrapping();
+        const result: any = await codeScrapping();
 
         // const promises = result.map(async (data) => {
         //   await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
