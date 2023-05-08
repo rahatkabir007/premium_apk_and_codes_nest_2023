@@ -12,7 +12,7 @@ import { NewspapersModule } from './newspapers/newspapers.module';
 
 @Module({
   imports: [
-    // ScheduleModule.forRoot(),
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     MongooseModule.forRoot(
       process.env.DATABASE_URL_APK ?? "",

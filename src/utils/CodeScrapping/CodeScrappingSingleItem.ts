@@ -5,7 +5,7 @@ export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Pro
             console.log('going to details page item', k + 1);
             const codeObj: any = {}
             await page.waitForTimeout(5000)
-            await page.goto(codeDatas[k].url)
+            await page.goto(codeDatas[k].url, { waitUntil: 'load', timeout: 0 })
             await page.waitForTimeout(2000)
             const title = codeDatas[k].title;
             const description = codeDatas[k].description;
@@ -38,7 +38,7 @@ export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Pro
             await page.waitForTimeout(5000);
             if (linkText.includes("codecanyon")) {
                 console.log("going to codecanyon");
-                await page.goto(linkText);
+                await page.goto(linkText), { waitUntil: 'load', timeout: 0 };
                 await page.waitForTimeout(2000);
 
                 const htmlContent = await page.evaluate(() => {

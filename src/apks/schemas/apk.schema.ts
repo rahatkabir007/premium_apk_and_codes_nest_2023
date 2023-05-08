@@ -34,23 +34,20 @@ export class APK {
     developer: string;
 
     @Prop({ required: true })
-    allText:Array<string>;
+    allText: Array<string>;
 
     @Prop({ required: true })
     imgSrcAll: Array<string>;
 
-   
+
     @Prop({ required: true })
     requiredAndroid: string;
-    
+
     @Prop({ required: true })
     downloadFile: Array<{ href: string, innerText: string }>;
 
     @Prop({ required: true })
-    downloadFile: Array<{ href: string, innerText: string }>;
-    
-    @Prop({ required: true })
-    catSub: Array<any>;
+    page: number;
 
 }
 
