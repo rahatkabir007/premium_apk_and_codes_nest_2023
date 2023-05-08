@@ -12,7 +12,8 @@ export interface codeDataType {
   title: string;
   img: string;
   category: string;
-  url: string
+  url: string;
+
 }
 var isWorking = false;
 @Injectable()

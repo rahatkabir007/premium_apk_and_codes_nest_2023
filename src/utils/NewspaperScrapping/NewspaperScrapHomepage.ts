@@ -25,8 +25,9 @@ export const newspaperDataScrapping = async (): Promise<any> => {
             await page.goto("https://www.allbanglanewspaper.xyz/")
             await page.waitForTimeout(2000);
 
+
             //online newspaper
-            const onlineData = await page.evaluate(() => {
+            const onlineNewspaperData = await page.evaluate(() => {
                 const items = Array.from(document.querySelectorAll('.allbanglanewspaperslogo'));
                 const result = [];
                 for (const item of items) {
@@ -36,12 +37,12 @@ export const newspaperDataScrapping = async (): Promise<any> => {
                         const aTag = item.querySelector('a');
                         const imgTag = aTag.querySelector('img');
                         const imageUrl = imgTag.getAttribute('src');
-                        const newImageUrl = getImg(imageUrl);
+                        const img = imageUrl.replace('.', 'https://www.allbanglanewspaper.xyz');
                         const category = "onlineNewspaper"
                         const url = imgTag.getAttribute('title')
                         const newspaper = {
                             newspaperName,
-                            newImageUrl,
+                            img,
                             category,
                             url
                         }
@@ -56,9 +57,63 @@ export const newspaperDataScrapping = async (): Promise<any> => {
                 return result;
             });
 
-            await page.goto("https://www.allbanglanewspaper.xyz/bangladesh/sharebazarnewspaper")
+            console.log(onlineNewspaperData);
 
-            console.log(onlineData);
+            await page.waitForTimeout(2000);
+
+            //sharebazar newspaper
+            await page.goto("https://www.allbanglanewspaper.xyz/bangladesh/sharebazarnewspaper");
+            const sharebazarnewspaperData = await page.evaluate(() => {
+                const result = [];
+                const items = Array.from(document.querySelectorAll('.allbanglanewspaperslogo'));
+                for (const item of items) {
+                    try {
+                        const divTag = item.querySelector('div');
+                        const newspaperName = divTag.textContent.trim() || "";
+                        const aTag = item.querySelector('a');
+                        const imgTag = aTag.querySelector('img');
+                        const imageUrl = imgTag.getAttribute('src');
+                        const img = imageUrl.replace('.', 'https://www.allbanglanewspaper.xyz');
+                        const category = "sharebazarnewspaper"
+                        const url = imgTag.getAttribute('title')
+                        const newspaper = {
+                            newspaperName,
+                            img,
+                            category,
+                            url
+                        }
+                        if (aTag && imgTag && divTag) {
+                            result.push(newspaper)
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+                const items2 = Array.from(document.querySelectorAll('.newspapers-list-item'));
+                for (const item of items2) {
+                    try {
+                        const aTag = item.querySelector('a');
+                        const imgTag = aTag.querySelector('img');
+                        const imageUrl = imgTag.getAttribute('src');
+                        const img = imageUrl.replace('.', 'https://www.allbanglanewspaper.xyz');
+                        const category = "sharebazarnewspaper"
+                        const url = imgTag.getAttribute('title')
+                        const newspaper = {
+                            img,
+                            category,
+                            url
+                        }
+                        if (aTag && imgTag) {
+                            result.push(newspaper)
+                        }
+                    } catch (error) {
+                        console.error(error);
+                    }
+                }
+                return result;
+            });
+            console.log("🚀 ~ file: NewspaperScrapHomepage.ts:95 ~ sharebazarnewspaperData ~ sharebazarnewspaperData:", sharebazarnewspaperData)
+
 
 
 
@@ -73,6 +128,3 @@ export const newspaperDataScrapping = async (): Promise<any> => {
 
 }
 
-const getImg = (url) => {
-    url.replace('.', 'https://www.allbanglanewspaper.xyz');
-}

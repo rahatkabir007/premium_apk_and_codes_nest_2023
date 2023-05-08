@@ -17,6 +17,7 @@ export interface codeDataType {
   category: string;
   date: string;
   downloadLinks: string[];
+  page: number
 }
 var isWorking = false;
 @Injectable()
@@ -40,10 +41,15 @@ export class CodesService {
         console.log('Set Timeout hit');
         const codeLastDate = await this.codeModel.find().sort({ mongoDbDate: -1 })
         const codeLastDt = codeLastDate[0]?.date || ''
+        const lastPScrap = await this.codeModel.find().sort({ page: 1 })
+        const firstPScrap = await this.codeModel.find().sort({ page: -1 })
+        const lastPageScrap = lastPScrap[0]?.page || 0
+        const firstPageScrap = firstPScrap[0]?.page || 0
+        const pageGap = (firstPageScrap - lastPageScrap) + 1 || 0
         const { lastLinkNumber, page, browser } = await codeScrappingPageNumber();
         console.log("🚀 ~ file: codes.service.ts:87 ~ CodesService ~ setTimeout ~ result:", lastLinkNumber)
         let codeDatas;
-        for (let i = lastLinkNumber; i >= 1; i--) {
+        for (let i = lastLinkNumber - pageGap; i >= 1; i--) {
           const result: any = await codeScrappingAllItems(page, codeLastDt, i);
           if (result === "continue") {
             continue;
@@ -58,6 +64,7 @@ export class CodesService {
             if (objResult === "continue") {
               continue;
             }
+            objResult.page = i
             console.log("🚀 ~ file: codes.service.ts:98 ~ CodesService ~ setTimeout ~ objResult:", objResult)
             codeObjArray.push(objResult)
           }
