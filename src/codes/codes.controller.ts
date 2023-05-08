@@ -4,21 +4,15 @@ import { CreateCodeDto } from './dto/create-code.dto';
 import { UpdateCodeDto } from './dto/update-code.dto';
 import { Response } from 'express';
 
-let isWorking = false;
+
 @Controller('codes')
 export class CodesController {
   constructor(private readonly codesService: CodesService) { }
 
 
   @Post('/postCodes')
-  postCodes(@Res() res: Response) {
-    if (isWorking) {
-      return res.status(409).json({ message: 'Work in progress' });
-    }
-    isWorking = true
-    const create = this.codesService.createCodeDatas(res);
-    isWorking = false;
-    return create;
+  async postCodes(@Res() res: Response) {
+    return await this.codesService.createCodeDatas(res);
   }
 
   @Get('/findAllCodesPaginated')
@@ -47,10 +41,10 @@ export class CodesController {
     return this.codesService.findOneCodeData(id);
   }
 
-  @Post()
-  create(@Body() createCodeDto: CreateCodeDto) {
-    return this.codesService.create(createCodeDto);
-  }
+  // @Post()
+  // create(@Body() createCodeDto: CreateCodeDto) {
+  //   return this.codesService.create(createCodeDto);
+  // }
 
 
 

@@ -19,6 +19,9 @@ export class APK {
     created: string;
 
     @Prop({ required: true })
+    createdDate: Date;
+
+    @Prop({ required: true })
     categories: string;
 
     @Prop({ required: true })
