@@ -8,7 +8,7 @@ export type NewspaperDocument = Newspaper & Document;
 @Schema({ timestamps: true })
 export class Newspaper {
     @Prop()
-    newspaperName: string;
+    title: string;
 
     @Prop({ required: true })
     img: string;

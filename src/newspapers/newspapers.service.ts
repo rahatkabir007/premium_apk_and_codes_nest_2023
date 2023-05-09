@@ -9,7 +9,7 @@ import { newspaperDataScrapping } from 'src/utils/NewspaperScrapping/NewspaperSc
 
 
 export interface newspaperDataType {
-  newspaperName?: string;
+  title?: string;
   img: string;
   category: string;
   url: string;
@@ -22,7 +22,7 @@ export class NewspapersService {
   private newspaperModel: Model<NewspaperDocument>
 
   async create(createNewspaperDto: CreateNewspaperDto) {
-    const cr = await this.newspaperModel.findOneAndUpdate({ title: createNewspaperDto.newspaperName }, createNewspaperDto, { upsert: true, new: true });
+    const cr = await this.newspaperModel.findOneAndUpdate({ title: createNewspaperDto.title }, createNewspaperDto, { upsert: true, new: true });
     return "Insert";
   }
 

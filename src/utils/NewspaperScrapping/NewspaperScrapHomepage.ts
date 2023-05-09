@@ -22,7 +22,7 @@ export const newspaperDataScrapping = async (): Promise<any> => {
             context.setDefaultTimeout(timeout)
 
             const page = await context.newPage();
-            await page.goto("https://www.allbanglanewspaper.xyz/")
+            await page.goto("https://www.allbanglanewspaper.xyz/bangladesh/sharebazarnewspaper")
             await page.waitForTimeout(2000);
 
 
@@ -56,6 +56,7 @@ export const newspaperDataScrapping = async (): Promise<any> => {
 
                 return result;
             });
+            console.log("🚀 ~ file: NewspaperScrapHomepage.ts:59 ~ onlineNewspaperData ~ onlineNewspaperData:", onlineNewspaperData)
 
 
 
@@ -126,13 +127,19 @@ export const newspaperDataScrapping = async (): Promise<any> => {
                 }
                 return result;
             });
+            console.log("🚀 ~ file: NewspaperScrapHomepage.ts:130 ~ sharebazarnewspaperData ~ sharebazarnewspaperData:", sharebazarnewspaperData)
 
 
 
             const final = onlineNewspaperData.concat(sharebazarnewspaperData);
 
+            // const newArr = [];
+            // onlineNewspaperData.slice(0, 30).map(item => {
+            //     item.category = "indianNewspaper";
+            //     newArr.push(item)
+            // })
 
-
+            // console.log("nn", newArr);
             resolve(final);
 
         } catch (error) {

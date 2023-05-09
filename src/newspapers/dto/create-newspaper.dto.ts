@@ -1,5 +1,5 @@
 export class CreateNewspaperDto {
-    newspaperName: string;
+    title: string;
     img: string;
     category: string;
     url: string
