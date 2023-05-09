@@ -8,8 +8,8 @@ import { InjectModel } from '@nestjs/mongoose';
 import { newspaperDataScrapping } from 'src/utils/NewspaperScrapping/NewspaperScrapHomepage';
 
 
-export interface codeDataType {
-  title: string;
+export interface newspaperDataType {
+  newspaperName?: string;
   img: string;
   category: string;
   url: string;
@@ -37,7 +37,10 @@ export class NewspapersService {
       try {
         console.log('Set Timeout hit');
         const result = await newspaperDataScrapping();
-
+        const promises = result.map(async (data: newspaperDataType) => {
+          await this.newspaperModel.findOneAndUpdate({ url: data.url }, data, { upsert: true, new: true });
+        });
+        await Promise.all(promises);
         console.log('DB insert');
         isWorking = false;
         return "Inserted to DB"
