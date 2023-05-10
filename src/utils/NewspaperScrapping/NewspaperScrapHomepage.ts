@@ -39,7 +39,12 @@ export const newspaperDataScrapping = async (): Promise<any> => {
                         const imageUrl = imgTag.getAttribute('src');
                         const img = imageUrl.replace('.', 'https://www.allbanglanewspaper.xyz');
                         const category = "onlineNewspaper"
-                        const url = imgTag.getAttribute('title')
+
+                        const href = aTag.getAttribute('href');
+                        const hrefParts = href.split("/");
+                        const text = hrefParts[hrefParts.length - 1].replace(".html", "");
+                        // const url = imgTag.getAttribute('title')
+                        const url = text;
                         const newspaper = {
                             newspaperName,
                             img,
