@@ -27,9 +27,9 @@ import { NewspapersModule } from './newspapers/newspapers.module';
       }
     ),
     MongooseModule.forRoot(
-      process.env.DATABASE_URL_NEWSPAPER ?? "",
+      process.env.DATABASE_URL_SCRAP_SERVER ?? "",
       {
-        connectionName: DATABASE_CONNECTION.NEWSPAPER
+        connectionName: DATABASE_CONNECTION.SCRAP_SERVER
       }
     ),
     ApksModule,

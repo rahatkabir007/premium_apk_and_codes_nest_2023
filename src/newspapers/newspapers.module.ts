@@ -8,7 +8,7 @@ import { DATABASE_CONNECTION } from 'src/utils/DatabaseConstants';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: Newspaper.name, schema: NewspaperSchema }], DATABASE_CONNECTION.NEWSPAPER),
+      { name: Newspaper.name, schema: NewspaperSchema }], DATABASE_CONNECTION.SCRAP_SERVER),
   ],
   controllers: [NewspapersController],
   providers: [NewspapersService]

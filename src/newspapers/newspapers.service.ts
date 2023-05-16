@@ -18,7 +18,7 @@ export interface newspaperDataType {
 var isWorking = false;
 @Injectable()
 export class NewspapersService {
-  @InjectModel(Newspaper.name, DATABASE_CONNECTION.NEWSPAPER)
+  @InjectModel(Newspaper.name, DATABASE_CONNECTION.SCRAP_SERVER)
   private newspaperModel: Model<NewspaperDocument>
 
   async create(createNewspaperDto: CreateNewspaperDto) {
