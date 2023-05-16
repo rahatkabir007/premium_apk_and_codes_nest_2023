@@ -8,6 +8,7 @@ import { Model } from 'mongoose';
 import { PdfBookAuthor, PdfBookAuthorDocument } from './schemas/pdfBooksAuthors.schema';
 import { bookScrappingPageNumber } from 'src/utils/PdfBookScrapping/BookScrappingPageNumber';
 import { bookScrappingAllItems } from 'src/utils/PdfBookScrapping/BookScrappingAllItems';
+import { bookAuthorScrapping } from 'src/utils/PdfBookScrapping/BookAuthorScrapping';
 
 
 export interface pdfBookDataType {
@@ -59,12 +60,29 @@ export class PdfBooksService {
         const { lastPageNumber, page, browser } = await bookScrappingPageNumber();
 
         let bookDatas;
-        for (let i = lastPageNumber - pageGap; i >= 1; i--) {
+        // for (let i = lastPageNumber - pageGap; i >= 1; i--) {
+        for (let i = lastPageNumber; i >= 1; i--) {
           const result: any = await bookScrappingAllItems(page, bookLastDt, i);
+          // if (result === "continue") {
+          //   continue;
+          // }
+          bookDatas = result;
+          // if (bookDatas.length === 0) {
+          //   break;
+          // }
+          let codeObjArray = [];
+          for (let j = bookDatas.length - 1; j >= 0; j--) {
+            const authorYesPdfIdArray = await bookAuthorScrapping(bookDatas, j, page)
+            authorYesPdfIdArray.map(async authorYesPdfId => {
+              const author = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfId })
+              console.log("🚀 ~ file: pdf-books.service.ts:78 ~ setTimeout ~ author:", author)
+            })
+          }
         }
 
 
 
+        await browser.close();
         //main codes
         console.log('DB insert');
         isWorking = false;

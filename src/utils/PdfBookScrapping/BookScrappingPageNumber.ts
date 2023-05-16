@@ -8,7 +8,7 @@ export const bookScrappingPageNumber = async (): Promise<any> => {
             console.log("Started Scrap");
             const timeout = 0;
             const browser = await chromium.launch({
-                headless: true
+                headless: false
             });
             const context = await browser.newContext();
 
@@ -16,7 +16,7 @@ export const bookScrappingPageNumber = async (): Promise<any> => {
             context.setDefaultTimeout(timeout)
 
             const page = await context.newPage();
-            await page.goto("https://yes-pdf.com/books", { waitUntil: 'load', timeout: timeout })
+            await page.goto("https://yes-pdf.com/books")
             await page.waitForTimeout(2000);
             const lastPageNumber = await page.$$eval('.pagination .page-item a', (links) => {
                 const lastLink = links[links.length - 1];

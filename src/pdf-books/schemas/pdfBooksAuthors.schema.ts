@@ -19,6 +19,9 @@ export class PdfBookAuthor {
     @Prop()
     downloadLink: string;
 
+    @Prop()
+    authorYesPdfId: string;
+
 }
 
 export const PdfBookAuthorSchema = SchemaFactory.createForClass(PdfBookAuthor);
