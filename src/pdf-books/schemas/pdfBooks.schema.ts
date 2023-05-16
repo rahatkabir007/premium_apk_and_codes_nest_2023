@@ -22,6 +22,9 @@ export class PdfBook {
     img: string;
 
     @Prop()
+    date: string;
+
+    @Prop()
     downloadLink: string;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "PdfBookAuthor" })

@@ -6,6 +6,8 @@ import { PdfBook, PdfBookDocument } from './schemas/pdfBooks.schema';
 import { DATABASE_CONNECTION } from 'src/utils/DatabaseConstants';
 import { Model } from 'mongoose';
 import { PdfBookAuthor, PdfBookAuthorDocument } from './schemas/pdfBooksAuthors.schema';
+import { bookScrappingPageNumber } from 'src/utils/PdfBookScrapping/BookScrappingPageNumber';
+import { bookScrappingAllItems } from 'src/utils/PdfBookScrapping/BookScrappingAllItems';
 
 
 export interface pdfBookDataType {
@@ -44,15 +46,26 @@ export class PdfBooksService {
     setTimeout(async () => {
       try {
         console.log('Set Timeout hit');
-        //codes
+        //main codes
+        //  page checking
+        const bookLastDate = await this.pdfBookModel.find().sort({ mongoDbDate: -1 })
+        const bookLastDt = bookLastDate[0]?.date || ''
+        const lastPScrap = await this.pdfBookModel.find().sort({ page: 1 })
+        const firstPScrap = await this.pdfBookModel.find().sort({ page: -1 })
+        const lastPageScrap = lastPScrap[0]?.page || 0
+        const firstPageScrap = firstPScrap[0]?.page || 0
+        const pageGap = (firstPageScrap - lastPageScrap) + 1 || 0
+        //  page checking
+        const { lastPageNumber, page, browser } = await bookScrappingPageNumber();
 
-        const create = await this.pdfBookModel.create({
-          title: "hello"
-        })
+        let bookDatas;
+        for (let i = lastPageNumber - pageGap; i >= 1; i--) {
+          const result: any = await bookScrappingAllItems(page, bookLastDt, i);
+        }
 
 
 
-        //codes
+        //main codes
         console.log('DB insert');
         isWorking = false;
         return "Inserted to DB"
