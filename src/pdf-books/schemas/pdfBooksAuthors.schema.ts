@@ -17,9 +17,6 @@ export class PdfBookAuthor {
     img: string;
 
     @Prop()
-    downloadLink: string;
-
-    @Prop()
     authorYesPdfId: string;
 
 }

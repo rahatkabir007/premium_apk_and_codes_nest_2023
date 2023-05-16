@@ -3,7 +3,7 @@ export const bookScrappingAllItems = async (page, lastDate, i): Promise<any> => 
     return new Promise<any>(async (resolve, reject) => {
         try {
             console.log("Going to the page", i);
-            await page.waitForTimeout(10000)
+            await page.waitForTimeout(2000)
             await page.goto(`https://yes-pdf.com/books/page/${i}`);
             //DATE Handle
 

@@ -8,6 +8,7 @@ import { Model } from 'mongoose';
 import { PdfBookAuthor, PdfBookAuthorDocument } from './schemas/pdfBooksAuthors.schema';
 import { bookScrappingPageNumber } from 'src/utils/PdfBookScrapping/BookScrappingPageNumber';
 import { bookScrappingAllItems } from 'src/utils/PdfBookScrapping/BookScrappingAllItems';
+import { bookAuthorIdScrapping } from 'src/utils/PdfBookScrapping/BookAuthorIdScrapping';
 import { bookAuthorScrapping } from 'src/utils/PdfBookScrapping/BookAuthorScrapping';
 
 
@@ -70,12 +71,17 @@ export class PdfBooksService {
           // if (bookDatas.length === 0) {
           //   break;
           // }
-          let codeObjArray = [];
+          let authorObjArray = [];
           for (let j = bookDatas.length - 1; j >= 0; j--) {
-            const authorYesPdfIdArray = await bookAuthorScrapping(bookDatas, j, page)
+            const authorYesPdfIdArray = await bookAuthorIdScrapping(bookDatas, j, page)
             authorYesPdfIdArray.map(async authorYesPdfId => {
               const author = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfId })
               console.log("🚀 ~ file: pdf-books.service.ts:78 ~ setTimeout ~ author:", author)
+              if (author.length === 0) {
+                const authorDatas = await bookAuthorScrapping(authorYesPdfId, page);
+                authorDatas.authorYesPdfId = authorYesPdfId
+                console.log("🚀 ~ file: pdf-books.service.ts:84 ~ setTimeout ~ authorDatas:", authorDatas);
+              }
             })
           }
         }

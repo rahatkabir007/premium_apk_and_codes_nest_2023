@@ -1,26 +1,27 @@
 
-export const bookAuthorScrapping = async (bookDatas, j, page): Promise<any> => {
+export const bookAuthorScrapping = async (authorId, page): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
-            console.log('going to details page item', j + 1);
+            console.log('going to author page');
+            console.log("🚀 ~ file: BookAuthorScrapping.ts:3 ~ bookAuthorScrapping ~ authorId:", authorId)
+            const parsedAuthorId = parseInt(authorId)
+            const authorObj: any = {}
             await page.waitForTimeout(2000)
-            await page.goto(`https://yes-pdf.com${bookDatas[j].url}`);
+            await page.goto(`https://yes-pdf.com/author/${parsedAuthorId}/books`);
             await page.waitForTimeout(2000)
-            const hrefs = await page.$$eval('.book-meta tbody tr:nth-child(3) td a', (elements) => {
-                return elements.map((el) => {
-                    const href = el.href;
-                    const splitted = href.split('/author/');
-                    if (splitted.length === 2) {
-                        const number = splitted[1].split('/')[0];
-                        return number;
-                    }
-                    return null;
-                });
-            });
 
-            console.log(hrefs);
+            // const srcs = await page.$$eval('.author-photo img', (imgs) => imgs.map((img) => img.getAttribute('src')));
+            // const authorTitle = await page.$eval('.author-info h1', (element) => element.textContent);
+            // const authorDescription = await page.$$eval('.description-author p', (elements) => {
+            //     return elements.map((element) => element.textContent);
+            // });
 
-            resolve(hrefs);
+            // authorObj.title = authorTitle;
+            // authorObj.description = authorDescription;
+            // authorObj.img = `https://yes-pdf.com${srcs}`
+
+
+            // resolve();
 
         } catch (error) {
             console.log("🚀 ~ file: test.ts:29 ~ returnnewPromise ~ error:", error)
