@@ -9,6 +9,8 @@ import { DATABASE_CONNECTION } from './utils/DatabaseConstants';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
 import { NewspapersModule } from './newspapers/newspapers.module';
+import { PdfBooksModule } from './pdf-books/pdf-books.module';
+
 
 @Module({
   imports: [
@@ -35,6 +37,7 @@ import { NewspapersModule } from './newspapers/newspapers.module';
     ApksModule,
     CodesModule,
     NewspapersModule,
+    PdfBooksModule,
     // TasksModule
   ],
   controllers: [AppController],
