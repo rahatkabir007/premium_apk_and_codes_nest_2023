@@ -36,6 +36,9 @@ export class Code {
     @Prop({ required: true })
     downloadLinks: Array<string>;
 
+    @Prop({ required: true })
+    page: number;
+
 }
 
 export const CodeSchema = SchemaFactory.createForClass(Code);

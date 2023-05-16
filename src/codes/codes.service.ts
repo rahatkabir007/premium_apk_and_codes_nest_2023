@@ -17,6 +17,7 @@ export interface codeDataType {
   category: string;
   date: string;
   downloadLinks: string[];
+  page: number
 }
 var isWorking = false;
 @Injectable()
@@ -28,50 +29,6 @@ export class CodesService {
   ) { }
 
 
-  // async create(createCodeDto: CreateCodeDto) {
-  //   try {
-  //     const result = await codeScrapping();
-  //     console.log('codeArray', result);
-
-  //     return result
-  //   } catch (error) {
-  //     console.error(error);
-  //   }
-  // }
-
-  // async createCodeDatas(res) {
-  //   if (isWorking) {
-  //     return res.status(409).json({ message: 'Work in progress' });
-  //   }
-  //   isWorking = true
-  //   res.send('Scrapping Initiated');
-  //   console.log("route hit");
-  //   setTimeout(async () => {
-  //     try {
-  //       console.log('Timeout hit');
-  //       const codeLastDate = await this.codeModel.find().sort({ mongoDbDate: -1 })
-  //       const codeLastDt = codeLastDate[0]?.date || ''
-  //       const result: any = await codeScrapping(codeLastDt);
-
-  //       // const promises = result.map(async (data) => {
-  //       //   await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
-  //       // });
-
-  //       // await Promise.all(promises);
-  //       for (let i = 0; i < result?.length; i++) {
-  //         await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
-  //       }
-  //       console.log('DB insert');
-  //       isWorking = false;
-  //       return "Inserted to DB"
-  //     } catch (error) {
-  //       console.error(error);
-  //       isWorking = false;
-  //       res.status(500).send('Error occurred during scraping');
-  //     }
-  //   }, 3000);
-
-  // }
   async createCodeDatas(res) {
     if (isWorking) {
       return res.status(409).json({ message: 'Work in progress' });
@@ -81,13 +38,18 @@ export class CodesService {
     console.log("route hit");
     setTimeout(async () => {
       try {
-        console.log('Timeout hit');
+        console.log('Set Timeout hit');
         const codeLastDate = await this.codeModel.find().sort({ mongoDbDate: -1 })
         const codeLastDt = codeLastDate[0]?.date || ''
+        const lastPScrap = await this.codeModel.find().sort({ page: 1 })
+        const firstPScrap = await this.codeModel.find().sort({ page: -1 })
+        const lastPageScrap = lastPScrap[0]?.page || 0
+        const firstPageScrap = firstPScrap[0]?.page || 0
+        const pageGap = (firstPageScrap - lastPageScrap) + 1 || 0
         const { lastLinkNumber, page, browser } = await codeScrappingPageNumber();
         console.log("🚀 ~ file: codes.service.ts:87 ~ CodesService ~ setTimeout ~ result:", lastLinkNumber)
         let codeDatas;
-        for (let i = lastLinkNumber; i >= 1; i--) {
+        for (let i = lastLinkNumber - pageGap; i >= 1; i--) {
           const result: any = await codeScrappingAllItems(page, codeLastDt, i);
           if (result === "continue") {
             continue;
@@ -102,6 +64,7 @@ export class CodesService {
             if (objResult === "continue") {
               continue;
             }
+            objResult.page = i
             console.log("🚀 ~ file: codes.service.ts:98 ~ CodesService ~ setTimeout ~ objResult:", objResult)
             codeObjArray.push(objResult)
           }

@@ -9,6 +9,7 @@ import { DATABASE_CONNECTION } from './utils/DatabaseConstants';
 import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
 import { HustleModule } from './hustle/hustle.module';
+import { NewspapersModule } from './newspapers/newspapers.module';
 
 @Module({
   imports: [
@@ -32,10 +33,18 @@ import { HustleModule } from './hustle/hustle.module';
         connectionName: DATABASE_CONNECTION.HUSTLE
       }
     ),
+    MongooseModule.forRoot(
+      process.env.DATABASE_URL_SCRAP_SERVER ?? "",
+      {
+        connectionName: DATABASE_CONNECTION.SCRAP_SERVER
+      }
+    ),
     ApksModule,
     CodesModule,
     TasksModule,
-    HustleModule
+    HustleModule,
+    NewspapersModule,
+    // TasksModule
   ],
   controllers: [AppController],
   providers: [AppService],
