@@ -73,16 +73,21 @@ export class PdfBooksService {
           // }
           let authorObjArray = [];
           for (let j = bookDatas.length - 1; j >= 0; j--) {
-            const authorYesPdfIdArray = await bookAuthorIdScrapping(bookDatas, j, page)
-            authorYesPdfIdArray.map(async authorYesPdfId => {
-              const author = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfId })
-              console.log("🚀 ~ file: pdf-books.service.ts:78 ~ setTimeout ~ author:", author)
-              if (author.length === 0) {
-                const authorDatas = await bookAuthorScrapping(authorYesPdfId, page);
-                authorDatas.authorYesPdfId = authorYesPdfId
-                console.log("🚀 ~ file: pdf-books.service.ts:84 ~ setTimeout ~ authorDatas:", authorDatas);
+            const authorYesPdfIdArray = await bookAuthorIdScrapping(bookDatas[j], page)
+            for (let k = 0; k < authorYesPdfIdArray.length; k++) {
+              const author = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfIdArray[k] })
+              console.log("🚀 ~ file: pdf-books.service.ts:79 ~ setTimeout ~ author:", author)
+              if (author.length > 0) {
+                continue;
               }
-            })
+              // if (author.length === 0) { 
+              const authorDatas = await bookAuthorScrapping(authorYesPdfIdArray[k], page);
+              console.log("🚀 ~ file: pdf-books.service.ts:81 ~ setTimeout ~ authorDatas:", authorDatas)
+              authorDatas.authorYesPdfId = authorYesPdfIdArray[k]
+              await this.pdfBookAuthorModel.create(authorDatas);
+              // }
+              console.log("🚀 ~ file: pdf-books.service.ts:81 ~ setTimeout ~ authorDatas:", authorDatas)
+            }
           }
         }
 

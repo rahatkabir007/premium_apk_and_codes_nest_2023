@@ -1,10 +1,10 @@
 
-export const bookAuthorIdScrapping = async (bookDatas, j, page): Promise<any> => {
+export const bookAuthorIdScrapping = async (bookDataUrl, page): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
-            console.log('going to details page item', j + 1);
+            console.log('going to details page item', bookDataUrl);
             await page.waitForTimeout(2000)
-            await page.goto(`https://yes-pdf.com${bookDatas[j].url}`);
+            await page.goto(`https://yes-pdf.com${bookDataUrl.url}`);
             await page.waitForTimeout(2000)
             const hrefs = await page.$$eval('.book-meta tbody tr:nth-child(3) td a', (elements) => {
                 return elements.map((el) => {

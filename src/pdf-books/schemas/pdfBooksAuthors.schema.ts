@@ -11,7 +11,7 @@ export class PdfBookAuthor {
     title: string;
 
     @Prop()
-    description: string;
+    description: string[];
 
     @Prop()
     img: string;
