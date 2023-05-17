@@ -1,5 +1,5 @@
 
-export const bookScrappingAllItems = async (page, lastDate, i): Promise<any> => {
+export const bookScrappingAllItems = async (page, i): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
             console.log("Going to the page", i);

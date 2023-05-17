@@ -12,8 +12,9 @@ export type PdfBookDocument = PdfBook & Document;
 export class PdfBook {
     // @Prop({ required: true })
     // title: string;
+
     @Prop()
-    title: string;
+    bookTitle: string;
 
     @Prop()
     description: string;
@@ -22,16 +23,46 @@ export class PdfBook {
     img: string;
 
     @Prop()
-    date: string;
+    downloadLink: string;
 
     @Prop()
-    downloadLink: string;
+    readingLink: string;
+
+    @Prop()
+    publishedYear: string;
+
+    @Prop()
+    publisher: string;
+
+    @Prop()
+    genres: string;
+
+    @Prop()
+    authors: string;
+
+    @Prop()
+    bookPages: string;
+
+    @Prop()
+    language: string;
+
+    @Prop()
+    physicalForm: string;
+
+    @Prop()
+    type: string;
 
     @Prop({ type: mongoose.Schema.Types.ObjectId, ref: "PdfBookAuthor" })
     authorMongoDBId: PdfBookAuthor;
 
     @Prop()
     page: number;
+
+    @Prop()
+    authorYesPdfId: string[];
+
+    @Prop()
+    bookYesPdfId: string;
 
 }
 
