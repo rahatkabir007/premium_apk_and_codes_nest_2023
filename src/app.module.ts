@@ -10,6 +10,7 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
 import { HustleModule } from './hustle/hustle.module';
 import { NewspapersModule } from './newspapers/newspapers.module';
+import { TorrentsModule } from './torrents/torrents.module';
 
 @Module({
   imports: [
@@ -39,11 +40,18 @@ import { NewspapersModule } from './newspapers/newspapers.module';
         connectionName: DATABASE_CONNECTION.SCRAP_SERVER
       }
     ),
+    MongooseModule.forRoot(
+      process.env.DATABASE_URL_TORRENTS ?? "",
+      {
+        connectionName: DATABASE_CONNECTION.TORRENTS
+      }
+    ),
     ApksModule,
     CodesModule,
     TasksModule,
     HustleModule,
     NewspapersModule,
+    TorrentsModule,
     // TasksModule
   ],
   controllers: [AppController],

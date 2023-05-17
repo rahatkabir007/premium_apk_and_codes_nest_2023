@@ -3,4 +3,5 @@ export enum DATABASE_CONNECTION {
     CODE = "CODE",
     HUSTLE = "HUSTLE",
     SCRAP_SERVER = "SCRAP_SERVER",
+    TORRENTS = "TORRENTS"
 }
