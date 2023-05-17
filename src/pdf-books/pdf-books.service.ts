@@ -57,13 +57,13 @@ export class PdfBooksService {
         const firstPScrap = await this.pdfBookModel.find().sort({ page: -1 })
         const lastPageScrap = lastPScrap[0]?.page || 0
         const firstPageScrap = firstPScrap[0]?.page || 0
-        const pageGap = (firstPageScrap - lastPageScrap) + 1 || 0
+        const pageGap = (firstPageScrap - lastPageScrap) || 0
         //  page checking
         const { lastPageNumber, page, browser } = await bookScrappingPageNumber();
 
         let bookDatas;
-        // for (let i = lastPageNumber - pageGap; i >= 1; i--) {
-        for (let i = lastPageNumber; i >= 1; i--) {
+        for (let i = lastPageNumber - pageGap; i >= 1; i--) {
+          // for (let i = lastPageNumber; i >= 1; i--) {
           const result: any = await bookScrappingAllItems(page, i);
           // if (result === "continue") {
           //   continue;

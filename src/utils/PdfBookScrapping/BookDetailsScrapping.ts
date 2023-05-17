@@ -17,7 +17,7 @@ export const bookDetailsScrapping = async (bookDataUrl, page): Promise<any> => {
 
                 const bookCoverSrc = bookCoverImg ? bookCoverImg.getAttribute('src') : null;
                 const bookLinksHrefs = Array.from(bookLinks, link => link.getAttribute('href'));
-                const colH1Text = colH1 ? colH1.textContent.replace(/ FREE DOWNLOAD/g, '') : null;
+                const colH1Text = colH1 ? colH1.textContent : null;
                 const bookYearText = bookYear ? bookYear.textContent : null;
                 const bookMetaData = Array.from(bookMetaTdList, td => {
                     const anchors = Array.from(td.querySelectorAll('a'));
@@ -60,7 +60,7 @@ export const bookDetailsScrapping = async (bookDataUrl, page): Promise<any> => {
                 const img = `https://yes-pdf.com${bookCoverSrc}`;
                 const downloadLink = `https://yes-pdf.com${bookLinksHrefs[0]}`;
                 const readingLink = `https://yes-pdf.com${bookLinksHrefs[1]}`;
-                const bookTitle = colH1Text;
+                const bookTitle = colH1Text.replace(" Free Download", "");
                 const publishedYear = bookYearText;
                 const publisher = cleanedBookMetaData[0] === "" ? "Not Found" : cleanedBookMetaData[0];
                 const genres = cleanedBookMetaData[1] === "" ? "Not Found" : cleanedBookMetaData[1];
