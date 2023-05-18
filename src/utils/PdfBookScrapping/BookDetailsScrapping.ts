@@ -99,8 +99,6 @@ export const bookDetailsScrapping = async (bookDataUrl, page): Promise<any> => {
             resolve(data);
 
         } catch (error) {
-            console.log("🚀 ~ file: test.ts:29 ~ returnnewPromise ~ error:", error)
-
             reject(error);
         }
     })

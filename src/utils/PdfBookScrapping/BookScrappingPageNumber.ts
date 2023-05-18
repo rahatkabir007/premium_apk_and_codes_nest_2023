@@ -31,8 +31,6 @@ export const bookScrappingPageNumber = async (): Promise<any> => {
             resolve(result);
 
         } catch (error) {
-            console.log("🚀 ~ file: test.ts:29 ~ returnnewPromise ~ error:", error)
-
             reject(error);
         }
     })

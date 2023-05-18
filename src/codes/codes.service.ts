@@ -45,7 +45,7 @@ export class CodesService {
         const firstPScrap = await this.codeModel.find().sort({ page: -1 })
         const lastPageScrap = lastPScrap[0]?.page || 0
         const firstPageScrap = firstPScrap[0]?.page || 0
-        const pageGap = (firstPageScrap - lastPageScrap) + 1 || 0
+        let pageGap = (firstPageScrap - lastPageScrap) || 0
         const { lastLinkNumber, page, browser } = await codeScrappingPageNumber();
         console.log("🚀 ~ file: codes.service.ts:87 ~ CodesService ~ setTimeout ~ result:", lastLinkNumber)
         let codeDatas;
