@@ -48,12 +48,15 @@ export const bookDetailsScrapping = async (bookDataUrl, page): Promise<any> => {
 
                 const authorName = document.querySelectorAll('.book-meta tbody tr:nth-child(3) td a');
                 const authorYesPdfId = [];
+                const authorsArray = [];
                 for (const el of authorName) {
+                    const anchorText = el.textContent.trim();
                     const href = el.getAttribute('href');
                     const splitted = href.split('/author/');
                     if (splitted.length === 2) {
                         const number = splitted[1].split('/')[0];
                         authorYesPdfId.push(number);
+                        authorsArray.push(anchorText);
                     }
                 }
 
@@ -66,6 +69,8 @@ export const bookDetailsScrapping = async (bookDataUrl, page): Promise<any> => {
                 const genres = cleanedBookMetaData[1] === "" ? "Not Found" : cleanedBookMetaData[1];
                 const authors = cleanedBookMetaData[2] === "" ? "Not Found" : cleanedBookMetaData[2];
                 const bookPages = cleanedBookMetaData[3] === "" ? "Not Found" : cleanedBookMetaData[3];
+                const ISBN10 = cleanedBookMetaData[4] === "" ? "Not Found" : cleanedBookMetaData[4];
+                const ISBN13 = cleanedBookMetaData[5] === "" ? "Not Found" : cleanedBookMetaData[5];
                 const language = cleanedBookMetaData[7] === "" ? "Not Found" : cleanedBookMetaData[7];
                 const physicalForm = cleanedBookMetaData[8] === "" ? "Not Found" : cleanedBookMetaData[8];
                 const type = cleanedBookMetaData[9] === "" ? "Not Found" : cleanedBookMetaData[9];
@@ -81,7 +86,8 @@ export const bookDetailsScrapping = async (bookDataUrl, page): Promise<any> => {
                     publishedYear,
                     publisher,
                     genres,
-                    authors,
+                    ISBN10,
+                    ISBN13,
                     bookPages,
                     language,
                     physicalForm,

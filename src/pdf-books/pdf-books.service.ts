@@ -21,6 +21,7 @@ export interface pdfBookDataType {
 }
 
 export interface pdfBookAuthorDataType {
+  _id: string,
   title: string;
   description: string;
   img: string;
@@ -65,6 +66,7 @@ export class PdfBooksService {
           let bookObjArray = [];
           for (let j = bookDatas.length - 1; j >= 0; j--) {
             const bookDetails = await bookDetailsScrapping(bookDatas[j], page);
+            const authorData = []
             for (let k = 0; k < bookDetails.authorYesPdfId.length; k++) {
               const authorYesPdfIdArray = bookDetails.authorYesPdfId[k]
               const author = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfIdArray })
@@ -74,8 +76,16 @@ export class PdfBooksService {
               const authorDatas = await bookAuthorScrapping(authorYesPdfIdArray, page);
               authorDatas.authorYesPdfId = authorYesPdfIdArray
               await this.pdfBookAuthorModel.create(authorDatas);
+              const authorCollection = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfIdArray })
+              const authorObj = {
+                _id: authorCollection[0]?._id,
+                title: authorCollection[0]?.title
+              }
+              authorData.push(authorObj);
             }
+
             bookDetails.page = i
+            bookDetails.authors = authorData
             bookObjArray.push(bookDetails)
           }
           const promises = bookObjArray.map(async (data) => {
