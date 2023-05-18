@@ -5,7 +5,6 @@ import { HUSTLE, HUSTLEDocument } from './schemas/hustle.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { DATABASE_CONNECTION } from 'src/utils/DatabaseConstants';
-import { hustleScrapping } from 'src/utils/HustleScrapping/hustleScrapping';
 let isWorking = false
 
 

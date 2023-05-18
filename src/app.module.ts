@@ -10,7 +10,12 @@ import { ScheduleModule } from '@nestjs/schedule';
 import { TasksModule } from './tasks/tasks.module';
 import { HustleModule } from './hustle/hustle.module';
 import { NewspapersModule } from './newspapers/newspapers.module';
+<<<<<<< HEAD
 import { TorrentsModule } from './torrents/torrents.module';
+=======
+import { PdfBooksModule } from './pdf-books/pdf-books.module';
+
+>>>>>>> a4423c14e88a3291f4b1d813ea58a32176157415
 
 @Module({
   imports: [
@@ -51,7 +56,11 @@ import { TorrentsModule } from './torrents/torrents.module';
     TasksModule,
     HustleModule,
     NewspapersModule,
+<<<<<<< HEAD
     TorrentsModule,
+=======
+    PdfBooksModule,
+>>>>>>> a4423c14e88a3291f4b1d813ea58a32176157415
     // TasksModule
   ],
   controllers: [AppController],
