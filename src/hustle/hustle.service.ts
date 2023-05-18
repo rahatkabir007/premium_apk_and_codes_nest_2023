@@ -5,6 +5,10 @@ import { HUSTLE, HUSTLEDocument } from './schemas/hustle.schema';
 import { Model } from 'mongoose';
 import { InjectModel } from '@nestjs/mongoose';
 import { DATABASE_CONNECTION } from 'src/utils/DatabaseConstants';
+<<<<<<< HEAD
+=======
+let isWorking = false
+>>>>>>> 4c8cdaa356a3cfd62d59cafa6077f6af1071361a
 
 
 @Injectable()
