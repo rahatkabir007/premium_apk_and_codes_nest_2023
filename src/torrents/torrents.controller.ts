@@ -14,17 +14,17 @@ export class TorrentsController {
   }
 
   @Get('/findAllTorrent')
-  async findAllApkCd(@Query() queries: { page: number }) {
+  async findAllTorrentCd(@Query() queries: { page: number }) {
     return await this.torrentsService.findAllTorrentData(queries);
   }
 
   @Get('/findAllApkSearch')
-  async findAllApkS(@Query() queries: { search: string, page: number }) {
+  async findAllTorrentS(@Query() queries: { search: string, page: number }) {
     return await this.torrentsService.findAllTorrentDataSearch(queries);
   }
 
   @Get('/findAllCategorizedApk')
-  async findAllCategorizedCodes(@Query() queries: { category: string, page: number, subCat: string }) {
+  async findAllCategorizedTorrent(@Query() queries: { category: string, page: number, subCat: string }) {
     return await this.torrentsService.findAllCategorizedTorrent(queries);
   }
 

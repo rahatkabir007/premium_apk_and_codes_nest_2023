@@ -58,6 +58,10 @@ export const torrentScrappingSingleItem = async (page: any, lastDate: any, allRe
                 const img = document.getElementsByClassName('code-block code-block-7')[0].nextElementSibling.getAttribute('src')
                 return img
             })
+            const comment = await page.evaluate(() => {
+                const com = document.getElementsByClassName('comments')[0].textContent
+                return com
+            })
 
             const allText = await page.evaluate(() => {
                 const entryContent = document?.querySelector('.entry-content');
@@ -103,6 +107,7 @@ export const torrentScrappingSingleItem = async (page: any, lastDate: any, allRe
             apkObj.tags = tags || ''
             apkObj.htmlContent = htmlContent || "";
             apkObj.allText = allText
+            apkObj.comment = comment
             // apkObj.version = version
             // apkObj.fileSize = fileSize
             // apkObj.developer = developer
