@@ -158,7 +158,7 @@ export const apkScrapping = (lastDate) => {
               const newPage = pages[pages.length - 1];
               await newPage.waitForLoadState('load');
               // await newPage.waitForTimeout(5000)
-            
+
               const requiredAndroid = await newPage.evaluate(() => {
                 var androidVersions = document?.getElementsByClassName('dl-version')[0]?.getElementsByTagName('span')[1]?.innerText || ''
                 return androidVersions
@@ -174,13 +174,13 @@ export const apkScrapping = (lastDate) => {
                 });
                 return downloadLinkDetailArr;
               });
-              
+
               // Do something with requiredAndroid and newPageExtractedMetaTags
-              return {newPageExtractedMetaTags,requiredAndroid}
+              return { newPageExtractedMetaTags, requiredAndroid }
             }
             //early end
 
-            const {newPageExtractedMetaTags,requiredAndroid} =await myFunction()
+            const { newPageExtractedMetaTags, requiredAndroid } = await myFunction()
 
             apkObj.title = title
             apkObj.imgSrc = imgSrc

@@ -1,5 +1,7 @@
 export enum DATABASE_CONNECTION {
     APK = "APK",
     CODE = "CODE",
+    HUSTLE = "HUSTLE",
     SCRAP_SERVER = "SCRAP_SERVER",
+    TORRENTS = "TORRENTS"
 }
