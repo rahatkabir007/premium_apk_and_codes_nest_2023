@@ -11,6 +11,8 @@ import { TasksModule } from './tasks/tasks.module';
 import { HustleModule } from './hustle/hustle.module';
 import { NewspapersModule } from './newspapers/newspapers.module';
 import { TorrentsModule } from './torrents/torrents.module';
+import { PdfBooksModule } from './pdf-books/pdf-books.module';
+
 
 @Module({
   imports: [
@@ -52,6 +54,7 @@ import { TorrentsModule } from './torrents/torrents.module';
     HustleModule,
     NewspapersModule,
     TorrentsModule,
+    PdfBooksModule,
     // TasksModule
   ],
   controllers: [AppController],
