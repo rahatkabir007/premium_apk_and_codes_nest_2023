@@ -44,76 +44,91 @@ export class ApksService {
     if (isWorking) {
       return res.status(409).json({ message: 'Work in progress' });
     }
-    isWorking = true
+    isWorking = true;
     res.send('Scrapping Initiated');
     console.log("route hit");
-    setTimeout(async () => {
-      try {
-        console.log('Timeout hit');
-        const apkLastDate = await this.apkModel.find().sort({ createdDate: -1 })
-        const lastPScrap = await this.apkModel.find().sort({ page: 1 })
-        const firstPScrap = await this.apkModel.find().sort({ page: -1 })
-        const apkLastDt = apkLastDate[0]?.created || ''
 
-        const lastPageScrap = lastPScrap[0]?.page || 0
-        const firstPageScrap = firstPScrap[0]?.page || 0
-        const pageGap = (firstPageScrap - lastPageScrap) || 0
-        console.log('last page scrap', lastPageScrap)
-        console.log('first page scrap', firstPageScrap)
-        console.log('pageGap', pageGap)
-        console.log('apkLastDt', apkLastDt)
-        const { totalP, page, context } = await apkScrappingPageNumber();
+    try {
+      setTimeout(async () => {
+        try {
+          console.log('Timeout hit');
+          const apkLastDate = await this.apkModel.find().sort({ createdDate: -1 })
+          const lastPScrap = await this.apkModel.find().sort({ page: 1 })
+          const firstPScrap = await this.apkModel.find().sort({ page: -1 })
+          const apkLastDt = apkLastDate[0]?.created || ''
 
-        console.log('totalP page', totalP)
+          const lastPageScrap = lastPScrap[0]?.page || 0
+          const firstPageScrap = firstPScrap[0]?.page || 0
+          const pageGap = (firstPageScrap - lastPageScrap) || 0
+          console.log('last page scrap', lastPageScrap)
+          console.log('first page scrap', firstPageScrap)
+          console.log('pageGap', pageGap)
+          console.log('apkLastDt', apkLastDt)
+          const { totalP, page, context } = await apkScrappingPageNumber();
 
-        let allReadMoreHref;
-        for (let i = totalP - pageGap; i >= 1; i--) {
-          const result: any = await apkScrappingAllItems(page, apkLastDt, i);
-          if (result === "continue") {
-            continue;
-          }
-          allReadMoreHref = result;
-          if (allReadMoreHref.length === 0) {
-            break;
-          }
-          let apkObjArray = [];
-          for (let j = allReadMoreHref.length - 1; j >= 0; j--) {
-            const objResult: any = await apkScrappingSingleItem(page, apkLastDt, allReadMoreHref, j, context);
-            if (objResult === "continue") {
+          console.log('totalP page', totalP)
+
+          let allReadMoreHref;
+          for (let i = totalP - pageGap; i >= 1; i--) {
+            const result: any = await apkScrappingAllItems(page, apkLastDt, i);
+            if (result === "continue") {
               continue;
             }
-            console.log("🚀 ~ file: codes.service.ts:98 ~ CodesService ~ setTimeout ~ objResult:", objResult)
-            objResult.page = i
-            console.log('objResult', objResult)
-            apkObjArray.push(objResult)
+            allReadMoreHref = result;
+            if (allReadMoreHref.length === 0) {
+              break;
+            }
+            let apkObjArray = [];
+            for (let j = allReadMoreHref.length - 1; j >= 0; j--) {
+              const objResult: any = await apkScrappingSingleItem(page, apkLastDt, allReadMoreHref, j, context);
+              if (objResult === "continue") {
+                continue;
+              }
+              console.log("🚀 ~ file: codes.service.ts:98 ~ CodesService ~ setTimeout ~ objResult:", objResult)
+              objResult.page = i
+              console.log('objResult', objResult)
+              apkObjArray.push(objResult)
+            }
+
+            console.log("apkObjArray", apkObjArray)
+            const promises = apkObjArray.map(async (data) => {
+              await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+            });
+
+            await Promise.all(promises);
+            console.log('DB insert', i, "page");
           }
+          // const result:any = await apkScrapping(apkLastDt); // Call the main function and capture the return value
 
-          console.log("apkObjArray", apkObjArray)
-          const promises = apkObjArray.map(async (data) => {
-            await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
-          });
 
-          await Promise.all(promises);
-          console.log('DB insert', i, "page");
+          // const promises = result.map(async (data) => {
+          //   await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+          // });
+
+          // await Promise.all(promises);
+          console.log('DB insert');
+          isWorking = false
+          return "Inserted to DB"
+
+          //     } catch (error) {
+          //       console.error(error);
+          //       isWorking = false;
+          //       res.status(500).send('Error occurred during scraping');
+          //     }
+          //   }, 3000);
+          // }
+          throw new Error('Example error');
+        } catch (error) {
+          console.error(error);
+          isWorking = false;
+          res.status(500).send('Error occurred during scraping');
         }
-        // const result:any = await apkScrapping(apkLastDt); // Call the main function and capture the return value
-
-
-        // const promises = result.map(async (data) => {
-        //   await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
-        // });
-
-        // await Promise.all(promises);
-        console.log('DB insert');
-        isWorking = false
-        return "Inserted to DB"
-
-      } catch (error) {
-        console.error(error);
-        isWorking = false;
-        res.status(500).send('Error occurred during scraping');
-      }
-    }, 3000);
+      }, 3000);
+    } catch (error) {
+      console.error(error);
+      isWorking = false;
+      res.status(500).send('Error occurred before scraping');
+    }
   }
 
 
