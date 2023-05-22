@@ -26,6 +26,7 @@ export interface pdfBookAuthorDataType {
   description: string;
   img: string;
   downloadLinks: string;
+  authorBookCount: number
 }
 var isWorking = false;
 
@@ -143,14 +144,29 @@ export class PdfBooksService {
     console.log('query', query.page)
     const limit = 12;
     const page = query.page;
+    const allAuthorsDatainital = await this.pdfBookAuthorModel.find().sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
+    const allAuthorsDataLength = await this.pdfBookAuthorModel.find().count();
+    for (let i = 0; i < allAuthorsDatainital.length; i++) {
+      const authorBooks = await this.pdfBookModel.aggregate([
+        { $match: { authorYesPdfId: allAuthorsDatainital[i]?.authorYesPdfId } }
+      ])
+      const authorBookCount = authorBooks.length
+      await this.pdfBookAuthorModel.updateOne(
+        { _id: allAuthorsDatainital[i]._id },
+        { $set: { authorBookCount: authorBookCount } },
+        { upsert: true, new: true }
+      );
+    }
     const allAuthorsData = await this.pdfBookAuthorModel.find().sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
-    const allAuthorsDataLength = await this.pdfBookAuthorModel.find().count()
     return { allAuthorsData, allAuthorsDataLength }
   }
 
   async findOneAuthor(id: string) {
     const author = await this.pdfBookAuthorModel.findOne({ _id: id })
-    return { author }
+    const authorBooks = await this.pdfBookModel.aggregate([
+      { $match: { authorYesPdfId: author?.authorYesPdfId } }
+    ])
+    return { author, authorBooks }
   }
 
 }

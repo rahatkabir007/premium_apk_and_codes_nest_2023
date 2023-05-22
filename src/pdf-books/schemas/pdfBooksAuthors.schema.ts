@@ -19,6 +19,9 @@ export class PdfBookAuthor {
     @Prop()
     authorYesPdfId: string;
 
+    @Prop()
+    authorBookCount: number;
+
 }
 
 export const PdfBookAuthorSchema = SchemaFactory.createForClass(PdfBookAuthor);
