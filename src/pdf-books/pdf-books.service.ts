@@ -117,7 +117,7 @@ export class PdfBooksService {
     const limit = 8;
     const page = query.page;
     const allBooksData = await this.pdfBookModel.find().sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
-    const allBooksDataLength = (await this.pdfBookModel.find().count())
+    const allBooksDataLength = await this.pdfBookModel.find().count()
     return { allBooksData, allBooksDataLength }
   }
 
@@ -127,18 +127,30 @@ export class PdfBooksService {
     const limit = 8;
     const searchValue = query.search;
     const page = query.page;
-    const torrentAllDataSearch = await this.pdfBookModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
-    const torrentAllDataLengthSearch = await this.pdfBookModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
-    // const catSubLastObj = await this.apkModel.findOne({title:null});
-    // const catSub=catSubLastObj.catSub
-    console.log('apkAllDataLenght', torrentAllDataLengthSearch)
-    console.log('torrentAllDataSearch', torrentAllDataSearch)
-    return { torrentAllDataSearch, torrentAllDataLengthSearch }
+    const booksAllDataSearch = await this.pdfBookModel.find({ "bookTitle": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
+    const booksAllDataLengthSearch = await this.pdfBookModel.find({ "bookTitle": { $regex: searchValue, $options: 'i' } }).count()
+    return { booksAllDataSearch, booksAllDataLengthSearch }
   }
 
 
   async findOneBook(id: string) {
-    const torrentOne = await this.pdfBookModel.findOne({ _id: id })
-    return { torrentOne }
+    const book = await this.pdfBookModel.findOne({ _id: id })
+    return { book }
   }
+
+
+  async findAllAuthorsData(query: { page: number }) {
+    console.log('query', query.page)
+    const limit = 12;
+    const page = query.page;
+    const allAuthorsData = await this.pdfBookAuthorModel.find().sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
+    const allAuthorsDataLength = await this.pdfBookAuthorModel.find().count()
+    return { allAuthorsData, allAuthorsDataLength }
+  }
+
+  async findOneAuthor(id: string) {
+    const author = await this.pdfBookAuthorModel.findOne({ _id: id })
+    return { author }
+  }
+
 }

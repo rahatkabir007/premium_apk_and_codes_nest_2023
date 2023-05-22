@@ -27,4 +27,15 @@ export class PdfBooksController {
     return this.pdfBooksService.findOneBook(id);
   }
 
+
+  @Get('/findAllAuthors')
+  async findAllAuthors(@Query() queries: { page: number }) {
+    return await this.pdfBooksService.findAllAuthorsData(queries);
+  }
+
+  @Get('/findOneAuthor/:id')
+  findOneAuthor(@Param('id') id: string) {
+    return this.pdfBooksService.findOneAuthor(id);
+  }
+
 }
