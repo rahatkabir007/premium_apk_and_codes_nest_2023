@@ -38,6 +38,8 @@ export class TORRENT {
     @Prop({ required: true })
     tags: string;
 
+    @Prop({ required: true })
+    downloadLink: string;
 
     @Prop({ required: true })
     allText: Array<string>;

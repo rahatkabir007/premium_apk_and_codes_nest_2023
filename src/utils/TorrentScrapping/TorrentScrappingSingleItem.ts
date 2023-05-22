@@ -3,7 +3,6 @@
 export const torrentScrappingSingleItem = async (page: any, lastDate: any, allReadMoreHref: any, j: any): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
-
             // for (var j = 0; j < 1; j++) {
             var apkObj: any = {}
             await page.goto(allReadMoreHref[j])
@@ -73,12 +72,18 @@ export const torrentScrappingSingleItem = async (page: any, lastDate: any, allRe
                         if (node?.nodeType === Node?.TEXT_NODE) {
                             const text = node?.textContent.trim() || '';
                             if (text !== '' && !text.includes('adsbygoogle')) {
-                                extractedData.push('bold: ' + text);
+                                // Check if the text has bold font styling
+                                const computedStyle = window.getComputedStyle(node.parentElement);
+                                const isBold = computedStyle.fontWeight === 'bold' || computedStyle.fontWeight === '700';
+                                // Concatenate 'bold' with the text if it has bold font styling
+                                const modifiedText = isBold ? 'bold: ' + text : text;
+                                // textArray.push(modifiedText);
+                                extractedData.push(modifiedText);
                             }
                         } else if (node.nodeType === Node.ELEMENT_NODE) {
                             if (node.nodeName === 'IMG') {
                                 const src = node?.getAttribute('src') || '';
-                                if (src) {
+                                if (src && !src.includes('https://www.freecoursesonline.me/wp-content/uploads/2017/09/zzzz.png')) {
                                     extractedData.push('imgSrc: ' + src);
                                 }
                             } else {
@@ -97,6 +102,29 @@ export const torrentScrappingSingleItem = async (page: any, lastDate: any, allRe
                 return extractedData
             })
 
+            const downloadLink = await page.evaluate(() => {
+                // Find all <a> elements on the page
+                var aElements = document.getElementsByTagName('a');
+
+                // Loop through each <a> element
+                for (var i = 0; i < aElements.length; i++) {
+                    var aElement = aElements[i];
+
+                    // Check if the <a> element has a child <img> element
+                    if (aElement.getElementsByTagName('img').length > 0) {
+                        var imgElement = aElement.getElementsByTagName('img')[0];
+
+                        // Check if the source of the child <img> element matches the desired value
+                        if (imgElement.src === 'https://www.freecoursesonline.me/wp-content/uploads/2017/09/zzzz.png') {
+                            var hrefValue = aElement.href;
+                            console.log(hrefValue);
+                            break; // Stop the loop after finding the first match (if there are multiple)
+                        }
+                    }
+                }
+                return hrefValue
+            })
+
 
 
             apkObj.title = title
@@ -108,6 +136,7 @@ export const torrentScrappingSingleItem = async (page: any, lastDate: any, allRe
             apkObj.htmlContent = htmlContent || "";
             apkObj.allText = allText
             apkObj.comment = comment
+            apkObj.downloadLink = downloadLink
             // apkObj.version = version
             // apkObj.fileSize = fileSize
             // apkObj.developer = developer
