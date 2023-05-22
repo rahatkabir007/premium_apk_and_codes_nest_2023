@@ -20,6 +20,9 @@ export class PdfBook {
     description: string;
 
     @Prop()
+    shortDescription: string;
+
+    @Prop()
     img: string;
 
     @Prop()

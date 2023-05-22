@@ -1,10 +1,10 @@
 
-export const bookDetailsScrapping = async (bookDataUrl, page): Promise<any> => {
+export const bookDetailsScrapping = async (bookData, page): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
-            console.log('going to details page item', bookDataUrl);
+            console.log('going to details page item', bookData);
             await page.waitForTimeout(2000)
-            await page.goto(`https://yes-pdf.com${bookDataUrl.url}`);
+            await page.goto(`https://yes-pdf.com${bookData.url}`);
             await page.waitForTimeout(2000)
 
             const data = await page.evaluate(() => {
@@ -99,9 +99,10 @@ export const bookDetailsScrapping = async (bookDataUrl, page): Promise<any> => {
             });
 
 
-            const url2 = bookDataUrl.url;
+            const url2 = bookData.url;
             const bookYesPdfId = url2.match(/\/book\/(\d+)/)[1];
             data.bookYesPdfId = bookYesPdfId
+            data.shortDescription = bookData.shortDescription
             resolve(data);
 
         } catch (error) {
