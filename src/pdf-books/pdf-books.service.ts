@@ -112,4 +112,33 @@ export class PdfBooksService {
     }, 3000)
   }
 
+  async findAllBooksData(query: { page: number }) {
+    console.log('query', query.page)
+    const limit = 8;
+    const page = query.page;
+    const allBooksData = await this.pdfBookModel.find().sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
+    const allBooksDataLength = (await this.pdfBookModel.find().count())
+    return { allBooksData, allBooksDataLength }
+  }
+
+  async findAllBooksDataSearch(query: { search: string, page: number }) {
+    console.log('query', query.search)
+    console.log('page', query.page)
+    const limit = 8;
+    const searchValue = query.search;
+    const page = query.page;
+    const torrentAllDataSearch = await this.pdfBookModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
+    const torrentAllDataLengthSearch = await this.pdfBookModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
+    // const catSubLastObj = await this.apkModel.findOne({title:null});
+    // const catSub=catSubLastObj.catSub
+    console.log('apkAllDataLenght', torrentAllDataLengthSearch)
+    console.log('torrentAllDataSearch', torrentAllDataSearch)
+    return { torrentAllDataSearch, torrentAllDataLengthSearch }
+  }
+
+
+  async findOneBook(id: string) {
+    const torrentOne = await this.pdfBookModel.findOne({ _id: id })
+    return { torrentOne }
+  }
 }
