@@ -27,6 +27,10 @@ export class PdfBooksController {
     return this.pdfBooksService.findOneBook(id);
   }
 
+  @Get('/findRandomBooks')
+  findTrendingCodes() {
+    return this.pdfBooksService.findRandomizedBooks()
+  }
 
   @Get('/findAllAuthors')
   async findAllAuthors(@Query() queries: { page: number }) {

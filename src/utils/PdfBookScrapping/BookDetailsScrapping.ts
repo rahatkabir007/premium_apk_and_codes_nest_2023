@@ -39,12 +39,21 @@ export const bookDetailsScrapping = async (bookData, page): Promise<any> => {
                     return cleanedContent.trim();
                 });
 
+
+
                 const bookDescriptionHTML = bookDescriptionDiv ? bookDescriptionDiv.innerHTML : null;
 
-                const cleanedBookDescriptionHTML = bookDescriptionHTML
-                    ? bookDescriptionHTML.replace(/\n/g, '').replace(/\s+/g, '')
-                    : null;
+                let modifiedHTML = bookDescriptionHTML.replace(/\n/g, '');
 
+                // Remove multiple spaces but keep one space between words
+                modifiedHTML = modifiedHTML.replace(/\s+/g, ' ');
+
+                // Remove any tag other than <b>, <p>, <i>
+                modifiedHTML = modifiedHTML.replace(/<(?!\/?(b|p|i)\b)[^>]*>/gi, '');
+
+                const cleanedBookDescriptionHTML = bookDescriptionHTML
+                    ? modifiedHTML
+                    : null;
 
                 const authorName = document.querySelectorAll('.book-meta tbody tr:nth-child(3) td a');
                 const authorYesPdfId = [];

@@ -72,6 +72,12 @@ export class PdfBooksService {
               const authorYesPdfIdArray = bookDetails.authorYesPdfId[k]
               const author = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfIdArray })
               if (author.length > 0) {
+                const authorCollection = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfIdArray })
+                const authorObj = {
+                  _id: authorCollection[0]?._id,
+                  title: authorCollection[0]?.title
+                }
+                authorData.push(authorObj);
                 continue;
               }
               const authorDatas = await bookAuthorScrapping(authorYesPdfIdArray, page);
@@ -115,7 +121,7 @@ export class PdfBooksService {
 
   async findAllBooksData(query: { page: number }) {
     console.log('query', query.page)
-    const limit = 8;
+    const limit = 20;
     const page = query.page;
     const allBooksData = await this.pdfBookModel.find().sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
     const allBooksDataLength = await this.pdfBookModel.find().count()
@@ -139,6 +145,20 @@ export class PdfBooksService {
     return { book }
   }
 
+  async findRandomizedBooks() {
+    function getRandomSubset(array, count) {
+      const shuffledArray = array.slice(); // Create a copy of the original array
+      for (let i = shuffledArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+      }
+      return shuffledArray.slice(0, count);
+    }
+
+    const allBooks = await this.pdfBookModel.find();
+    const randomBooks = getRandomSubset(allBooks, 12);
+    return { randomBooks };
+  }
 
   async findAllAuthorsData(query: { page: number }) {
     console.log('query', query.page)
