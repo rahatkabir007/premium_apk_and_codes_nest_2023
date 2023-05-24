@@ -8,13 +8,13 @@ export const apkScrappingPageNumber = async (): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
             console.log("Started Scrap");
-            const browser = await chromium.launch({ headless: false, timeout: timeout });
+            const browser = await chromium.launch({ headless: true, timeout: timeout });
             const context = await browser.newContext();
 
             context.setDefaultNavigationTimeout(timeout)
             context.setDefaultTimeout(timeout)
 
-            
+
             const page = await context.newPage();
             await page.goto('https://www.revdl.com');
             await page.waitForTimeout(3000);
@@ -25,8 +25,8 @@ export const apkScrappingPageNumber = async (): Promise<any> => {
                 const nextDivText = dotsSpan.nextElementSibling.textContent;
                 console.log('nextDivText', nextDivText)
                 return parseInt(nextDivText.replace(',', ''))
-              })
-            const result = { totalP, page,context }
+            })
+            const result = { totalP, page, context }
             resolve(result);
 
         } catch (error) {
