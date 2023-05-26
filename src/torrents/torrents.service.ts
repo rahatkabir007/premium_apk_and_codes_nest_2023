@@ -96,11 +96,12 @@ export class TorrentsService {
     console.log('query', query.page)
     const limit = 8;
     const page = query.page;
+    const torrentAll = await this.torrentModel.find()
     const torrentAllData = await this.torrentModel.find().sort({ createdDate: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
     const torrentAllDataLength = (await this.torrentModel.find().sort({ createdDate: -1 }).count())
     console.log('torrentAllDataLength', torrentAllDataLength)
     console.log('torrentAllData', torrentAllData)
-    return { torrentAllData, torrentAllDataLength }
+    return { torrentAll, torrentAllData, torrentAllDataLength }
   }
 
 
