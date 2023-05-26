@@ -136,11 +136,13 @@ export class ApksService {
     console.log('query', query.page)
     const limit = 8;
     const page = query.page;
+    const apkAll = await this.apkModel.find()
     const apkAllData = await this.apkModel.find().sort({ createdDate: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
     const apkAllDataLength = (await this.apkModel.find().sort({ createdDate: -1 }).count())
     console.log('apkAllDataLength', apkAllDataLength)
     console.log('apkAllData', apkAllData)
-    return { apkAllData, apkAllDataLength }
+    console.log('apkAll', apkAll)
+    return { apkAll, apkAllData, apkAllDataLength }
   }
 
   async findLastDateApk() {

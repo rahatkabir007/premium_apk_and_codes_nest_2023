@@ -11,16 +11,17 @@ export class ApksController {
 
 
   @Post('/test')
-async test(@Res() res: Response) {
-  //   if (isWorking) {
-  //     //@ts-ignore
-  //   return res.status(409).json({ message: 'Work in progress' });
-  // }
-  // isWorking = true
+  async test(@Res() res: Response) {
+    //   if (isWorking) {
+    //     //@ts-ignore
+    //   return res.status(409).json({ message: 'Work in progress' });
+    //   return res.status(409).json({ message: 'Work in progress' });
+    // }
+    // isWorking = true
     // const create =
-      await this.apksService.createApkDatas(res);
-  // isWorking = false
-  // return create
+    await this.apksService.createApkDatas(res);
+    // isWorking = false
+    // return create
   }
 
   // @Post('/test')
@@ -40,17 +41,17 @@ async test(@Res() res: Response) {
   // }
 
   @Get('/findAllApk')
-  async findAllApkCd( @Query() queries: {page:number}) {
+  async findAllApkCd(@Query() queries: { page: number }) {
     return await this.apksService.findAllApkData(queries);
   }
 
   @Get('/findAllApkSearch')
-  async findAllApkS( @Query() queries: {search:string, page:number}) {
+  async findAllApkS(@Query() queries: { search: string, page: number }) {
     return await this.apksService.findAllApkDataSearch(queries);
   }
 
   @Get('/findAllCategorizedApk')
-  async findAllCategorizedCodes(@Query() queries: { category: string, page: number,subCat:string }) {
+  async findAllCategorizedCodes(@Query() queries: { category: string, page: number, subCat: string }) {
     return await this.apksService.findAllCategorizedApk(queries);
   }
 
