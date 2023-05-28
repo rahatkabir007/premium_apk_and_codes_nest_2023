@@ -103,11 +103,11 @@ export class CodesService {
     // let limit = 10
     const page = query.page || 1;
     // const page = 1;
-
+    const allCodes = await this.codeModel.find();
     const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).sort({ mongoDbDate: -1 }).exec();
     const totalCodeLength = await this.codeModel.count()
     const pageCountNumber = Math.ceil(totalCodeLength / limit)
-    return { codes, pageCountNumber }
+    return { codes, pageCountNumber, allCodes }
   }
 
   async findTrendingCodes() {

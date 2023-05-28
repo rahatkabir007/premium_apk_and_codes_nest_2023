@@ -1,10 +1,10 @@
 
-export const bookDetailsScrapping = async (bookDataUrl, page): Promise<any> => {
+export const bookDetailsScrapping = async (bookData, page): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
-            console.log('going to details page item', bookDataUrl);
+            console.log('going to details page item', bookData);
             await page.waitForTimeout(2000)
-            await page.goto(`https://yes-pdf.com${bookDataUrl.url}`);
+            await page.goto(`https://yes-pdf.com${bookData.url}`);
             await page.waitForTimeout(2000)
 
             const data = await page.evaluate(() => {
@@ -12,90 +12,84 @@ export const bookDetailsScrapping = async (bookDataUrl, page): Promise<any> => {
                 const bookLinks = document.querySelectorAll('.book-links a');
                 const colH1 = document.querySelector('.col-lg-9 h1');
                 const bookYear = document.querySelector('.book-year');
-                const bookMetaTdList = document.querySelectorAll('.book-meta tbody tr td:nth-child(2)');
                 const bookDescriptionDiv = document.querySelector('.book-description');
 
                 const bookCoverSrc = bookCoverImg ? bookCoverImg.getAttribute('src') : null;
                 const bookLinksHrefs = Array.from(bookLinks, link => link.getAttribute('href'));
                 const colH1Text = colH1 ? colH1.textContent : null;
                 const bookYearText = bookYear ? bookYear.textContent : null;
-                const bookMetaData = Array.from(bookMetaTdList, td => {
-                    const anchors = Array.from(td.querySelectorAll('a'));
-                    const spans = Array.from(td.querySelectorAll('span'));
-                    let content;
-
-                    if (anchors.length > 0) {
-                        content = anchors.map(anchor => anchor.textContent).join(', ');
-                    } else if (spans.length > 0) {
-                        content = spans.map(span => span.textContent).join(', ');
-                    } else {
-                        content = td.textContent;
-                    }
-
-                    return content;
-                });
-                const cleanedBookMetaData = bookMetaData.map(content => {
-                    const cleanedContent = content.replace(/\n/g, '').replace(/\s+/g, ' ');
-                    return cleanedContent.trim();
-                });
-
-                const bookDescriptionHTML = bookDescriptionDiv ? bookDescriptionDiv.innerHTML : null;
-
-                const cleanedBookDescriptionHTML = bookDescriptionHTML
-                    ? bookDescriptionHTML.replace(/\n/g, '').replace(/\s+/g, '')
-                    : null;
-
-
-                const authorName = document.querySelectorAll('.book-meta tbody tr:nth-child(3) td a');
-                const authorYesPdfId = [];
-                for (const el of authorName) {
-                    const href = el.getAttribute('href');
-                    const splitted = href.split('/author/');
-                    if (splitted.length === 2) {
-                        const number = splitted[1].split('/')[0];
-                        authorYesPdfId.push(number);
-                    }
-                }
 
                 const img = `https://yes-pdf.com${bookCoverSrc}`;
                 const downloadLink = `https://yes-pdf.com${bookLinksHrefs[0]}`;
                 const readingLink = `https://yes-pdf.com${bookLinksHrefs[1]}`;
                 const bookTitle = colH1Text.replace(" Free Download", "");
                 const publishedYear = bookYearText;
-                const publisher = cleanedBookMetaData[0] === "" ? "Not Found" : cleanedBookMetaData[0];
-                const genres = cleanedBookMetaData[1] === "" ? "Not Found" : cleanedBookMetaData[1];
-                const authors = cleanedBookMetaData[2] === "" ? "Not Found" : cleanedBookMetaData[2];
-                const bookPages = cleanedBookMetaData[3] === "" ? "Not Found" : cleanedBookMetaData[3];
-                const language = cleanedBookMetaData[7] === "" ? "Not Found" : cleanedBookMetaData[7];
-                const physicalForm = cleanedBookMetaData[8] === "" ? "Not Found" : cleanedBookMetaData[8];
-                const type = cleanedBookMetaData[9] === "" ? "Not Found" : cleanedBookMetaData[9];
+
+                const bookDescriptionHTML = bookDescriptionDiv ? bookDescriptionDiv.innerHTML : null;
+
+                let modifiedHTML = bookDescriptionHTML.replace(/\n/g, '');
+
+                // Remove multiple spaces but keep one space between words
+                modifiedHTML = modifiedHTML.replace(/\s+/g, ' ');
+
+                // Remove any tag other than <b>, <p>, <i>
+                modifiedHTML = modifiedHTML.replace(/<(?!\/?(b|p|i)\b)[^>]*>/gi, '');
+
+                const cleanedBookDescriptionHTML = bookDescriptionHTML
+                    ? modifiedHTML
+                    : null;
+
+                const authorYesPdfId = [];
+                const metadataRows = document.querySelector('.table.book-meta tbody').querySelectorAll('tr');
+                const metadata = {};
+                for (const row of metadataRows) {
+                    let key = (row.querySelector('td:nth-child(1)') as HTMLElement).innerText.toLowerCase().replace(' ', '_').replace(':', '');
+                    let value: any = '';
+
+                    if (key === 'pages') {
+                        key = 'bookPages';
+                    } else if (key === 'physical_form') {
+                        key = 'physicalForm';
+                    } else if (key === 'isbn10') {
+                        key = 'ISBN10';
+                    }
+
+                    const valueCell = row.querySelector('td:nth-child(2)') as HTMLElement;
+                    const anchorTags = valueCell.querySelectorAll('a');
+
+                    if (key === 'authors') {
+                        value = Array.from(anchorTags).map((anchor) => {
+                            const href = (anchor as HTMLAnchorElement).href;
+                            const authorId = href.match(/author\/(\d+)\/books/)[1];
+                            return authorId;
+                        });
+                        authorYesPdfId.push(...value);
+                    } else {
+                        value = valueCell.innerText;
+                        metadata[key] = value;
+                    }
+                }
 
 
 
 
                 return {
+                    ...metadata,
                     bookTitle,
                     img,
                     downloadLink,
                     readingLink,
                     publishedYear,
-                    publisher,
-                    genres,
-                    authors,
-                    bookPages,
-                    language,
-                    physicalForm,
-                    type,
                     description: cleanedBookDescriptionHTML,
                     authorYesPdfId,
-
                 };
             });
 
 
-            const url2 = bookDataUrl.url;
+            const url2 = bookData.url;
             const bookYesPdfId = url2.match(/\/book\/(\d+)/)[1];
             data.bookYesPdfId = bookYesPdfId
+            data.shortDescription = bookData.shortDescription
             resolve(data);
 
         } catch (error) {

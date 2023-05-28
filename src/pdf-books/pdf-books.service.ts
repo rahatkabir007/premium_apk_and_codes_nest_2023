@@ -21,10 +21,12 @@ export interface pdfBookDataType {
 }
 
 export interface pdfBookAuthorDataType {
+  _id: string,
   title: string;
   description: string;
   img: string;
   downloadLinks: string;
+  authorBookCount: number
 }
 var isWorking = false;
 
@@ -65,17 +67,32 @@ export class PdfBooksService {
           let bookObjArray = [];
           for (let j = bookDatas.length - 1; j >= 0; j--) {
             const bookDetails = await bookDetailsScrapping(bookDatas[j], page);
+            const authorData = []
             for (let k = 0; k < bookDetails.authorYesPdfId.length; k++) {
               const authorYesPdfIdArray = bookDetails.authorYesPdfId[k]
               const author = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfIdArray })
               if (author.length > 0) {
+                const authorCollection = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfIdArray })
+                const authorObj = {
+                  _id: authorCollection[0]?._id,
+                  title: authorCollection[0]?.title
+                }
+                authorData.push(authorObj);
                 continue;
               }
               const authorDatas = await bookAuthorScrapping(authorYesPdfIdArray, page);
               authorDatas.authorYesPdfId = authorYesPdfIdArray
               await this.pdfBookAuthorModel.create(authorDatas);
+              const authorCollection = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfIdArray })
+              const authorObj = {
+                _id: authorCollection[0]?._id,
+                title: authorCollection[0]?.title
+              }
+              authorData.push(authorObj);
             }
+
             bookDetails.page = i
+            bookDetails.authors = authorData
             bookObjArray.push(bookDetails)
           }
           const promises = bookObjArray.map(async (data) => {
@@ -100,6 +117,76 @@ export class PdfBooksService {
         res.status(500).send('Error occurred during scraping');
       }
     }, 3000)
+  }
+
+  async findAllBooksData(query: { page: number }) {
+    console.log('query', query.page)
+    const limit = 20;
+    const page = query.page;
+    const allBooksData = await this.pdfBookModel.find().sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
+    const allBooksDataLength = await this.pdfBookModel.find().count()
+    return { allBooksData, allBooksDataLength }
+  }
+
+  async findAllBooksDataSearch(query: { search: string, page: number }) {
+    console.log('query', query.search)
+    console.log('page', query.page)
+    const limit = 8;
+    const searchValue = query.search;
+    const page = query.page;
+    const booksAllDataSearch = await this.pdfBookModel.find({ "bookTitle": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
+    const booksAllDataLengthSearch = await this.pdfBookModel.find({ "bookTitle": { $regex: searchValue, $options: 'i' } }).count()
+    return { booksAllDataSearch, booksAllDataLengthSearch }
+  }
+
+
+  async findOneBook(id: string) {
+    const book = await this.pdfBookModel.findOne({ _id: id })
+    return { book }
+  }
+
+  async findRandomizedBooks() {
+    function getRandomSubset(array, count) {
+      const shuffledArray = array.slice(); // Create a copy of the original array
+      for (let i = shuffledArray.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+      }
+      return shuffledArray.slice(0, count);
+    }
+
+    const allBooks = await this.pdfBookModel.find();
+    const randomBooks = getRandomSubset(allBooks, 12);
+    return { randomBooks };
+  }
+
+  async findAllAuthorsData(query: { page: number }) {
+    console.log('query', query.page)
+    const limit = 12;
+    const page = query.page;
+    const allAuthorsDatainital = await this.pdfBookAuthorModel.find().sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
+    const allAuthorsDataLength = await this.pdfBookAuthorModel.find().count();
+    for (let i = 0; i < allAuthorsDatainital.length; i++) {
+      const authorBooks = await this.pdfBookModel.aggregate([
+        { $match: { authorYesPdfId: allAuthorsDatainital[i]?.authorYesPdfId } }
+      ])
+      const authorBookCount = authorBooks.length
+      await this.pdfBookAuthorModel.updateOne(
+        { _id: allAuthorsDatainital[i]._id },
+        { $set: { authorBookCount: authorBookCount } },
+        { upsert: true, new: true }
+      );
+    }
+    const allAuthorsData = await this.pdfBookAuthorModel.find().sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
+    return { allAuthorsData, allAuthorsDataLength }
+  }
+
+  async findOneAuthor(id: string) {
+    const author = await this.pdfBookAuthorModel.findOne({ _id: id })
+    const authorBooks = await this.pdfBookModel.aggregate([
+      { $match: { authorYesPdfId: author?.authorYesPdfId } }
+    ])
+    return { author, authorBooks }
   }
 
 }

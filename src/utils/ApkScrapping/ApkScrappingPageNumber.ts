@@ -14,7 +14,6 @@ export const apkScrappingPageNumber = async (): Promise<any> => {
             context.setDefaultNavigationTimeout(timeout)
             context.setDefaultTimeout(timeout)
 
-
             const page = await context.newPage();
             await page.goto('https://www.revdl.com');
             await page.waitForTimeout(3000);

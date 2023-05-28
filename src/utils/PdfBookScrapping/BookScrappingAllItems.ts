@@ -10,8 +10,9 @@ export const bookScrappingAllItems = async (page, i): Promise<any> => {
             //Every Books Detail URL Extraction
             const bookDatas = await page.$$eval('.book', (bookData) => {
                 return bookData.map((el) => {
+                    const shortDescription = el.querySelector('.book-short-description').textContent.trim();
                     const url = el.querySelector('.book-cover a')?.getAttribute('href') ?? '';
-                    return { url };
+                    return { url, shortDescription };
                 });
             })
             //Every Books Detail URL Extraction

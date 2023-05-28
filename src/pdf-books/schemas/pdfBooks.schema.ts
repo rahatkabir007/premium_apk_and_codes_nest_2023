@@ -20,6 +20,9 @@ export class PdfBook {
     description: string;
 
     @Prop()
+    shortDescription: string;
+
+    @Prop()
     img: string;
 
     @Prop()
@@ -38,10 +41,16 @@ export class PdfBook {
     genres: string;
 
     @Prop()
-    authors: string;
+    authors: Object[];
 
     @Prop()
     bookPages: string;
+
+    @Prop()
+    ISBN13: string;
+
+    @Prop()
+    ISBN10: string;
 
     @Prop()
     language: string;
