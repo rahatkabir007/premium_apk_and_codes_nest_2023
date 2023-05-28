@@ -189,4 +189,10 @@ export class PdfBooksService {
     return { author, authorBooks }
   }
 
+  async findAllSEOContents() {
+    const books = await this.pdfBookModel.find().sort({ createdAt: -1 });
+    const authors = await this.pdfBookAuthorModel.find().sort({ createdAt: -1 });
+    return { books, authors }
+  }
+
 }
