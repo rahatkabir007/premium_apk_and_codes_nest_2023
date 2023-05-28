@@ -19,31 +19,31 @@ import { PdfBooksModule } from './pdf-books/pdf-books.module';
     // ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     MongooseModule.forRoot(
-      process.env.DATABASE_URL_APK ?? "",
+      "mongodb+srv://apkDownloader:apkDownloader@cluster0.ugc7c.mongodb.net/apk_data?retryWrites=true&w=majority" ?? "",
       {
         connectionName: DATABASE_CONNECTION.APK
       }
     ),
     MongooseModule.forRoot(
-      process.env.DATABASE_URL_CODE ?? "",
+      "mongodb+srv://premiumCodebase:JOjWFZsaGf5icUiG@cluster0.bvy9met.mongodb.net/codes?retryWrites=true&w=majority" ?? "",
       {
         connectionName: DATABASE_CONNECTION.CODE
       }
     ),
     MongooseModule.forRoot(
-      process.env.DATABASE_URL_HUSTLE ?? "",
+      "mongodb+srv://torrentData:torrentData@cluster0.ugc7c.mongodb.net/torrentData?retryWrites=true&w=majority" ?? "",
       {
         connectionName: DATABASE_CONNECTION.HUSTLE
       }
     ),
     MongooseModule.forRoot(
-      process.env.DATABASE_URL_SCRAP_SERVER ?? "",
+      "mongodb+srv://scrap_server:2fwAOzG03cjqTHix@scrapcluster.vqkigpj.mongodb.net/scrap_server?retryWrites=true&w=majority" ?? "",
       {
         connectionName: DATABASE_CONNECTION.SCRAP_SERVER
       }
     ),
     MongooseModule.forRoot(
-      process.env.DATABASE_URL_TORRENTS ?? "",
+      "mongodb+srv://torrentData:torrentData@cluster0.ugc7c.mongodb.net/torrentData?retryWrites=true&w=majority" ?? "",
       {
         connectionName: DATABASE_CONNECTION.TORRENTS
       }
