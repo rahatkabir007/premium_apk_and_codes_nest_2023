@@ -146,18 +146,26 @@ export class TorrentsService {
 
   async findAllTagTorrent(query: { tag: string, page: number }) {
     const limit = 8;
-    const apkValue = query.tag;
+    let tagValue = query.tag;
+    var tag = query.tag.split(' ')
+    if (tag.length < 3) {
+      tagValue = tag.toString()
+    }
+    else {
+      tagValue = tag.slice(0, 2).join(' ')
+    }
+    // const tagValue = query.tag;
     const page = query.page;
-    console.log('subCat', apkValue, page);
+    console.log('subCat', tagValue, page);
     const tagTorrent = await this.torrentModel.find({
-      tags: { $regex: apkValue, $options: 'i' }
+      tags: { $regex: tagValue, $options: 'i' }
       // "tags": { $regex: `.*${apkValue}.*`, $options: 'i' }
       // "categories": { $regex: `.*${apkValue}.* `&& `.*${subCat}.*`, $options: 'i' },
       // "categories": { $regex: subCat, $options: 'i' } ,
     }).limit(limit).skip(((page as number) - 1) * (limit))
 
     const torrentAllDataLengthTag = await this.torrentModel.find({
-      tags: { $regex: apkValue, $options: 'i' }
+      tags: { $regex: tagValue, $options: 'i' }
       // "tags": { $regex: `.*${apkValue}.*`, $options: 'i' }
       // "categories": { $regex: `.*${apkValue}.*` && `.*${subCat}.*`, $options: 'i' },
       // "categories": { $regex: subCat, $options: 'i' } ,
