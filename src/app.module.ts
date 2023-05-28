@@ -16,7 +16,7 @@ import { PdfBooksModule } from './pdf-books/pdf-books.module';
 
 @Module({
   imports: [
-    ScheduleModule.forRoot(),
+    // ScheduleModule.forRoot(),
     ConfigModule.forRoot(),
     MongooseModule.forRoot(
       process.env.DATABASE_URL_APK ?? "",
@@ -50,7 +50,6 @@ import { PdfBooksModule } from './pdf-books/pdf-books.module';
     ),
     ApksModule,
     CodesModule,
-    TasksModule,
     HustleModule,
     NewspapersModule,
     TorrentsModule,
