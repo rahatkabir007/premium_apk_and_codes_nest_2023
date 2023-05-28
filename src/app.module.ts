@@ -55,7 +55,6 @@ import { PdfBooksModule } from './pdf-books/pdf-books.module';
     NewspapersModule,
     TorrentsModule,
     PdfBooksModule,
-    // TasksModule
   ],
   controllers: [AppController],
   providers: [AppService],
