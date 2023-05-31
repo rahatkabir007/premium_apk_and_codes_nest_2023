@@ -12,6 +12,11 @@ export class PdfBooksController {
     return await this.pdfBooksService.postPdfBookDatas(res);
   }
 
+  @Get('/findAllSEOContents')
+  findAllSEOContents() {
+    return this.pdfBooksService.findAllSEOContents()
+  }
+
   @Get('/findAllBooks')
   async findAllBooks(@Query() queries: { page: number }) {
     return await this.pdfBooksService.findAllBooksData(queries);
