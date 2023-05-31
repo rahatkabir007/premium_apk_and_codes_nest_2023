@@ -45,11 +45,46 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
       const developer = fileVersionsSizeDeveloper[2] || '';
 
       const allInnerDescription = await page.$eval('.post_content.entry-content', (element: Element) => {
-        const children = Array.from(element.children);
-        const filteredChildren = children.filter((child) => !child.classList.contains('wp-caption') && !child.classList.contains('hatom-extra'));
-        const innerTextArray = filteredChildren.flatMap((child) => child.textContent.trim().split('\n')) || '';
-        // return innerTextArray.join(',');
-        return innerTextArray;
+        // const children = Array.from(element.children);
+        // const filteredChildren = children.filter((child) => !child.classList.contains('wp-caption') && !child.classList.contains('hatom-extra'));
+        // const innerTextArray = filteredChildren.flatMap((child) => child.textContent.trim().split('\n')) || '';
+        // // return innerTextArray.join(',');
+        // return innerTextArray;
+        // Get the element with class "post_content"
+        var postContent = document.querySelector('.post_content');
+
+        // Initialize an empty array to store the extracted text
+        var textArray = [];
+
+        // Recursive function to traverse through the DOM tree and extract text nodes
+        function extractTextNodes(element) {
+          for (var i = 0; i < element.childNodes.length; i++) {
+            var node = element.childNodes[i];
+
+            // Check if the node is a text node and not under the 'hatom-extra' class
+            if (node.nodeType === Node.TEXT_NODE && !node.parentElement.classList.contains('hatom-extra')) {
+              // Extract the text content
+              var text = node.textContent.trim();
+
+              // Check if the text includes '<img'
+              if (text.indexOf('<img') === -1) {
+                // Add the text to the array
+                textArray.push(text);
+              }
+            } else if (node.nodeType === Node.ELEMENT_NODE && node.nodeName !== 'IMG') {
+              // Recursively call the function for non-img element nodes
+              extractTextNodes(node);
+            }
+          }
+        }
+
+        // Call the recursive function to extract text nodes
+        extractTextNodes(postContent);
+
+        // Output the resulting text array
+        console.log(textArray);
+        return textArray
+
       });
       console.log('innerTexts', allInnerDescription); // Output the innerTexts to the console
       const imgSrcAll = await page.evaluate(() => {
