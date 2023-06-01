@@ -123,7 +123,12 @@ export class PdfBooksService {
     console.log('query', query.page)
     const limit = 20;
     const page = query.page;
-    const allBooksData = await this.pdfBookModel.find().sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
+    const allBooksData = await this.pdfBookModel.find({
+      $or: [
+        { downloadLink: { $ne: "https://yes-pdf.comundefined" } },
+        { readingLink: { $ne: "https://yes-pdf.comundefined" } }
+      ]
+    }).sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
     const allBooksDataLength = await this.pdfBookModel.find().count()
     return { allBooksData, allBooksDataLength }
   }
@@ -134,8 +139,28 @@ export class PdfBooksService {
     const limit = 8;
     const searchValue = query.search;
     const page = query.page;
-    const booksAllDataSearch = await this.pdfBookModel.find({ "bookTitle": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
-    const booksAllDataLengthSearch = await this.pdfBookModel.find({ "bookTitle": { $regex: searchValue, $options: 'i' } }).count()
+    const booksAllDataSearch = await this.pdfBookModel.find({
+      $and: [
+        { "bookTitle": { $regex: searchValue, $options: 'i' } },
+        {
+          $or: [
+            { downloadLink: { $ne: 'https://yes-pdf.comundefined' } },
+            { readingLink: { $ne: 'https://yes-pdf.comundefined' } }
+          ]
+        }
+      ]
+    }).limit(limit).skip(((page as number) - 1) * (limit))
+    const booksAllDataLengthSearch = await this.pdfBookModel.find({
+      $and: [
+        { "bookTitle": { $regex: searchValue, $options: 'i' } },
+        {
+          $or: [
+            { downloadLink: { $ne: 'https://yes-pdf.comundefined' } },
+            { readingLink: { $ne: 'https://yes-pdf.comundefined' } }
+          ]
+        }
+      ]
+    }).count()
     return { booksAllDataSearch, booksAllDataLengthSearch }
   }
 
@@ -155,7 +180,12 @@ export class PdfBooksService {
       return shuffledArray.slice(0, count);
     }
 
-    const allBooks = await this.pdfBookModel.find();
+    const allBooks = await this.pdfBookModel.find({
+      $or: [
+        { downloadLink: { $ne: "https://yes-pdf.comundefined" } },
+        { readingLink: { $ne: "https://yes-pdf.comundefined" } }
+      ]
+    });
     const randomBooks = getRandomSubset(allBooks, 12);
     return { randomBooks };
   }
@@ -190,7 +220,12 @@ export class PdfBooksService {
   }
 
   async findAllSEOContents() {
-    const books = await this.pdfBookModel.find().sort({ createdAt: -1 });
+    const books = await this.pdfBookModel.find({
+      $or: [
+        { downloadLink: { $ne: "https://yes-pdf.comundefined" } },
+        { readingLink: { $ne: "https://yes-pdf.comundefined" } }
+      ]
+    }).sort({ createdAt: -1 });
     const authors = await this.pdfBookAuthorModel.find().sort({ createdAt: -1 });
     return { books, authors }
   }
