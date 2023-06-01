@@ -171,22 +171,34 @@ export class PdfBooksService {
   }
 
   async findRandomizedBooks() {
-    function getRandomSubset(array, count) {
-      const shuffledArray = array.slice(); // Create a copy of the original array
-      for (let i = shuffledArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-      }
-      return shuffledArray.slice(0, count);
-    }
+    // function getRandomSubset(array, count) {
+    //   const shuffledArray = array.slice(); // Create a copy of the original array
+    //   for (let i = shuffledArray.length - 1; i > 0; i--) {
+    //     const j = Math.floor(Math.random() * (i + 1));
+    //     [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+    //   }
+    //   return shuffledArray.slice(0, count);
+    // }
 
-    const allBooks = await this.pdfBookModel.find({
-      $or: [
-        { downloadLink: { $ne: "https://yes-pdf.comundefined" } },
-        { readingLink: { $ne: "https://yes-pdf.comundefined" } }
-      ]
-    });
-    const randomBooks = getRandomSubset(allBooks, 12);
+    // const allBooks = await this.pdfBookModel.find({
+    //   $or: [
+    //     { downloadLink: { $ne: "https://yes-pdf.comundefined" } },
+    //     { readingLink: { $ne: "https://yes-pdf.comundefined" } }
+    //   ]
+    // });
+    // const randomBooks = getRandomSubset(allBooks, 12);
+    const randomBooks = await this.pdfBookModel.aggregate([
+      {
+        $match: {
+          $or: [
+            { downloadLink: "https://yes-pdf.comundefined" },
+            { readingLink: "https://yes-pdf.comundefined" }
+          ]
+        }
+      },
+      { $sample: { size: 12 } }
+    ]).exec();
+
     return { randomBooks };
   }
 
