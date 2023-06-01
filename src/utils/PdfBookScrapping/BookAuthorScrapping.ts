@@ -5,7 +5,7 @@ export const bookAuthorScrapping = async (authorId, page): Promise<any> => {
             console.log('going to author page');
             const parsedAuthorId = parseInt(authorId)
             const authorObj: any = {}
-            await page.waitForTimeout(10000)
+            await page.waitForTimeout(5000)
             await page.goto(`https://yes-pdf.com/author/${parsedAuthorId}/books`);
             await page.waitForTimeout(2000)
 
