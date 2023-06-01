@@ -1,4 +1,3 @@
-
 export const bookScrappingAllItems = async (page, i): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {

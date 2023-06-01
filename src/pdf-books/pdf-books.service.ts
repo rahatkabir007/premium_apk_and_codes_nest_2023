@@ -67,6 +67,10 @@ export class PdfBooksService {
           let bookObjArray = [];
           for (let j = bookDatas.length - 1; j >= 0; j--) {
             const bookDetails = await bookDetailsScrapping(bookDatas[j], page);
+            if (bookDetails === null) {
+              console.log('Skipping scraping for this page, moving to the next page');
+              continue; // Move on to the next iteration of the loop
+            }
             const authorData = []
             for (let k = 0; k < bookDetails.authorYesPdfId.length; k++) {
               const authorYesPdfIdArray = bookDetails.authorYesPdfId[k]
