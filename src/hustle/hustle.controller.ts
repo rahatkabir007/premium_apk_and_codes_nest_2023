@@ -8,9 +8,9 @@ import { Response } from 'express';
 export class HustleController {
   constructor(private readonly hustleService: HustleService) { }
 
-  @Post()
-  create(@Body() createHustleDto: CreateHustleDto) {
-    return this.hustleService.create(createHustleDto);
+  @Post('/test')
+  async create(@Body() createHustleDto: CreateHustleDto) {
+    await this.hustleService.create(createHustleDto);
   }
 
   @Get()

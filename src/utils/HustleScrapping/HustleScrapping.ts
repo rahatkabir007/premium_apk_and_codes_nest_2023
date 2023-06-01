@@ -10,7 +10,7 @@ export const hustleScrapping = async (): Promise<any> => {
     spawnSync("npx", ["playwright", "install", "chromium"]);
     return new Promise<any>(async (resolve, reject) => {
         try {
-            console.log("Started Scrap");
+            console.log("Started Scrap ");
             const browser = await chromium.launch({ headless: false, timeout: timeout });
             const context = await browser.newContext();
             context.setDefaultNavigationTimeout(timeout)
