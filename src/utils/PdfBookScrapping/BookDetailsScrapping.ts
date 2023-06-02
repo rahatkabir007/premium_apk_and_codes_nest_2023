@@ -19,15 +19,6 @@ export const bookDetailsScrapping = async (bookData, page): Promise<any> => {
                 return;
             }
 
-            const pageUrl = await page.url();
-
-            // Check if the page is accessible
-            if (pageUrl !== `https://yes-pdf.com${bookData.url}`) {
-                console.log('Page is forbidden or inaccessible:', pageUrl);
-                resolve(null);
-                return;
-            }
-
 
             const data = await page.evaluate(() => {
                 const bookCoverImg = document.querySelector('.book-cover img');
