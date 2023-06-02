@@ -92,7 +92,7 @@ export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Pro
 
         } catch (error) {
             console.log("🚀 ~ file: test.ts:29 ~ returnnewPromise ~ error:", error)
-
+            resolve(null)
             reject(error);
         }
     })
