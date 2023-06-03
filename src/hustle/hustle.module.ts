@@ -8,7 +8,7 @@ import { DATABASE_CONNECTION } from 'src/utils/DatabaseConstants';
 @Module({
   imports: [
     MongooseModule.forFeature([
-      { name: HUSTLE.name, schema: HustleSchema }], DATABASE_CONNECTION.HUSTLE),
+      { name: HUSTLE.name, schema: HustleSchema }], DATABASE_CONNECTION.TORRENTS),
   ],
   controllers: [HustleController],
   providers: [HustleService]

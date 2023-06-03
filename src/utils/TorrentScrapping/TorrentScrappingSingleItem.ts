@@ -125,6 +125,11 @@ export const torrentScrappingSingleItem = async (page: any, lastDate: any, allRe
                 return hrefValue
             })
 
+            // if (downloadLink.indexOf(".torrent") === -1) {
+            //     console.log('not torrent')
+            //     resolve("continue")
+            //     return
+            // }
 
 
             apkObj.title = title
