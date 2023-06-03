@@ -30,12 +30,12 @@ import { PdfBooksModule } from './pdf-books/pdf-books.module';
         connectionName: DATABASE_CONNECTION.CODE
       }
     ),
-    MongooseModule.forRoot(
-      process.env.DATABASE_URL_HUSTLE ?? "",
-      {
-        connectionName: DATABASE_CONNECTION.HUSTLE
-      }
-    ),
+    // MongooseModule.forRoot(
+    //   process.env.DATABASE_URL_HUSTLE ?? "",
+    //   {
+    //     connectionName: DATABASE_CONNECTION.HUSTLE
+    //   }
+    // ),
     MongooseModule.forRoot(
       process.env.DATABASE_URL_SCRAP_SERVER ?? "",
       {

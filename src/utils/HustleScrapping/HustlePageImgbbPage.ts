@@ -17,6 +17,8 @@ export const hustlePageImgbbPage = async (): Promise<any> => {
                 return;
             });
 
+            //having clipboard(copy paste permission bt default)
+            await context.grantPermissions(['clipboard-read', 'clipboard-write']);
             context.setDefaultNavigationTimeout(timeout)
             context.setDefaultTimeout(timeout)
 

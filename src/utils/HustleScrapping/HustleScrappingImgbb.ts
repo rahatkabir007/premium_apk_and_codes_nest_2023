@@ -18,22 +18,64 @@ export async function downloadImage(page, imgurl) {
         return y
     })
     console.log('firstSrc', firstSrc);
+
+    // // Enable download events
+    // await page.on('download', (download) => {
+    //     // Specify the destination file path to save the downloaded image
+    //     const destinationPath = './image.jpg';
+
+    //     // Save the downloaded file to the destination path
+    //     download.saveAs(destinationPath);
+    // });
+
+    // Navigate to the URL
     await page.goto(firstSrc);
 
-    // Get the image buffer
-    const imageBuffer1 = await page.screenshot();
-    const filePath = './image.jpg';
+    // const ext = ext.replace(".", "")
+    await page.evaluate((link) => {
+        function download(firstSrc, filename) {
+            fetch(firstSrc)
+                .then(response => response.blob())
+                .then(blob => {
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = filename;
+                    link.click();
+                })
+                .catch(console.error);
+        }
 
-    // Save the image buffer to a file
-    await fs.promises.writeFile(filePath, imageBuffer1);
+        download(link, "any")
+    }, firstSrc)
+
+    const [download] = await Promise.all([
+        page.waitForEvent('download', { timeout: 600000 }),
+    ]);
+    const saveAsStr = `./image.jpg`
+    await download.saveAs(saveAsStr)
+    await page.waitForTimeout(2000)
+    // resolve(true)
 
 
-    // Set the destination file path to save the image
-    const destinationPath = './image.jpg';
+    // Wait for the download to finish
+    // await download.finished();
+
+    // await page.goto(firstSrc);
+
+    // // Get the image buffer
+    // const imageBuffer1 = await page.screenshot();
+    // const filePath = './image.jpg';
+
+    // // Save the image buffer to a file
+    // await fs.promises.writeFile(filePath, imageBuffer1);
+
+
+    // // Set the destination file path to save the image
+    // const destinationPath = './image.jpg';
 
     await page.goto('https://imgbb.com');
     const inputHandle = await page.$('input[type=file]');
-    await inputHandle.setInputFiles(destinationPath);
+    await inputHandle.setInputFiles('./image.jpg');
     await page.click('button.btn.btn-big.green[data-action="upload"]');
 
     await page.waitForSelector(".switch-combo");
@@ -43,12 +85,13 @@ export async function downloadImage(page, imgurl) {
 
     // Wait for the clipboard event to be triggered
     //   await page.waitForEvent("clipboard");
-    await page.waitForTimeout(5000)
+    await page.waitForTimeout(3000)
 
     // Get the copied value from the clipboard
     const copiedValue = await page.evaluate(() => navigator.clipboard.readText());
 
     console.log("Copied value:", copiedValue);
+    await page.waitForTimeout(2000)
     await page.goto(copiedValue)
 
 
