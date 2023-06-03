@@ -111,17 +111,21 @@ export class CodesService {
   }
 
   async findTrendingCodes() {
-    function getRandomSubset(array, count) {
-      const shuffledArray = array.slice(); // Create a copy of the original array
-      for (let i = shuffledArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-      }
-      return shuffledArray.slice(0, count);
-    }
+    // function getRandomSubset(array, count) {
+    //   const shuffledArray = array.slice(); // Create a copy of the original array
+    //   for (let i = shuffledArray.length - 1; i > 0; i--) {
+    //     const j = Math.floor(Math.random() * (i + 1));
+    //     [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+    //   }
+    //   return shuffledArray.slice(0, count);
+    // }
 
-    const allCodes = await this.codeModel.find();
-    const codes = getRandomSubset(allCodes, 9);
+    // const allCodes = await this.codeModel.find();
+    // const codes = getRandomSubset(allCodes, 9);
+    const codes = await this.codeModel.aggregate([
+      { $sample: { size: 9 } }
+    ]).exec();
+
     return { codes };
   }
 
@@ -149,7 +153,6 @@ export class CodesService {
 
   async findOneCodeData(id) {
     const code = await this.codeModel.findOne({ _id: id })
-    console.log("🚀 ~ file: codes.service.ts:59 ~ CodesService ~ findOneCodeData ~ code:", code)
     return code
   }
 

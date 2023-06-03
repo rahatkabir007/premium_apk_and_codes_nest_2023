@@ -123,7 +123,12 @@ export class PdfBooksService {
     console.log('query', query.page)
     const limit = 20;
     const page = query.page;
-    const allBooksData = await this.pdfBookModel.find().sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
+    const allBooksData = await this.pdfBookModel.find({
+      $or: [
+        { downloadLink: { $ne: "https://yes-pdf.comundefined" } },
+        { readingLink: { $ne: "https://yes-pdf.comundefined" } }
+      ]
+    }).sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
     const allBooksDataLength = await this.pdfBookModel.find().count()
     return { allBooksData, allBooksDataLength }
   }
@@ -134,8 +139,28 @@ export class PdfBooksService {
     const limit = 8;
     const searchValue = query.search;
     const page = query.page;
-    const booksAllDataSearch = await this.pdfBookModel.find({ "bookTitle": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
-    const booksAllDataLengthSearch = await this.pdfBookModel.find({ "bookTitle": { $regex: searchValue, $options: 'i' } }).count()
+    const booksAllDataSearch = await this.pdfBookModel.find({
+      $and: [
+        { "bookTitle": { $regex: searchValue, $options: 'i' } },
+        {
+          $or: [
+            { downloadLink: { $ne: 'https://yes-pdf.comundefined' } },
+            { readingLink: { $ne: 'https://yes-pdf.comundefined' } }
+          ]
+        }
+      ]
+    }).limit(limit).skip(((page as number) - 1) * (limit))
+    const booksAllDataLengthSearch = await this.pdfBookModel.find({
+      $and: [
+        { "bookTitle": { $regex: searchValue, $options: 'i' } },
+        {
+          $or: [
+            { downloadLink: { $ne: 'https://yes-pdf.comundefined' } },
+            { readingLink: { $ne: 'https://yes-pdf.comundefined' } }
+          ]
+        }
+      ]
+    }).count()
     return { booksAllDataSearch, booksAllDataLengthSearch }
   }
 
@@ -146,17 +171,34 @@ export class PdfBooksService {
   }
 
   async findRandomizedBooks() {
-    function getRandomSubset(array, count) {
-      const shuffledArray = array.slice(); // Create a copy of the original array
-      for (let i = shuffledArray.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
-      }
-      return shuffledArray.slice(0, count);
-    }
+    // function getRandomSubset(array, count) {
+    //   const shuffledArray = array.slice(); // Create a copy of the original array
+    //   for (let i = shuffledArray.length - 1; i > 0; i--) {
+    //     const j = Math.floor(Math.random() * (i + 1));
+    //     [shuffledArray[i], shuffledArray[j]] = [shuffledArray[j], shuffledArray[i]];
+    //   }
+    //   return shuffledArray.slice(0, count);
+    // }
 
-    const allBooks = await this.pdfBookModel.find();
-    const randomBooks = getRandomSubset(allBooks, 12);
+    // const allBooks = await this.pdfBookModel.find({
+    //   $or: [
+    //     { downloadLink: { $ne: "https://yes-pdf.comundefined" } },
+    //     { readingLink: { $ne: "https://yes-pdf.comundefined" } }
+    //   ]
+    // });
+    // const randomBooks = getRandomSubset(allBooks, 12);
+    const randomBooks = await this.pdfBookModel.aggregate([
+      {
+        $match: {
+          $or: [
+            { downloadLink: "https://yes-pdf.comundefined" },
+            { readingLink: "https://yes-pdf.comundefined" }
+          ]
+        }
+      },
+      { $sample: { size: 12 } }
+    ]).exec();
+
     return { randomBooks };
   }
 
@@ -190,7 +232,12 @@ export class PdfBooksService {
   }
 
   async findAllSEOContents() {
-    const books = await this.pdfBookModel.find().sort({ createdAt: -1 });
+    const books = await this.pdfBookModel.find({
+      $or: [
+        { downloadLink: { $ne: "https://yes-pdf.comundefined" } },
+        { readingLink: { $ne: "https://yes-pdf.comundefined" } }
+      ]
+    }).sort({ createdAt: -1 });
     const authors = await this.pdfBookAuthorModel.find().sort({ createdAt: -1 });
     return { books, authors }
   }
