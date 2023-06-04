@@ -17,6 +17,7 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
       console.log('created', createdN)
       const dateC = new Date(createdN ? createdN : null);
       const dateL = new Date(lastDate)
+      console.log('dateC dateL', dateC, dateL)
       if (dateL > dateC) {
         console.log('hee')
         resolve("continue")
@@ -31,18 +32,28 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
         return concatenatedText;
       });
 
-      const title = await page.locator('.post-title h1').innerText() || ''
-      const imgSrc = await page.locator('.attachment-featured_image').getAttribute('data-src') || ''
+      // const title = await page.locator('.post-title h1').innerText() || ''
+      const title = await page.evaluate(() => {
+        const titleElement = document.querySelector('.post-title h1') || '';
+        return titleElement ? titleElement.textContent : '';
+      });
+      const imgSrc = await page.evaluate(() => {
+        const imgElement = document.querySelector('.attachment-featured_image') || '';
+        return imgElement ? imgElement.getAttribute('data-src') : '';
+      });
+      console.log('title imgSrc', title, imgSrc)
 
       const fileVersionsSizeDeveloper = await page.$$eval('.dl-size', (elements) => {
         return elements.map(element => {
-          const secondSpan = element.querySelector('span:nth-child(2)');
+          const secondSpan = element.querySelector('span:nth-child(2)') || '';
           return secondSpan ? secondSpan.textContent.trim() : '';
         });
       });
+      console.log('fileVersionsSizeDeveloper', fileVersionsSizeDeveloper)
       const version = fileVersionsSizeDeveloper[0] || '';
       const fileSize = fileVersionsSizeDeveloper[1] || '';
       const developer = fileVersionsSizeDeveloper[2] || '';
+      console.log('version fileSize developer', version, fileSize, developer);
 
       const allInnerDescription = await page.$eval('.post_content.entry-content', (element: Element) => {
         // const children = Array.from(element.children);
@@ -51,7 +62,7 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
         // // return innerTextArray.join(',');
         // return innerTextArray;
         // Get the element with class "post_content"
-        var postContent = document.querySelector('.post_content');
+        var postContent = document.querySelector('.post_content') || '';
 
         // Initialize an empty array to store the extracted text
         var textArray = [];
@@ -59,19 +70,23 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
         // Recursive function to traverse through the DOM tree and extract text nodes
         function extractTextNodes(element) {
           for (var i = 0; i < element.childNodes.length; i++) {
-            var node = element.childNodes[i];
+            var node = element.childNodes[i] || '';
+            console.log('node', node)
 
             // Check if the node is a text node and not under the 'hatom-extra' class
             if (node.nodeType === Node.TEXT_NODE && !node.parentElement.classList.contains('hatom-extra')) {
               // Extract the text content
-              var text = node.textContent.trim();
+              var text = node.textContent.trim() || '';
+              console.log('text', text)
 
               // Check if the text includes '<img'
               if (text.indexOf('<img') === -1) {
+                console.log('not');
                 // Add the text to the array
                 textArray.push(text);
               }
             } else if (node.nodeType === Node.ELEMENT_NODE && node.nodeName !== 'IMG') {
+              console.log('yes');
               // Recursively call the function for non-img element nodes
               extractTextNodes(node);
             }
@@ -82,7 +97,7 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
         extractTextNodes(postContent);
 
         // Output the resulting text array
-        console.log(textArray);
+        console.log('textArray', textArray);
         return textArray
 
       });
@@ -101,7 +116,7 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
       const downloadButtons = await page.$$('.download_button');
       if (downloadButtons.length > 0) {
         await downloadButtons[0].click();
-        await page.waitForTimeout(5000); // Add a delay to allow time for new tab to open
+        await page.waitForTimeout(3000); // Add a delay to allow time for new tab to open
         // Get the newly opened page
 
 
@@ -116,6 +131,7 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
             var androidVersions = document?.getElementsByClassName('dl-version')[0]?.getElementsByTagName('span')[1]?.innerText || ''
             return androidVersions
           });
+          console.log('requiredAndroid', requiredAndroid)
           const newPageExtractedMetaTags = await newPage.evaluate(() => {
             const downloadLinkDetailArr: any = [];
             const downloadLinkDetail = document.querySelectorAll('.dl a');
@@ -134,6 +150,7 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
         //early end
 
         const { newPageExtractedMetaTags, requiredAndroid } = await myFunction()
+        console.log('newPageExtractedMetaTags, requiredAndroid', newPageExtractedMetaTags, requiredAndroid);
 
         apkObj.title = title
         apkObj.imgSrc = imgSrc

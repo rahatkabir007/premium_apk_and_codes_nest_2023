@@ -91,6 +91,7 @@ export class ApksService {
             }
 
             console.log("apkObjArray", apkObjArray)
+            console.log("waiting for mongodb connection")
             const promises = apkObjArray.map(async (data) => {
               await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
             });
