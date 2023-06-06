@@ -3,7 +3,7 @@ export const codeScrappingAllItems = async (page, lastDate, i): Promise<any> => 
     return new Promise<any>(async (resolve, reject) => {
         try {
             console.log("Going to the page", i);
-            await page.waitForTimeout(5000)
+            await page.waitForTimeout(10000)
             await page.goto(`https://codelist.cc/pgs/${i}/`, { waitUntil: 'load', timeout: 0 });
 
             const NextStep = await page.evaluate(() => {

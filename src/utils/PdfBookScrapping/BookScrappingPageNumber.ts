@@ -17,7 +17,7 @@ export const bookScrappingPageNumber = async (): Promise<any> => {
 
             const page = await context.newPage();
             await page.goto("https://yes-pdf.com/books")
-            await page.waitForTimeout(5000);
+            await page.waitForTimeout(10000);
             const lastPageNumber = await page.$$eval('.pagination .page-item a', (links) => {
                 const lastLink = links[links.length - 1];
                 const href = (lastLink as HTMLAnchorElement).href;
