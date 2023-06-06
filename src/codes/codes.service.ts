@@ -39,8 +39,13 @@ export class CodesService {
     setTimeout(async () => {
       try {
         console.log('Set Timeout hit');
-        // const codeLastDate = await this.codeModel.find().sort({ $natural: 1 }).lean().allowDiskUse(true);
-        // const codeLastDt = codeLastDate[0]?.date || ''
+        const codeLastDate = await this.codeModel.find().sort({ $natural: 1 }).lean()
+        const codeLastDt = codeLastDate[0]?.date || ''
+        // const lastPScrap = await this.codeModel.find().sort({ page: 1 }).lean()
+        // const firstPScrap = await this.codeModel.find().sort({ page: -1 }).lean()
+        // const lastPageScrap = lastPScrap[0]?.page || 0
+        // const firstPageScrap = firstPScrap[0]?.page || 0
+        // let pageGap = (firstPageScrap - lastPageScrap) || 0
         const result = await this.codeModel.aggregate([
           { $sort: { page: 1 } },
           { $limit: 1 },
@@ -58,7 +63,6 @@ export class CodesService {
         const firstPageScrap = result2[0]?.firstPageScrap || 0;
 
         let pageGap = (firstPageScrap - lastPageScrap) || 0;
-
         const { lastLinkNumber, page, browser } = await codeScrappingPageNumber();
         console.log("🚀 ~ file: codes.service.ts:87 ~ CodesService ~ setTimeout ~ result:", lastLinkNumber)
         let codeDatas;
