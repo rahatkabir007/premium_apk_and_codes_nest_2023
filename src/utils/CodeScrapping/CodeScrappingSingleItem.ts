@@ -1,7 +1,6 @@
 export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
-
             console.log('going to details page item', k + 1);
             const codeObj: any = {}
             await page.waitForTimeout(5000)
@@ -94,6 +93,7 @@ export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Pro
             console.log("🚀 ~ file: test.ts:29 ~ returnnewPromise ~ error:", error)
             resolve(null)
             reject(error);
+            return;
         }
     })
 
