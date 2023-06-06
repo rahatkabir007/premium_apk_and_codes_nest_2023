@@ -29,14 +29,44 @@ export class TorrentsService {
     setTimeout(async () => {
       try {
         console.log('Timeout hit');
-        const torrentLastDate = await this.torrentModel.find().sort({ createdDate: -1 })
+        const torrentLastDate = await this.torrentModel.aggregate([
+          { $sort: { createdDate: -1 } },
+          { $limit: 1 },
+          { $project: { _id: 0, created: 1 } }
+        ]).exec();
+        // const apkLastDate = await this.apkModel.find().sort({ createdDate: -1 })
+        console.log('torrentLastDate', torrentLastDate);
         const torrentLastDt = torrentLastDate[0]?.created || ''
 
-        const lastPScrap = await this.torrentModel.find().sort({ page: 1 })
-        const firstPScrap = await this.torrentModel.find().sort({ page: -1 })
+        const lastPScrap = await this.torrentModel.aggregate([
+          { $sort: { page: 1 } },
+          { $limit: 1 },
+          { $project: { _id: 0, page: 1 } }
+        ]).exec();
+        // const lastPScrap = await this.torrentModel.find().sort({ page: 1 })
         const lastPageScrap = lastPScrap[0]?.page || 0
+
+        // const firstPScrap = await this.torrentModel.find().sort({ page: -1 })
+        const firstPScrap = await this.torrentModel.aggregate([
+          { $sort: { page: -1 } },
+          { $limit: 1 },
+          { $project: { _id: 0, page: 1 } }
+        ]).exec();
+
         const firstPageScrap = firstPScrap[0]?.page || 0
         const pageGap = (firstPageScrap - lastPageScrap) || 0
+        console.log('last page scrap', lastPageScrap)
+        console.log('first page scrap', firstPageScrap)
+        console.log('pageGap', pageGap)
+        console.log('torrentLastDt', lastPageScrap)
+        // const torrentLastDate = await this.torrentModel.find().sort({ createdDate: -1 })
+        // const torrentLastDt = torrentLastDate[0]?.created || ''
+
+        // const lastPScrap = await this.torrentModel.find().sort({ page: 1 })
+        // const firstPScrap = await this.torrentModel.find().sort({ page: -1 })
+        // const lastPageScrap = lastPScrap[0]?.page || 0
+        // const firstPageScrap = firstPScrap[0]?.page || 0
+        // const pageGap = (firstPageScrap - lastPageScrap) || 0
         const { totalP, page } = await torrentScrappingPageNumber();
         console.log('total', totalP)
 

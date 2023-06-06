@@ -50,7 +50,7 @@ import { PdfBooksModule } from './pdf-books/pdf-books.module';
     ),
     ApksModule,
     CodesModule,
-    // TasksModule,
+    TasksModule,
     HustleModule,
     NewspapersModule,
     TorrentsModule,

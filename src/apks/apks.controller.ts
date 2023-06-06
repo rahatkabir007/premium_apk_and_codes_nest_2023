@@ -23,6 +23,20 @@ export class ApksController {
     // isWorking = false
     // return create
   }
+  @Post('/fetch')
+  async test2(@Res() res: Response) {
+    //   if (isWorking) {
+    //     //@ts-ignore
+    //   return res.status(409).json({ message: 'Work in progress' });
+    //   return res.status(409).json({ message: 'Work in progress' });
+    // }
+    // isWorking = true
+    // const create =
+    await this.apksService.fetchApkDatas(res);
+    // isWorking = false
+    // return create
+  }
+
 
   // @Post('/test')
   // test(@Body() createApk: CreateApkDto) {
