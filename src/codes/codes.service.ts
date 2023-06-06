@@ -39,18 +39,31 @@ export class CodesService {
     setTimeout(async () => {
       try {
         console.log('Set Timeout hit');
-        const codeLastDate = await this.codeModel.find().sort({ $natural: 1 }).lean()
-        const codeLastDt = codeLastDate[0]?.date || ''
-        const lastPScrap = await this.codeModel.find().sort({ $natural: 1 }).lean()
-        const firstPScrap = await this.codeModel.find().sort({ $natural: 1 }).lean()
-        const lastPageScrap = lastPScrap[0]?.page || 0
-        const firstPageScrap = firstPScrap[0]?.page || 0
-        let pageGap = (firstPageScrap - lastPageScrap) || 0
+        // const codeLastDate = await this.codeModel.find().sort({ $natural: 1 }).lean().allowDiskUse(true);
+        // const codeLastDt = codeLastDate[0]?.date || ''
+        const result = await this.codeModel.aggregate([
+          { $sort: { page: 1 } },
+          { $limit: 1 },
+          { $group: { _id: null, lastPageScrap: { $first: "$page" } } }
+        ]).exec();
+
+        const lastPageScrap = result[0]?.lastPageScrap || 0;
+
+        const result2 = await this.codeModel.aggregate([
+          { $sort: { page: -1 } },
+          { $limit: 1 },
+          { $group: { _id: null, firstPageScrap: { $first: "$page" } } }
+        ]).exec();
+
+        const firstPageScrap = result2[0]?.firstPageScrap || 0;
+
+        let pageGap = (firstPageScrap - lastPageScrap) || 0;
+
         const { lastLinkNumber, page, browser } = await codeScrappingPageNumber();
         console.log("🚀 ~ file: codes.service.ts:87 ~ CodesService ~ setTimeout ~ result:", lastLinkNumber)
         let codeDatas;
         for (let i = lastLinkNumber - pageGap; i >= 1; i--) {
-          const result: any = await codeScrappingAllItems(page, codeLastDt, i);
+          const result: any = await codeScrappingAllItems(page, i);
           if (result === "continue") {
             continue;
           }
@@ -60,7 +73,7 @@ export class CodesService {
           }
           let codeObjArray = [];
           for (let j = codeDatas.length - 1; j >= 0; j--) {
-            const objResult: any = await codeScrappingSingleItem(page, codeLastDt, codeDatas, j);
+            const objResult: any = await codeScrappingSingleItem(page, codeDatas, j);
             if (objResult === "continue") {
               continue;
             }
@@ -191,7 +204,7 @@ export class CodesService {
   }
 
   async findAllSEOContents() {
-    const codes = await this.codeModel.find().sort({ createdAt: -1 });
+    const codes = await this.codeModel.find().sort({ createdAt: -1 }).lean().allowDiskUse(true);;
     return { codes }
   }
 

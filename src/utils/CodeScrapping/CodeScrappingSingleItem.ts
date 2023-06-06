@@ -1,4 +1,4 @@
-export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Promise<any> => {
+export const codeScrappingSingleItem = async (page, codeDatas, k): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
             console.log('going to details page item', k + 1);
@@ -16,13 +16,13 @@ export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Pro
             }
             const date = codeDatas[k].date;
             const nullorTextDate = date || null;
-            const dateC = new Date(nullorTextDate);
-            const dateL = new Date(lastDate)
-            if (dateL > dateC) {
-                resolve("continue")
-                return;
-            }
-            const mongoDbDate = dateC.toISOString();
+            // const dateC = new Date(nullorTextDate);
+            // const dateL = new Date(lastDate)
+            // if (dateL > dateC) {
+            //     resolve("continue")
+            //     return;
+            // }
+            // const mongoDbDate = dateC.toISOString();
             const downloadLinks = await page.evaluate(() => {
                 //@ts-ignore
                 const downloadLinksArr = document.getElementsByClassName('quote')[0].innerText.split("\n")
@@ -82,7 +82,7 @@ export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Pro
             codeObj.img = img;
             codeObj.category = category;
             codeObj.date = date;
-            codeObj.mongoDbDate = mongoDbDate;
+            codeObj.mongoDbDate = "";
             codeObj.url = linkText
             codeObj.downloadLinks = downloadLinks;
             // codeDatasArray.push(codeObj)
