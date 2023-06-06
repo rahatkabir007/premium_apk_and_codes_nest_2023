@@ -39,10 +39,10 @@ export class CodesService {
     setTimeout(async () => {
       try {
         console.log('Set Timeout hit');
-        const codeLastDate = await this.codeModel.find().sort({ mongoDbDate: -1 })
+        const codeLastDate = await this.codeModel.find().sort({ $natural: 1 }).lean()
         const codeLastDt = codeLastDate[0]?.date || ''
-        const lastPScrap = await this.codeModel.find().sort({ page: 1 })
-        const firstPScrap = await this.codeModel.find().sort({ page: -1 })
+        const lastPScrap = await this.codeModel.find().sort({ $natural: 1 }).lean()
+        const firstPScrap = await this.codeModel.find().sort({ $natural: 1 }).lean()
         const lastPageScrap = lastPScrap[0]?.page || 0
         const firstPageScrap = firstPScrap[0]?.page || 0
         let pageGap = (firstPageScrap - lastPageScrap) || 0
@@ -72,11 +72,21 @@ export class CodesService {
             console.log("🚀 ~ file: codes.service.ts:98 ~ CodesService ~ setTimeout ~ objResult:", objResult)
             codeObjArray.push(objResult)
           }
-          const promises = codeObjArray.map(async (data) => {
-            await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
-          });
+          // const promises = codeObjArray.map(async (data) => {
+          //   await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+          // });
 
-          await Promise.all(promises);
+          // await Promise.all(promises);
+          const bulkOperations = codeObjArray.map((data) => ({
+            updateOne: {
+              filter: { title: data.title },
+              update: data,
+              upsert: true,
+            },
+          }));
+
+          await this.codeModel.bulkWrite(bulkOperations);
+
           console.log('DB insert', i, "page");
         }
         console.log("🚀 ~ file: codes.service.ts:111 ~ CodesService ~ setTimeout ~ codeDatas:", codeDatas)
@@ -107,11 +117,17 @@ export class CodesService {
     // let limit = 10
     const page = query.page || 1;
     // const page = 1;
-    const allCodes = await this.codeModel.find();
-    const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).sort({ mongoDbDate: -1 }).exec();
-    const totalCodeLength = await this.codeModel.count()
+    // const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).sort({ mongoDbDate: -1 }).exec();
+    const codes = await this.codeModel
+      .find()
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .sort({ mongoDbDate: -1 })
+      .allowDiskUse(true)
+      .lean();
+    const totalCodeLength = await this.codeModel.countDocuments();
     const pageCountNumber = Math.ceil(totalCodeLength / limit)
-    return { codes, pageCountNumber, allCodes }
+    return { codes, pageCountNumber }
   }
 
   async findTrendingCodes() {
@@ -137,7 +153,14 @@ export class CodesService {
     const limit = 8;
     const searchValue = query.search;
     const page = query.page;
-    const searchedCodes = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit)).sort({ mongoDbDate: -1 });
+    // const searchedCodes = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit)).sort({ mongoDbDate: -1 });
+    const searchedCodes = await this.codeModel
+      .find({ "title": { $regex: searchValue, $options: 'i' } })
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .sort({ mongoDbDate: -1 })
+      .allowDiskUse(true)
+      .lean();
     const searchedCodesLength = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
     const pageCountNumber = Math.ceil(searchedCodesLength / limit)
     return { searchedCodes, pageCountNumber }
@@ -147,7 +170,14 @@ export class CodesService {
     const limit = 8;
     const categoryValue = query.category;
     const page = query.page;
-    const categorizedCodes = await this.codeModel.find({ "category": { $regex: categoryValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit)).sort({ mongoDbDate: -1 })
+    // const categorizedCodes = await this.codeModel.find({ "category": { $regex: categoryValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit)).sort({ mongoDbDate: -1 })
+    const categorizedCodes = await this.codeModel
+      .find({ "category": { $regex: categoryValue, $options: 'i' } })
+      .limit(limit)
+      .skip((page - 1) * limit)
+      .sort({ mongoDbDate: -1 })
+      .allowDiskUse(true)
+      .lean();
     const categorizedCodesLength = await this.codeModel.find({ "category": { $regex: categoryValue, $options: 'i' } }).count()
     const pageCountNumber = Math.ceil(categorizedCodesLength / limit)
     return { categorizedCodes, pageCountNumber }
