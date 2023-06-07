@@ -1,10 +1,9 @@
 export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
-
             console.log('going to details page item', k + 1);
             const codeObj: any = {}
-            await page.waitForTimeout(5000)
+            await page.waitForTimeout(10000)
             await page.goto(codeDatas[k].url, { waitUntil: 'load', timeout: 0 })
             await page.waitForTimeout(2000)
             const title = codeDatas[k].title;
@@ -33,18 +32,33 @@ export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Pro
             //codecanyon scrap
             const linkText = await page.evaluate(() => {
                 const link = document.querySelector('.single-body a');
-                return link.textContent;
+                if (link) {
+                    return link.textContent;
+                } else {
+                    const singleBodyElement = document.querySelector('.single-body');
+                    if (singleBodyElement) {
+                        const string = singleBodyElement.textContent;
+                        const regex = /http:\/\/[^ \n\r\t\]]+/g;
+                        const matches = string.match(regex);
+                        if (matches && matches.length > 0) {
+                            return matches[0];
+                        }
+                    }
+                }
+                return null;
             });
-            await page.waitForTimeout(5000);
-            if (linkText.includes("codecanyon")) {
+
+            await page.waitForTimeout(10000);
+
+            if (linkText && linkText.includes("codecanyon")) {
                 console.log("going to codecanyon");
-                await page.goto(linkText), { waitUntil: 'load', timeout: 0 };
+                await page.goto(linkText, { waitUntil: 'load', timeout: 0 });
                 await page.waitForTimeout(2000);
 
                 const htmlContent = await page.evaluate(() => {
-                    const element = document.querySelector('.user-html'); // replace "your-class" with your class name
+                    const element = document.querySelector('.user-html');
                     if (!element) {
-                        return null; // Return null if the element is not found 
+                        return null; // Return null if the element is not found
                     }
                     let htmlContent = element.innerHTML;
 
@@ -54,12 +68,14 @@ export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Pro
                     // Replace <span> elements with <img> elements
                     htmlContent = htmlContent.replace(/<span([^>]*)data-src="([^"]*)"([^>]*)data-alt="([^"]*)"[^>]*><\/span>/g, '<img$1src="$2"$3alt="$4">');
 
-                    return htmlContent === null ? "" : htmlContent;
+                    return htmlContent;
                 });
 
                 codeObj.htmlContent = htmlContent || "";
                 // codecanyon scrap finish
             }
+
+
 
             codeObj.title = title;
             codeObj.description = description;
@@ -75,8 +91,9 @@ export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Pro
 
         } catch (error) {
             console.log("🚀 ~ file: test.ts:29 ~ returnnewPromise ~ error:", error)
-
+            resolve(null)
             reject(error);
+            return;
         }
     })
 

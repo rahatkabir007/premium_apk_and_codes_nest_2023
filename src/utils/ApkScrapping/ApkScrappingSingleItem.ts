@@ -116,7 +116,11 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
       const downloadButtons = await page.$$('.download_button');
       if (downloadButtons.length > 0) {
         await downloadButtons[0].click();
+<<<<<<< HEAD
         await page.waitForTimeout(3000); // Add a delay to allow time for new tab to open
+=======
+        await page.waitForTimeout(10000); // Add a delay to allow time for new tab to open
+>>>>>>> 9f489a1cdcf9790e37a0e71b4e12866fdc41fc50
         // Get the newly opened page
 
 
@@ -173,7 +177,7 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
 
       // console.log('going to details page item', k + 1);
       // const codeObj: any = {}
-      // await page.waitForTimeout(5000)
+      // await page.waitForTimeout(10000)
       // await page.goto(codeDatas[k].url)
       // await page.waitForTimeout(2000)
       // const title = codeDatas[k].title;
@@ -204,7 +208,7 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
       //     const link = document.querySelector('.single-body a');
       //     return link.textContent;
       // });
-      // await page.waitForTimeout(5000);
+      // await page.waitForTimeout(10000);
       // if (linkText.includes("codecanyon")) {
       //     console.log("going to codecanyon");
       //     await page.goto(linkText);

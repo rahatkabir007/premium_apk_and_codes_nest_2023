@@ -158,7 +158,7 @@ export const torrentScrappingSingleItem = async (page: any, lastDate: any, allRe
 
             // console.log('going to details page item', k + 1);
             // const codeObj: any = {}
-            // await page.waitForTimeout(5000)
+            // await page.waitForTimeout(10000)
             // await page.goto(codeDatas[k].url)
             // await page.waitForTimeout(2000)
             // const title = codeDatas[k].title;
@@ -189,7 +189,7 @@ export const torrentScrappingSingleItem = async (page: any, lastDate: any, allRe
             //     const link = document.querySelector('.single-body a');
             //     return link.textContent;
             // });
-            // await page.waitForTimeout(5000);
+            // await page.waitForTimeout(10000);
             // if (linkText.includes("codecanyon")) {
             //     console.log("going to codecanyon");
             //     await page.goto(linkText);

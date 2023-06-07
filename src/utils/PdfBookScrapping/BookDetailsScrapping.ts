@@ -5,7 +5,20 @@ export const bookDetailsScrapping = async (bookData, page): Promise<any> => {
             console.log('going to details page item', bookData);
             await page.waitForTimeout(10000)
             await page.goto(`https://yes-pdf.com${bookData.url}`);
-            await page.waitForTimeout(2000)
+            await page.waitForTimeout(2000);
+
+
+            const isForbidden = await page.evaluate(() => {
+                const h1Element = document.querySelector('h1');
+                return h1Element && h1Element.textContent.includes('403 Forbidden');
+            });
+
+            if (isForbidden) {
+                console.log('Page is forbidden. Skipping scraping for:', bookData);
+                resolve(null);
+                return;
+            }
+
 
             const data = await page.evaluate(() => {
                 const bookCoverImg = document.querySelector('.book-cover img');
@@ -94,6 +107,7 @@ export const bookDetailsScrapping = async (bookData, page): Promise<any> => {
 
         } catch (error) {
             reject(error);
+            resolve(null);
         }
     })
 
