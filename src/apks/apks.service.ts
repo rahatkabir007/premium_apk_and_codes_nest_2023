@@ -87,7 +87,7 @@ export class ApksService {
           console.log('totalP page', totalP)
 
           let allReadMoreHref;
-          for (let i = totalP - pageGap; i >= 1; i--) {
+          for (let i = totalP - pageGap; i >= 2; i--) {
             const result: any = await apkScrappingAllItems(page, apkLastDt, i, 'initial');
             if (result === "continue") {
               continue;
@@ -110,11 +110,23 @@ export class ApksService {
 
             console.log("apkObjArray", apkObjArray)
             console.log("waiting for mongodb connection")
-            const promises = apkObjArray.map(async (data) => {
-              await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+            const bulkOps = apkObjArray.map((data) => {
+              return {
+                updateOne: {
+                  filter: { title: data.title },
+                  update: { $set: data },
+                  upsert: true,
+                  new: true,
+                },
+              };
             });
 
-            await Promise.all(promises);
+            await this.apkModel.bulkWrite(bulkOps);
+            // const promises = apkObjArray.map(async (data) => {
+            //   await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+            // });
+
+            // await Promise.all(promises);
             console.log('DB insert', i, "page");
           }
           // const result:any = await apkScrapping(apkLastDt); // Call the main function and capture the return value
@@ -136,7 +148,7 @@ export class ApksService {
           //     }
           //   }, 3000);
           // }
-          throw new Error('Example error');
+          // throw new Error('Example error');
         } catch (error) {
           console.error(error);
           isWorking = false;
@@ -183,22 +195,29 @@ export class ApksService {
           console.log('totalP page', totalP)
 
           let allReadMoreHref;
+          // let shouldBreak = false;
           for (let i = 1; i <= totalP; i++) {
             const result: any = await apkScrappingAllItems(page, apkLastDt, i, 'fetch');
             if (result === "break") {
+              console.log('hello break')
+              // shouldBreak = true;
               break;
             }
+
+            // if (!shouldBreak) {
+            console.log('hello no break')
             allReadMoreHref = result;
             if (allReadMoreHref.length === 0) {
+              console.log('length break')
               break;
             }
             let apkObjArray = [];
             for (let j = allReadMoreHref.length - 1; j >= 0; j--) {
               const objResult: any = await apkScrappingSingleItem(page, apkLastDt, allReadMoreHref, j, context);
+              console.log('objResult', objResult)
               if (objResult === "continue") {
                 continue;
               }
-              console.log("🚀 ~ file: codes.service.ts:98 ~ CodesService ~ setTimeout ~ objResult:", objResult)
               objResult.page = i
               console.log('objResult', objResult)
               apkObjArray.push(objResult)
@@ -206,21 +225,29 @@ export class ApksService {
 
             console.log("apkObjArray", apkObjArray)
             console.log("waiting for mongodb connection")
-            const promises = apkObjArray.map(async (data) => {
-              await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+            const bulkOps = apkObjArray.map((data) => {
+              return {
+                updateOne: {
+                  filter: { title: data.title },
+                  update: { $set: data },
+                  upsert: true,
+                  new: true,
+                },
+              };
             });
 
-            await Promise.all(promises);
-            console.log('DB insert', i, "page");
+            await this.apkModel.bulkWrite(bulkOps);
+            // const result:any = await apkScrapping(apkLastDt); // Call the main function and capture the return value
+
+
+            // const promises = result.map(async (data) => {
+            //   await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+            // });
+
+            // await Promise.all(promises);
+            // }
           }
-          // const result:any = await apkScrapping(apkLastDt); // Call the main function and capture the return value
 
-
-          // const promises = result.map(async (data) => {
-          //   await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
-          // });
-
-          // await Promise.all(promises);
           console.log('DB insert');
           isWorking = false
           return "Inserted to DB"
@@ -232,7 +259,7 @@ export class ApksService {
           //     }
           //   }, 3000);
           // }
-          throw new Error('Example error');
+          // throw new Error('Example error');
         } catch (error) {
           console.error(error);
           isWorking = false;
@@ -247,29 +274,37 @@ export class ApksService {
   }
 
 
+  async findAllApkDataSiteMap() {
+    console.log('what');
+    const apkAll = await this.apkModel.find().select('_id');
+    return { apkAll }
+  }
+
   async findAllApkData(query: { page: number }) {
     console.log('query', query.page)
     const limit = 8;
     const page = query.page;
-    const apkAll = await this.apkModel.find()
-    const apkAllData = await this.apkModel.find().sort({ createdDate: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
-    const apkAllDataLength = (await this.apkModel.find().sort({ createdDate: -1 }).count())
+    // const apkAll = await this.apkModel.find().select('_id');
+    // const apkAll = await this.apkModel.find()
+    const apkAllData = await this.apkModel.find().sort({ createdDate: -1 }).limit(limit).skip(((page as number) - 1) * (limit)).select('_id title imgSrc allText created categories')
+    // const apkAllDataLength = (await this.apkModel.find().sort({ createdDate: -1 }).count())
+    const apkAllDataLength = await this.apkModel.countDocuments();
     console.log('apkAllDataLength', apkAllDataLength)
     console.log('apkAllData', apkAllData)
-    console.log('apkAll', apkAll)
-    return { apkAll, apkAllData, apkAllDataLength }
+    // console.log('apkAll', apkAll)
+    return { apkAllData, apkAllDataLength }
   }
 
-  async findLastDateApk() {
-    // console.log('query',query.page)
-    // const limit = 8;
-    // const page = query.page;
-    const apkAllData = await this.apkModel.find().sort({ createdDate: -1 })
-    // const apkAllDataLength = (await this.apkModel.find().sort({ createdDate: -1 }).count())
-    // console.log('apkAllDataLength', apkAllDataLength)
-    console.log('apkAllData', apkAllData)
-    return apkAllData[0].created
-  }
+  // async findLastDateApk() {
+  //   // console.log('query',query.page)
+  //   // const limit = 8;
+  //   // const page = query.page;
+  //   const apkAllData = await this.apkModel.find().sort({ createdDate: -1 })
+  //   // const apkAllDataLength = (await this.apkModel.find().sort({ createdDate: -1 }).count())
+  //   // console.log('apkAllDataLength', apkAllDataLength)
+  //   console.log('apkAllData', apkAllData)
+  //   return apkAllData[0].created
+  // }
 
   async findAllApkDataSearch(query: { search: string, page: number }) {
     console.log('query', query.search)
@@ -277,8 +312,11 @@ export class ApksService {
     const limit = 8;
     const searchValue = query.search;
     const page = query.page;
-    const apkAllDataSearch = await this.apkModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit))
-    const apkAllDataLengthSearch = await this.apkModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
+    const apkAllDataSearch = await this.apkModel.find({ "title": { $regex: searchValue, $options: 'i' } }).limit(limit).skip(((page as number) - 1) * (limit)).select('_id title imgSrc allText created categories')
+
+    // const apkAllDataLengthSearch = await this.apkModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
+    const apkAllDataLengthSearch = await this.apkModel.countDocuments({ "title": { $regex: searchValue, $options: 'i' } });
+
     // const catSubLastObj = await this.apkModel.findOne({title:null});
     // const catSub=catSubLastObj.catSub
     console.log('apkAllDataLenght', apkAllDataLengthSearch)
@@ -296,13 +334,17 @@ export class ApksService {
       "categories": { $regex: `.*${apkValue}.*${subCat}|.*${subCat}.*${apkValue}.*`, $options: 'i' }
       // "categories": { $regex: `.*${apkValue}.* `&& `.*${subCat}.*`, $options: 'i' },
       // "categories": { $regex: subCat, $options: 'i' } ,
-    }).limit(limit).skip(((page as number) - 1) * (limit))
+    }).limit(limit).skip(((page as number) - 1) * (limit)).select('_id title imgSrc allText created categories')
 
-    const apkAllDataLengthCategorized = await this.apkModel.find({
+    const apkAllDataLengthCategorized = await this.apkModel.countDocuments({
       "categories": { $regex: `.*${apkValue}.*${subCat}|.*${subCat}.*${apkValue}.*`, $options: 'i' }
-      // "categories": { $regex: `.*${apkValue}.*` && `.*${subCat}.*`, $options: 'i' },
-      // "categories": { $regex: subCat, $options: 'i' } ,
-    }).count()
+    });
+
+    // const apkAllDataLengthCategorized = await this.apkModel.find({
+    //   "categories": { $regex: `.*${apkValue}.*${subCat}|.*${subCat}.*${apkValue}.*`, $options: 'i' }
+    //   // "categories": { $regex: `.*${apkValue}.*` && `.*${subCat}.*`, $options: 'i' },
+    //   // "categories": { $regex: subCat, $options: 'i' } ,
+    // }).count()
     // const pageCountNumber = Math.ceil(categorizedCodesLength / limit)
     // const catSubLastObj = await this.apkModel.findOne({title:null});
     // const catSub = catSubLastObj.catSub
@@ -312,7 +354,7 @@ export class ApksService {
   }
 
   async findOneApk(id: string) {
-    const apkOne = await this.apkModel.findOne({ _id: id })
+    const apkOne = await this.apkModel.findOne({ _id: id });
     return { apkOne }
   }
 

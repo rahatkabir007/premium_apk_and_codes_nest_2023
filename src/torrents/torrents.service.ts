@@ -19,7 +19,7 @@ export class TorrentsService {
     // eslint-disable-next-line no-empty-function
   ) { }
 
-  createTorrentDatas(res) {
+  async createTorrentDatas(res) {
     if (isWorking) {
       return res.status(409).json({ message: 'Work in progress' });
     }
@@ -73,7 +73,7 @@ export class TorrentsService {
         let allReadMoreHref;
         // for (let i = totalP - pageGap; i >= 1; i--) {
         for (let i = totalP - pageGap; i >= 1; i--) {
-          const result: any = await torrenScrappingAllItems(page, torrentLastDt, i);
+          const result: any = await torrenScrappingAllItems(page, torrentLastDt, i, 'initial');
           if (result === "continue") {
             continue;
           }
@@ -95,11 +95,138 @@ export class TorrentsService {
           }
 
           console.log("torrentObjArray", torrentObjArray)
-          const promises = torrentObjArray.map(async (data) => {
-            await this.torrentModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+          const bulkOps = torrentObjArray.map((data) => {
+            return {
+              updateOne: {
+                filter: { title: data.title },
+                update: { $set: data },
+                upsert: true,
+              },
+            };
           });
 
-          await Promise.all(promises);
+          await this.torrentModel.bulkWrite(bulkOps);
+          // const promises = torrentObjArray.map(async (data) => {
+          //   await this.torrentModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+          // });
+
+          // await Promise.all(promises);
+          console.log('DB insert', i, "page");
+        }
+        // const result:any = await apkScrapping(apkLastDt); // Call the main function and capture the return value
+
+
+        // const promises = result.map(async (data) => {
+        //   await this.apkModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+        // });
+
+        // await Promise.all(promises);
+        console.log('DB insert');
+        isWorking = false
+        return "Inserted to DB"
+
+      } catch (error) {
+        console.error(error);
+        isWorking = false;
+        res.status(500).send('Error occurred during scraping');
+      }
+    }, 3000);
+  }
+
+  async fetchTorrentDatas(res) {
+    if (isWorking) {
+      return res.status(409).json({ message: 'Work in progress' });
+    }
+    isWorking = true
+    res.send('Scrapping Initiated');
+    console.log("route hit");
+    setTimeout(async () => {
+      try {
+        console.log('Timeout hit');
+        const torrentLastDate = await this.torrentModel.aggregate([
+          { $sort: { createdDate: -1 } },
+          { $limit: 1 },
+          { $project: { _id: 0, created: 1 } }
+        ]).exec();
+        // const apkLastDate = await this.apkModel.find().sort({ createdDate: -1 })
+        console.log('torrentLastDate', torrentLastDate);
+        const torrentLastDt = torrentLastDate[0]?.created || ''
+
+        const lastPScrap = await this.torrentModel.aggregate([
+          { $sort: { page: 1 } },
+          { $limit: 1 },
+          { $project: { _id: 0, page: 1 } }
+        ]).exec();
+        // const lastPScrap = await this.torrentModel.find().sort({ page: 1 })
+        const lastPageScrap = lastPScrap[0]?.page || 0
+
+        // const firstPScrap = await this.torrentModel.find().sort({ page: -1 })
+        const firstPScrap = await this.torrentModel.aggregate([
+          { $sort: { page: -1 } },
+          { $limit: 1 },
+          { $project: { _id: 0, page: 1 } }
+        ]).exec();
+
+        const firstPageScrap = firstPScrap[0]?.page || 0
+        const pageGap = (firstPageScrap - lastPageScrap) || 0
+        console.log('last page scrap', lastPageScrap)
+        console.log('first page scrap', firstPageScrap)
+        console.log('pageGap', pageGap)
+        console.log('torrentLastDt', lastPageScrap)
+        // const torrentLastDate = await this.torrentModel.find().sort({ createdDate: -1 })
+        // const torrentLastDt = torrentLastDate[0]?.created || ''
+
+        // const lastPScrap = await this.torrentModel.find().sort({ page: 1 })
+        // const firstPScrap = await this.torrentModel.find().sort({ page: -1 })
+        // const lastPageScrap = lastPScrap[0]?.page || 0
+        // const firstPageScrap = firstPScrap[0]?.page || 0
+        // const pageGap = (firstPageScrap - lastPageScrap) || 0
+        const { totalP, page } = await torrentScrappingPageNumber();
+        console.log('total', totalP)
+
+        let allReadMoreHref;
+        // for (let i = totalP - pageGap; i >= 1; i--) {
+        for (let i = 1; i <= totalP; i++) {
+          const result: any = await torrenScrappingAllItems(page, torrentLastDt, i, 'fetch');
+          if (result === "break") {
+            console.log('hello break')
+            // shouldBreak = true;
+            break;
+          }
+          allReadMoreHref = result;
+          if (allReadMoreHref.length === 0) {
+            break;
+          }
+          console.log('allReadMoreHref', allReadMoreHref)
+          let torrentObjArray = [];
+          for (let j = allReadMoreHref.length - 1; j >= 0; j--) {
+            const objResult: any = await torrentScrappingSingleItem(page, torrentLastDate, allReadMoreHref, j);
+            if (objResult === "continue") {
+              continue;
+            }
+            console.log("🚀 ~ file: codes.service.ts:98 ~ CodesService ~ setTimeout ~ objResult:", objResult)
+            objResult.page = i
+            console.log('objResult', objResult)
+            torrentObjArray.push(objResult)
+          }
+
+          console.log("torrentObjArray", torrentObjArray)
+          const bulkOps = torrentObjArray.map((data) => {
+            return {
+              updateOne: {
+                filter: { title: data.title },
+                update: { $set: data },
+                upsert: true,
+              },
+            };
+          });
+
+          await this.torrentModel.bulkWrite(bulkOps);
+          // const promises = torrentObjArray.map(async (data) => {
+          //   await this.torrentModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+          // });
+
+          // await Promise.all(promises);
           console.log('DB insert', i, "page");
         }
         // const result:any = await apkScrapping(apkLastDt); // Call the main function and capture the return value

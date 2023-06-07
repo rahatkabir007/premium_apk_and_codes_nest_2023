@@ -34,7 +34,7 @@ export const apkScrappingAllItems = async (page, lastDate, i, type): Promise<any
         let text = []
         for (let k = 0; k < NextStep.length; k++) {
           console.log(NextStep[k]);
-          if (type = 'initial') {
+          if (type === 'initial') {
             if (new Date(lastDate) > new Date(NextStep[k] || null)) {
               //   console.log('true', new Date(lastDate) > new Date(NextStep[k]))
               text.push(true)
@@ -44,7 +44,7 @@ export const apkScrappingAllItems = async (page, lastDate, i, type): Promise<any
             }
           }
           else {
-            if (new Date(lastDate) < new Date(NextStep[k] || null)) {
+            if (new Date(lastDate) > new Date(NextStep[k] || null)) {
               //   console.log('true', new Date(lastDate) > new Date(NextStep[k]))
               text.push(true)
             }
@@ -57,7 +57,8 @@ export const apkScrappingAllItems = async (page, lastDate, i, type): Promise<any
       }
 
       console.log('pageChange()', pageChange())
-      if (type = 'initial') {
+      if (type === 'initial') {
+        console.log('initial')
         if (pageChange().filter(value => value === true).length === NextStep.length) {
           //   console.log()
           resolve("continue")
@@ -65,8 +66,8 @@ export const apkScrappingAllItems = async (page, lastDate, i, type): Promise<any
         }
       }
       else {
+        console.log('not initial')
         if (pageChange().filter(value => value === true).length === NextStep.length) {
-          //   console.log()
           resolve("break")
           return
         }
@@ -146,7 +147,7 @@ export const apkScrappingAllItems = async (page, lastDate, i, type): Promise<any
       // resolve(codeDatas);
 
     } catch (error) {
-      console.log("🚀 ~ file: test.ts:29 ~ returnnewPromise ~ error:", error)
+      console.log("🚀 ~ file: test.ts:29 ~inital fetch:", error)
 
       reject(error);
     }

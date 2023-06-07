@@ -10,7 +10,7 @@ export class ApksController {
   constructor(private readonly apksService: ApksService) { }
 
 
-  @Post('/test')
+  @Post('/fetchAll')
   async test(@Res() res: Response) {
     //   if (isWorking) {
     //     //@ts-ignore
@@ -57,6 +57,11 @@ export class ApksController {
   @Get('/findAllApk')
   async findAllApkCd(@Query() queries: { page: number }) {
     return await this.apksService.findAllApkData(queries);
+  }
+
+  @Get('/findAllApkSiteMp')
+  async findAllApkSM() {
+    return await this.apksService.findAllApkDataSiteMap();
   }
 
   @Get('/findAllApkSearch')

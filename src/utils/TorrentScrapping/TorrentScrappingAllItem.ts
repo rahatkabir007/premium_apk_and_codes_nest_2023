@@ -1,4 +1,4 @@
-export const torrenScrappingAllItems = async (page, lastDate, i): Promise<any> => {
+export const torrenScrappingAllItems = async (page, lastDate, i, type): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
             //// for (var i = 1; i < 4; i++) {
@@ -34,22 +34,42 @@ export const torrenScrappingAllItems = async (page, lastDate, i): Promise<any> =
                 let text = []
                 for (let k = 0; k < NextStep.length; k++) {
                     console.log(NextStep[k]);
-                    if (new Date(lastDate) > new Date(NextStep[k] || null)) {
-                        //   console.log('true', new Date(lastDate) > new Date(NextStep[k]))
-                        text.push(true)
+                    if (type === 'initial') {
+                        if (new Date(lastDate) > new Date(NextStep[k] || null)) {
+                            //   console.log('true', new Date(lastDate) > new Date(NextStep[k]))
+                            text.push(true)
+                        }
+                        else {
+                            text.push(false)
+                        }
                     }
                     else {
-                        text.push(false)
+                        if (new Date(lastDate) > new Date(NextStep[k] || null)) {
+                            //   console.log('true', new Date(lastDate) > new Date(NextStep[k]))
+                            text.push(true)
+                        }
+                        else {
+                            text.push(false)
+                        }
                     }
                 }
                 return text
             }
 
             console.log('pageChange()', pageChange())
-            if (pageChange().filter(value => value === true).length === NextStep.length) {
-                //   console.log()
-                resolve("continue")
-                return
+            if (type === 'initial') {
+                if (pageChange().filter(value => value === true).length === NextStep.length) {
+                    //   console.log()
+                    resolve("continue")
+                    return
+                }
+            }
+            else {
+                console.log('not initial')
+                if (pageChange().filter(value => value === true).length === NextStep.length) {
+                    resolve("break")
+                    return
+                }
             }
 
             const allReadMoreHref = await page.evaluate(() => {

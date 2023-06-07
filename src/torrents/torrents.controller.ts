@@ -8,9 +8,14 @@ import { Response } from 'express';
 export class TorrentsController {
   constructor(private readonly torrentsService: TorrentsService) { }
 
-  @Post('test')
-  create(@Res() res: Response) {
-    return this.torrentsService.createTorrentDatas(res);
+  @Post('/fetchAll')
+  async test(@Res() res: Response) {
+    await this.torrentsService.createTorrentDatas(res);
+  }
+
+  @Post('/fetch')
+  async test2(@Res() res: Response) {
+    await this.torrentsService.fetchTorrentDatas(res);
   }
 
   @Get('/findAllTorrent')
