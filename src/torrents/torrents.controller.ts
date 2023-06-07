@@ -23,6 +23,11 @@ export class TorrentsController {
     return await this.torrentsService.findAllTorrentData(queries);
   }
 
+  @Get('/findAllTorrentSiteMp')
+  async findAllTorrentSM() {
+    return await this.torrentsService.findAllTorrentDataSiteMap();
+  }
+
   @Get('/findAllTorrentSearch')
   async findAllTorrentS(@Query() queries: { search: string, page: number }) {
     return await this.torrentsService.findAllTorrentDataSearch(queries);

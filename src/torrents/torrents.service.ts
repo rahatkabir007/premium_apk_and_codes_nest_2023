@@ -249,16 +249,21 @@ export class TorrentsService {
     }, 3000);
   }
 
+  async findAllTorrentDataSiteMap() {
+    const torrentAll = await this.torrentModel.find({ downloadLink: { $regex: /\.torrent/i } }).select('_id')
+    return { torrentAll }
+  }
+
   async findAllTorrentData(query: { page: number }) {
     console.log('query', query.page)
     const limit = 8;
     const page = query.page;
-    const torrentAll = await this.torrentModel.find({ downloadLink: { $regex: /\.torrent/i } })
-    const torrentAllData = await this.torrentModel.find({ downloadLink: { $regex: /\.torrent/i } }).sort({ createdDate: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
-    const torrentAllDataLength = (await this.torrentModel.find({ downloadLink: { $regex: /\.torrent/i } }).sort({ createdDate: -1 }).count())
+    // const torrentAll = await this.torrentModel.find({ downloadLink: { $regex: /\.torrent/i } })
+    const torrentAllData = await this.torrentModel.find({ downloadLink: { $regex: /\.torrent/i } }).sort({ createdDate: -1 }).limit(limit).skip(((page as number) - 1) * (limit)).select('_id title imgSrc created comment categories')
+    const torrentAllDataLength = await this.torrentModel.countDocuments({ downloadLink: { $regex: /\.torrent/i } });
     console.log('torrentAllDataLength', torrentAllDataLength)
     console.log('torrentAllData', torrentAllData)
-    return { torrentAll, torrentAllData, torrentAllDataLength }
+    return { torrentAllData, torrentAllDataLength }
   }
 
 
@@ -271,8 +276,8 @@ export class TorrentsService {
     const torrentAllDataSearch = await this.torrentModel.find({
       "title": { $regex: searchValue, $options: 'i' },
       "downloadLink": { $regex: /\.torrent/i }
-    }).limit(limit).skip(((page as number) - 1) * (limit))
-    const torrentAllDataLengthSearch = await this.torrentModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
+    }).limit(limit).skip(((page as number) - 1) * (limit)).select('_id title imgSrc created comment categories')
+    const torrentAllDataLengthSearch = await this.torrentModel.countDocuments({ "title": { $regex: searchValue, $options: 'i' }, "downloadLink": { $regex: /\.torrent/i } })
     // const catSubLastObj = await this.apkModel.findOne({title:null});
     // const catSub=catSubLastObj.catSub
     console.log('apkAllDataLenght', torrentAllDataLengthSearch)
@@ -291,14 +296,14 @@ export class TorrentsService {
       "downloadLink": { $regex: /\.torrent/i }
       // "categories": { $regex: `.*${apkValue}.* `&& `.*${subCat}.*`, $options: 'i' },
       // "categories": { $regex: subCat, $options: 'i' } ,
-    }).limit(limit).skip(((page as number) - 1) * (limit))
+    }).limit(limit).skip(((page as number) - 1) * (limit)).select('_id title imgSrc created comment categories')
 
-    const torrentAllDataLengthCategorized = await this.torrentModel.find({
+    const torrentAllDataLengthCategorized = await this.torrentModel.countDocuments({
       "categories": { $regex: `.*${apkValue}.*${subCat}|.*${subCat}.*${apkValue}.*`, $options: 'i' },
       "downloadLink": { $regex: /\.torrent/i }
       // "categories": { $regex: `.*${apkValue}.*` && `.*${subCat}.*`, $options: 'i' },
       // "categories": { $regex: subCat, $options: 'i' } ,
-    }).count()
+    })
     // const pageCountNumber = Math.ceil(categorizedCodesLength / limit)
     // const catSubLastObj = await this.apkModel.findOne({title:null});
     // const catSub = catSubLastObj.catSub
@@ -326,15 +331,15 @@ export class TorrentsService {
       // "tags": { $regex: `.*${apkValue}.*`, $options: 'i' }
       // "categories": { $regex: `.*${apkValue}.* `&& `.*${subCat}.*`, $options: 'i' },
       // "categories": { $regex: subCat, $options: 'i' } ,
-    }).limit(limit).skip(((page as number) - 1) * (limit))
+    }).limit(limit).skip(((page as number) - 1) * (limit)).select('_id title imgSrc created comment categories')
 
-    const torrentAllDataLengthTag = await this.torrentModel.find({
+    const torrentAllDataLengthTag = await this.torrentModel.countDocuments({
       tags: { $regex: tagValue, $options: 'i' },
       downloadLink: { $regex: /\.torrent/i }
       // "tags": { $regex: `.*${apkValue}.*`, $options: 'i' }
       // "categories": { $regex: `.*${apkValue}.*` && `.*${subCat}.*`, $options: 'i' },
       // "categories": { $regex: subCat, $options: 'i' } ,
-    }).count()
+    })
     // const pageCountNumber = Math.ceil(categorizedCodesLength / limit)
     // const catSubLastObj = await this.apkModel.findOne({title:null});
     // const catSub = catSubLastObj.catSub
