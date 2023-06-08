@@ -85,11 +85,7 @@ export async function downloadImage(page, imgurl) {
 
     // Wait for the clipboard event to be triggered
     //   await page.waitForEvent("clipboard");
-<<<<<<< HEAD
-    await page.waitForTimeout(3000)
-=======
     await page.waitForTimeout(10000)
->>>>>>> 9f489a1cdcf9790e37a0e71b4e12866fdc41fc50
 
     // Get the copied value from the clipboard
     const copiedValue = await page.evaluate(() => navigator.clipboard.readText());

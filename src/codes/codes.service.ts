@@ -76,7 +76,7 @@ export class CodesService {
         console.log("🚀 ~ file: codes.service.ts:87 ~ CodesService ~ setTimeout ~ result:", lastLinkNumber)
         let codeDatas;
         for (let i = lastLinkNumber - pageGap; i >= 1; i--) {
-          const result: any = await codeScrappingAllItems(page, codeLastDt, i);
+          const result: any = await codeScrappingAllItems(page, codeLastDt, i, 'initial');
           if (result === "continue") {
             continue;
           }
@@ -138,6 +138,103 @@ export class CodesService {
 
   }
 
+  async createCodeDatasFromFirst(res) {
+    if (isWorking) {
+      return res.status(409).json({ message: 'Work in progress' });
+    }
+    isWorking = true
+    res.send('Scrapping Initiated');
+    console.log("route hit");
+    setTimeout(async () => {
+      try {
+        console.log('Set Timeout hit');
+        // const codeLastDate = await this.codeModel.find().sort({ mongoDbDate: -1 }).lean()
+        // const codeLastDt = codeLastDate[0]?.date || ''
+        // const lastPScrap = await this.codeModel.find().sort({ page: 1 }).lean()
+        // const firstPScrap = await this.codeModel.find().sort({ page: -1 }).lean()
+        // const lastPageScrap = lastPScrap[0]?.page || 0
+        // const firstPageScrap = firstPScrap[0]?.page || 0
+        // let pageGap = (firstPageScrap - lastPageScrap) || 0
+
+        const codeLastDate = await this.codeModel.aggregate([
+          { $sort: { mongoDbDate: -1 } },
+          { $limit: 1 },
+          { $project: { _id: 0, date: 1 } }
+        ]).exec();
+
+        const codeLastDt = codeLastDate[0]?.date || '';
+
+        const { lastLinkNumber, page, browser } = await codeScrappingPageNumber();
+        console.log("🚀 ~ file: codes.service.ts:87 ~ CodesService ~ setTimeout ~ result:", lastLinkNumber)
+        let codeDatas;
+        for (let i = 1; i <= lastLinkNumber; i++) {
+          const result: any = await codeScrappingAllItems(page, codeLastDt, i, 'fetch');
+          if (result === "break") {
+            break;
+          }
+          codeDatas = result;
+          if (codeDatas.length === 0) {
+            break;
+          }
+          let codeObjArray = [];
+          for (let j = codeDatas.length - 1; j >= 0; j--) {
+            const objResult: any = await codeScrappingSingleItem(page, codeLastDt, codeDatas, j);
+            if (objResult === "continue") {
+              continue;
+            }
+            if (objResult === null) {
+              console.log('Skipping scraping for this page, moving to the next page');
+              continue; // Move on to the next iteration of the loop
+            }
+            objResult.page = i
+            console.log("🚀 ~ file: codes.service.ts:98 ~ CodesService ~ setTimeout ~ objResult:", objResult)
+            codeObjArray.push(objResult)
+          }
+          // const promises = codeObjArray.map(async (data) => {
+          //   await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+          // });
+
+          // await Promise.all(promises);
+          const bulkOperations = codeObjArray.map((data) => ({
+            updateOne: {
+              filter: { title: data.title },
+              update: data,
+              upsert: true,
+            },
+          }));
+
+          await this.codeModel.bulkWrite(bulkOperations);
+
+          console.log('DB insert', i, "page");
+        }
+        console.log("🚀 ~ file: codes.service.ts:111 ~ CodesService ~ setTimeout ~ codeDatas:", codeDatas)
+        await browser.close();
+        // const promises = result.map(async (data) => {
+        //   await this.codeModel.findOneAndUpdate({ title: data.title }, data, { upsert: true, new: true });
+        // });
+
+        // await Promise.all(promises);
+        // for (let i = 0; i < result?.length; i++) {
+        //   await this.codeModel.findOneAndUpdate({ title: result[i].title }, result[i], { upsert: true, new: true })
+        // }
+        console.log('DB insert');
+        isWorking = false;
+        return "Inserted to DB"
+      } catch (error) {
+        console.error(error);
+        isWorking = false;
+        res.status(500).send('Error occurred during scraping');
+      }
+
+    }, 3000);
+
+  }
+
+
+
+
+
+
   async findAllCodeDatas(query: { page: number }) {
     let limit = 8;
     // let limit = 10
@@ -150,6 +247,7 @@ export class CodesService {
       .skip((page - 1) * limit)
       .sort({ mongoDbDate: -1 })
       .allowDiskUse(true)
+      // .select('_id title imgSrc allText created categories')
       .lean();
     const totalCodeLength = await this.codeModel.countDocuments();
     const pageCountNumber = Math.ceil(totalCodeLength / limit)
@@ -217,8 +315,15 @@ export class CodesService {
   }
 
   async findAllSEOContents() {
-    const codes = await this.codeModel.find().sort({ createdAt: -1 });
-    return { codes }
+    const cursor = this.codeModel.find().sort({ createdAt: -1 }).lean().cursor();
+    const codes = [];
+
+    await cursor.eachAsync((doc) => {
+      codes.push(doc._id);
+    });
+
+    return { codes };
   }
+
 
 }

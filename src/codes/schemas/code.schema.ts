@@ -42,3 +42,10 @@ export class Code {
 }
 
 export const CodeSchema = SchemaFactory.createForClass(Code);
+
+// Add indexing code here
+CodeSchema.index({ createdAt: -1 });
+CodeSchema.index({ page: 1 });
+CodeSchema.index({ mongoDbDate: -1 });
+
+export const CodeSchema = CodeSchema;

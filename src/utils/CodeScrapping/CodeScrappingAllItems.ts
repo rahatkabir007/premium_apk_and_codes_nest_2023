@@ -1,5 +1,5 @@
 
-export const codeScrappingAllItems = async (page, lastDate, i): Promise<any> => {
+export const codeScrappingAllItems = async (page, lastDate, i, type): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
         try {
             console.log("Going to the page", i);
@@ -17,22 +17,45 @@ export const codeScrappingAllItems = async (page, lastDate, i): Promise<any> => 
             })
             const pageChange = () => {
                 let text = []
-                for (let j = 0; j < NextStep.length; j++) {
-                    console.log(NextStep[j]);
-                    if (new Date(lastDate) > new Date(NextStep[j] || null)) {
-                        text.push(true)
+                for (let k = 0; k < NextStep.length; k++) {
+                    console.log(NextStep[k]);
+                    if (type === 'initial') {
+                        if (new Date(lastDate) > new Date(NextStep[k] || null)) {
+                            //   console.log('true', new Date(lastDate) > new Date(NextStep[k]))
+                            text.push(true)
+                        }
+                        else {
+                            text.push(false)
+                        }
                     }
                     else {
-                        text.push(false)
+                        if (new Date(lastDate) > new Date(NextStep[k] || null)) {
+                            //   console.log('true', new Date(lastDate) > new Date(NextStep[k]))
+                            text.push(true)
+                        }
+                        else {
+                            text.push(false)
+                        }
                     }
                 }
                 return text
             }
 
             console.log('pageChange()', pageChange())
-            if (pageChange().filter(value => value === true).length === NextStep.length) {
-                resolve("continue")
-                return; // Skip remaining code and move to next iteration
+            if (type === 'initial') {
+                console.log('initial')
+                if (pageChange().filter(value => value === true).length === NextStep.length) {
+                    //   console.log()
+                    resolve("continue")
+                    return
+                }
+            }
+            else {
+                console.log('not initial')
+                if (pageChange().filter(value => value === true).length === NextStep.length) {
+                    resolve("break")
+                    return
+                }
             }
             await page.waitForTimeout(2000)
             const codeDatas = await page.$$eval('.post--vertical', (codeData) => {

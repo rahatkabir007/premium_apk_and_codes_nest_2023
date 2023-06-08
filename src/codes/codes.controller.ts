@@ -11,9 +11,15 @@ export class CodesController {
 
 
   @Post('/postCodes')
-  async postCodes(@Res() res: Response) {
+  async postCodesFromLast(@Res() res: Response) {
     return await this.codesService.createCodeDatas(res);
   }
+
+  @Post('/postCodesFromFirst')
+  async postCodesFromFirst(@Res() res: Response) {
+    return await this.codesService.createCodeDatasFromFirst(res);
+  }
+
   @Get('/findAllSEOContents')
   findAllSEOContents() {
     return this.codesService.findAllSEOContents()
