@@ -246,8 +246,8 @@ export class CodesService {
       .limit(limit)
       .skip((page - 1) * limit)
       .sort({ mongoDbDate: -1 })
+      .select('_id title img date category description')
       .allowDiskUse(true)
-      // .select('_id title imgSrc allText created categories')
       .lean();
     const totalCodeLength = await this.codeModel.countDocuments();
     const pageCountNumber = Math.ceil(totalCodeLength / limit)
@@ -283,6 +283,7 @@ export class CodesService {
       .limit(limit)
       .skip((page - 1) * limit)
       .sort({ mongoDbDate: -1 })
+      .select('_id title img date category description')
       .allowDiskUse(true)
       .lean();
     const searchedCodesLength = await this.codeModel.find({ "title": { $regex: searchValue, $options: 'i' } }).count()
@@ -300,6 +301,7 @@ export class CodesService {
       .limit(limit)
       .skip((page - 1) * limit)
       .sort({ mongoDbDate: -1 })
+      .select('_id title img date category description')
       .allowDiskUse(true)
       .lean();
     const categorizedCodesLength = await this.codeModel.find({ "category": { $regex: categoryValue, $options: 'i' } }).count()
