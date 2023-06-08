@@ -43,7 +43,7 @@
 //         return new Promise<any>(async (resolve, reject) => {
 //             try {
 //                 console.log("Going to the page", i);
-//                 await page.waitForTimeout(10000)
+//                 await page.waitForTimeout(5000)
 //                 await page.goto(`https://codelist.cc/pgs/${i}/`);
 
 //                 const NextStep = await page.evaluate(() => {
@@ -108,7 +108,7 @@
 
 //                 console.log('going to details page item', k + 1);
 //                 const codeObj: any = {}
-//                 await page.waitForTimeout(10000)
+//                 await page.waitForTimeout(5000)
 //                 await page.goto(codeDatas[k].url)
 //                 await page.waitForTimeout(2000)
 //                 const title = codeDatas[k].title;
@@ -139,7 +139,7 @@
 //                     const link = document.querySelector('.single-body a');
 //                     return link.textContent;
 //                 });
-//                 await page.waitForTimeout(10000);
+//                 await page.waitForTimeout(5000);
 //                 if (linkText.includes("codecanyon")) {
 //                     console.log("going to codecanyon");
 //                     await page.goto(linkText);
@@ -224,7 +224,7 @@ export const codeScrapping = (lastDate) => {
             // for (var i = parsedPageNumber; i < 2; i++){
             for (var i = lastLinkNumber; i >= 1; i--) {
                 console.log("Going to the page", i);
-                await page.waitForTimeout(10000)
+                await page.waitForTimeout(5000)
                 await page.goto(`https://codelist.cc/pgs/${i}/`);
 
                 const NextStep = await page.evaluate(() => {
@@ -274,7 +274,7 @@ export const codeScrapping = (lastDate) => {
                 for (let k = codeDatas.length - 1; k >= 0; k--) {
                     console.log('going to details page', k);
                     const codeObj: any = {}
-                    await page.waitForTimeout(10000)
+                    await page.waitForTimeout(5000)
                     await page.goto(codeDatas[k].url)
                     await page.waitForTimeout(2000)
                     const title = codeDatas[k].title;
@@ -304,7 +304,7 @@ export const codeScrapping = (lastDate) => {
                         const link = document.querySelector('.single-body a');
                         return link.textContent;
                     });
-                    await page.waitForTimeout(10000);
+                    await page.waitForTimeout(5000);
                     if (linkText.includes("codecanyon")) {
                         console.log("going to codecanyon");
                         await page.goto(linkText);

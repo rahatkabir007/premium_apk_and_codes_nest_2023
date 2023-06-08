@@ -17,7 +17,7 @@ export const hustleScrapping = async (): Promise<any> => {
             context.setDefaultTimeout(timeout)
             const page = await context.newPage();
             await page.goto('http://web.archive.org/web/20221212190828/https://sidehustlestack.co/');
-            await page.waitForTimeout(10000);
+            await page.waitForTimeout(5000);
             const allHuss = await page.evaluate(async () => {
 
                 const h = document.getElementsByClassName('notion-collection-gallery medium');
@@ -46,7 +46,7 @@ export const hustleScrapping = async (): Promise<any> => {
 
                 await page.goto(url);
                 await page.waitForLoadState('load');
-                await page.waitForTimeout(10000);
+                await page.waitForTimeout(5000);
                 const HustleArray = await page.evaluate(async () => {
                     delay = ms => new Promise(res => setTimeout(res, ms));
                     var hustleObj: any = {}

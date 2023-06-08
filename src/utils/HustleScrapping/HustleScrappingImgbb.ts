@@ -85,7 +85,7 @@ export async function downloadImage(page, imgurl) {
 
     // Wait for the clipboard event to be triggered
     //   await page.waitForEvent("clipboard");
-    await page.waitForTimeout(10000)
+    await page.waitForTimeout(5000)
 
     // Get the copied value from the clipboard
     const copiedValue = await page.evaluate(() => navigator.clipboard.readText());
@@ -149,7 +149,7 @@ export async function downloadImage(page, imgurl) {
 //             context.setDefaultTimeout(timeout)
 //             const page = await context.newPage();
 //             await page.goto('http://web.archive.org/web/20221212190828/https://sidehustlestack.co/');
-//             await page.waitForTimeout(10000);
+//             await page.waitForTimeout(5000);
 //             const allHuss = await page.evaluate(async () => {
 
 //                 const h = document.getElementsByClassName('notion-collection-gallery medium');
@@ -178,7 +178,7 @@ export async function downloadImage(page, imgurl) {
 
 //                 await page.goto(url);
 //                 await page.waitForLoadState('load');
-//                 await page.waitForTimeout(10000);
+//                 await page.waitForTimeout(5000);
 //                 const HustleArray = await page.evaluate(async () => {
 //                     delay = ms => new Promise(res => setTimeout(res, ms));
 //                     var hustleObj: any = {}

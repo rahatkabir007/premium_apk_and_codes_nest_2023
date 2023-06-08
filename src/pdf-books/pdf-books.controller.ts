@@ -12,6 +12,11 @@ export class PdfBooksController {
     return await this.pdfBooksService.postPdfBookDatas(res);
   }
 
+  @Post('/postPdfBooksFromFirst')
+  async postPdfBooksFromFirst(@Res() res: Response) {
+    return await this.pdfBooksService.postPdfBookDatasFromFirst(res);
+  }
+
   @Get('/findAllSEOContents')
   findAllSEOContents() {
     return this.pdfBooksService.findAllSEOContents()

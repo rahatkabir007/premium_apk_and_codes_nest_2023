@@ -123,19 +123,127 @@ export class PdfBooksService {
     }, 3000)
   }
 
+  async postPdfBookDatasFromFirst(res) {
+    if (isWorking) {
+      return res.status(409).json({ message: 'Work in progress' });
+    }
+    isWorking = true
+    res.send('Scrapping Initiated');
+    console.log("route hit");
+    setTimeout(async () => {
+      try {
+        console.log('Set Timeout hit');
+        //main codes
+        //  page checking
+        const { lastPageNumber, page, browser } = await bookScrappingPageNumber();
+
+        let bookDatas;
+        for (let i = 1; i <= lastPageNumber; i++) {
+          const result: any = await bookScrappingAllItems(page, i);
+          bookDatas = result;
+          let bookObjArray = [];
+          for (let j = 0; j <= bookDatas.length; j++) {
+            const url2 = bookDatas[j].url;
+            const bookYesPdfId = url2.match(/\/book\/(\d+)/)[1];
+            const findBook = await this.pdfBookModel.find({ bookYesPdfId: bookYesPdfId })
+            if (findBook.length > 0) {
+              continue;
+            }
+            const bookDetails = await bookDetailsScrapping(bookDatas[j], page);
+            if (bookDetails === null) {
+              console.log('Skipping scraping for this page, moving to the next page');
+              continue; // Move on to the next iteration of the loop
+            }
+            const authorData = []
+            for (let k = 0; k < bookDetails.authorYesPdfId.length; k++) {
+              const authorYesPdfIdArray = bookDetails.authorYesPdfId[k]
+              const author = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfIdArray })
+              if (author.length > 0) {
+                const authorCollection = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfIdArray })
+                const authorObj = {
+                  _id: authorCollection[0]?._id,
+                  title: authorCollection[0]?.title
+                }
+                authorData.push(authorObj);
+                continue;
+              }
+              const authorDatas = await bookAuthorScrapping(authorYesPdfIdArray, page);
+              authorDatas.authorYesPdfId = authorYesPdfIdArray
+              await this.pdfBookAuthorModel.create(authorDatas);
+              const authorCollection = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfIdArray })
+              const authorObj = {
+                _id: authorCollection[0]?._id,
+                title: authorCollection[0]?.title
+              }
+              authorData.push(authorObj);
+            }
+
+            bookDetails.page = i
+            bookDetails.authors = authorData
+            bookObjArray.push(bookDetails)
+          }
+          const promises = bookObjArray.map(async (data) => {
+            await this.pdfBookModel.findOneAndUpdate({ bookYesPdfId: data.bookYesPdfId }, { $setOnInsert: data }, { upsert: true, new: true });
+          });
+
+          await Promise.all(promises);
+          console.log('DB insert', i, "page");
+        }
+
+
+
+        await browser.close();
+        //main codes
+        console.log('DB insert');
+        isWorking = false;
+        return "Inserted to DB"
+      }
+      catch (error) {
+        console.error(error);
+        isWorking = false;
+        res.status(500).send('Error occurred during scraping');
+      }
+    }, 3000)
+  }
+
   async findAllBooksData(query: { page: number }) {
-    console.log('query', query.page)
+    console.log('query', query.page);
     const limit = 20;
     const page = query.page;
-    const allBooksData = await this.pdfBookModel.find({
-      $or: [
-        { downloadLink: { $ne: "https://yes-pdf.comundefined" } },
-        { readingLink: { $ne: "https://yes-pdf.comundefined" } }
-      ]
-    }).sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
-    const allBooksDataLength = await this.pdfBookModel.find().count()
-    return { allBooksData, allBooksDataLength }
+    const skipCount = ((page as number) - 1) * limit;
+
+    const allBooksData = await this.pdfBookModel.aggregate([
+      {
+        $addFields: {
+          numericBookYesPdfId: { $toDouble: "$bookYesPdfId" }
+        }
+      },
+      {
+        $sort: { numericBookYesPdfId: -1 }
+      },
+      {
+        $project: {
+          _id: 1,
+          bookTitle: 1,
+          img: 1,
+          publishedYear: 1,
+          authors: 1,
+          shortDescription: 1
+        }
+      },
+      {
+        $skip: skipCount
+      },
+      {
+        $limit: limit
+      }
+    ]).exec();
+
+    const allBooksDataLength = await this.pdfBookModel.countDocuments().exec();
+
+    return { allBooksData, allBooksDataLength };
   }
+
 
   async findAllBooksDataSearch(query: { search: string, page: number }) {
     console.log('query', query.search)

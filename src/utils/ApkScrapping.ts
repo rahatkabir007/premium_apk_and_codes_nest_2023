@@ -11,7 +11,7 @@ export const apkScrapping = (lastDate) => {
       const context = await browser.newContext();
       const page = await context.newPage();
       await page.goto('https://www.revdl.com');
-      await page.waitForTimeout(10000);
+      await page.waitForTimeout(5000);
       let totalP = await page.evaluate(() => {
         const dotsSpan = document.querySelector('.page-numbers.dots');
         const nextDivText = dotsSpan.nextElementSibling.textContent;
@@ -148,7 +148,7 @@ export const apkScrapping = (lastDate) => {
           const downloadButtons = await page.$$('.download_button');
           if (downloadButtons.length > 0) {
             await downloadButtons[0].click();
-            await page.waitForTimeout(10000); // Add a delay to allow time for new tab to open
+            await page.waitForTimeout(5000); // Add a delay to allow time for new tab to open
             // Get the newly opened page
 
 
