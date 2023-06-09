@@ -147,7 +147,8 @@ export class PdfBooksService {
             const bookYesPdfId = url2.match(/\/book\/(\d+)/)[1];
             const findBook = await this.pdfBookModel.find({ bookYesPdfId: bookYesPdfId })
             if (findBook.length > 0) {
-              continue;
+              await browser.close()
+              break;
             }
             const bookDetails = await bookDetailsScrapping(bookDatas[j], page);
             if (bookDetails === null) {
@@ -181,7 +182,9 @@ export class PdfBooksService {
             bookDetails.page = i
             bookDetails.authors = authorData
             bookObjArray.push(bookDetails)
+
           }
+
           const promises = bookObjArray.map(async (data) => {
             await this.pdfBookModel.findOneAndUpdate({ bookYesPdfId: data.bookYesPdfId }, { $setOnInsert: data }, { upsert: true, new: true });
           });
@@ -350,7 +353,7 @@ export class PdfBooksService {
     await cursor1.eachAsync((doc) => {
       books.push(doc._id);
     });
-    const cursor2 = this.pdfBookModel.find().sort({ createdAt: -1 }).lean().cursor();
+    const cursor2 = this.pdfBookAuthorModel.find().sort({ createdAt: -1 }).lean().cursor();
     const authors = [];
 
     await cursor2.eachAsync((doc) => {
