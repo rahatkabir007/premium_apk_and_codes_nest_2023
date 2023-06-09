@@ -344,13 +344,25 @@ export class PdfBooksService {
   }
 
   async findAllSEOContents() {
-    const books = await this.pdfBookModel.find({
-      $or: [
-        { downloadLink: { $ne: "https://yes-pdf.comundefined" } },
-        { readingLink: { $ne: "https://yes-pdf.comundefined" } }
-      ]
-    }).sort({ createdAt: -1 });
-    const authors = await this.pdfBookAuthorModel.find().sort({ createdAt: -1 });
+    const cursor1 = this.pdfBookModel.find().sort({ createdAt: -1 }).lean().cursor();
+    const books = [];
+
+    await cursor1.eachAsync((doc) => {
+      books.push(doc._id);
+    });
+    const cursor2 = this.pdfBookModel.find().sort({ createdAt: -1 }).lean().cursor();
+    const authors = [];
+
+    await cursor2.eachAsync((doc) => {
+      authors.push(doc._id);
+    });
+    // const books = await this.pdfBookModel.find({
+    //   $or: [
+    //     { downloadLink: { $ne: "https://yes-pdf.comundefined" } },
+    //     { readingLink: { $ne: "https://yes-pdf.comundefined" } }
+    //   ]
+    // }).sort({ createdAt: -1 });
+    // const authors = await this.pdfBookAuthorModel.find().sort({ createdAt: -1 });
     return { books, authors }
   }
 
