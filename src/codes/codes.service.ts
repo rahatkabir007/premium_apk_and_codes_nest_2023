@@ -230,29 +230,68 @@ export class CodesService {
 
   }
 
-
-
-
-
-
-  async findAllCodeDatas(query: { page: number }) {
-    let limit = 8;
-    // let limit = 10
+  async findAllCodeDatas(query: { page?: number } = {}) {
+    const limit = 8;
     const page = query.page || 1;
-    // const page = 1;
-    // const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).sort({ mongoDbDate: -1 }).exec();
-    const codes = await this.codeModel
-      .find()
-      .limit(limit)
-      .skip((page - 1) * limit)
-      .sort({ mongoDbDate: -1 })
-      .select('_id title img date category description')
-      .allowDiskUse(true)
-      .lean();
-    const totalCodeLength = await this.codeModel.countDocuments();
-    const pageCountNumber = Math.ceil(totalCodeLength / limit)
-    return { codes, pageCountNumber }
+
+    const pipeline = [
+      {
+        $sort: { mongoDbDate: -1 }
+      },
+      {
+        $skip: (page - 1) * limit
+      },
+      {
+        $limit: limit
+      },
+      {
+        $project: {
+          _id: 1,
+          title: 1,
+          img: 1,
+          date: 1,
+          category: 1,
+          description: 1
+        }
+      }
+    ];
+
+    //@ts-ignore
+    const codes = await this.codeModel.aggregate(pipeline);
+
+    const countPipeline = [
+      {
+        $count: "totalCodeLength"
+      }
+    ];
+
+    const [countResult] = await this.codeModel.aggregate(countPipeline);
+    const totalCodeLength = countResult ? countResult.totalCodeLength : 0;
+
+    const pageCountNumber = Math.ceil(totalCodeLength / limit);
+
+    return { codes, pageCountNumber };
   }
+
+  // async findAllCodeDatas(query: { page: number }) {
+  //   let limit = 8;
+  //   // let limit = 10
+  //   const page = query.page || 1;
+  //   // const page = 1;
+  //   // const codes = await this.codeModel.find().limit(limit).skip((page as number - 1) * limit).sort({ mongoDbDate: -1 }).exec();
+  //   const codes = await this.codeModel
+  //     .find()
+  //     .limit(limit)
+  //     .skip((page - 1) * limit)
+  //     .sort({ mongoDbDate: -1 })
+  //     .select('_id title img date category description')
+  //     .allowDiskUse(true)
+  //     .lean();
+  //   const totalCodeLength = await this.codeModel.countDocuments();
+  //   const pageCountNumber = Math.ceil(totalCodeLength / limit)
+  //   return { codes, pageCountNumber }
+  // }
+
 
   async findTrendingCodes() {
     // function getRandomSubset(array, count) {
