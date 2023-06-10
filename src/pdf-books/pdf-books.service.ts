@@ -237,6 +237,7 @@ export class PdfBooksService {
           _id: 1,
           bookTitle: 1,
           img: 1,
+          imgbbImage: 1,
           publishedYear: 1,
           authors: 1,
           shortDescription: 1
@@ -330,7 +331,7 @@ export class PdfBooksService {
     const limit = 12;
     const page = query.page;
     const allAuthorsDatainital = await this.pdfBookAuthorModel.find().sort({ createdAt: -1 }).limit(limit).skip(((page as number) - 1) * (limit))
-    const allAuthorsDataLength = await this.pdfBookAuthorModel.find().count();
+    const allAuthorsDataLength = await this.pdfBookAuthorModel.find().countDocuments();
     for (let i = 0; i < allAuthorsDatainital.length; i++) {
       const authorBooks = await this.pdfBookModel.aggregate([
         { $match: { authorYesPdfId: allAuthorsDatainital[i]?.authorYesPdfId } }
@@ -397,7 +398,9 @@ export class PdfBooksService {
         for await (const book of cursor) {
           // Customize the image property
           const customizedImg = await downloadImageImgbb(book.img);
-
+          if (book.imgbbImage) {
+            continue;
+          }
           // Update the document with the new property
           book.imgbbImage = customizedImg;
 
@@ -438,17 +441,29 @@ export class PdfBooksService {
         // Process each document in the cursor
         let processedCount = 0;
         for await (const author of cursor) {
-          // Customize the image property
-          const customizedImg = await downloadImageImgbb(author.img);
+          if (author.imgbbImage) {
+            continue;
+          }
+          if (author.img === "https://yes-pdf.com/resources/images/comingsoon.png") {
+            const customizedImg = "https://i.ibb.co/XxLkfT7/image.png";
+            author.imgbbImage = customizedImg;
+            await author.save();
+            // Increment the processed count
+            processedCount++;
+          }
+          else {
+            // Customize the image property
+            const customizedImg = await downloadImageImgbb(author.img);
 
-          // Update the document with the new property
-          author.imgbbImage = customizedImg;
+            // Update the document with the new property
+            author.imgbbImage = customizedImg;
 
-          // Save the updated document
-          await author.save();
+            // Save the updated document
+            await author.save();
 
-          // Increment the processed count
-          processedCount++;
+            // Increment the processed count
+            processedCount++;
+          }
         }
 
         console.log(`Processed ${processedCount} documents.`);
