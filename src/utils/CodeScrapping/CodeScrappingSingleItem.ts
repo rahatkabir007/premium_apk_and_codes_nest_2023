@@ -23,11 +23,38 @@ export const codeScrappingSingleItem = async (page, lastDate, codeDatas, k): Pro
                 return;
             }
             const mongoDbDate = dateC.toISOString();
+            // const downloadLinks = await page.evaluate(() => {
+            //     //@ts-ignore
+            //     const downloadLinksArr = document.getElementsByClassName('quote')[0].innerText.split("\n")
+            //     return downloadLinksArr.filter((item) => item !== "");
+            // })
             const downloadLinks = await page.evaluate(() => {
-                //@ts-ignore
-                const downloadLinksArr = document.getElementsByClassName('quote')[0].innerText.split("\n")
-                return downloadLinksArr.filter((item) => item !== "");
-            })
+                const quoteElement = document.getElementsByClassName('quote')[0] as HTMLElement;
+                if (quoteElement) {
+                    const links = quoteElement.innerText?.split('\n').filter(item => item.trim() !== '') || [];
+                    return links;
+                } else {
+                    const tresdElement = document.querySelector('.tresd div span span') as HTMLElement;
+                    if (tresdElement) {
+                        const links = tresdElement.innerText?.split('\n').filter(item => item.trim() !== '') || [];
+                        return links;
+                    } else {
+                        const tresdDivElement = document.querySelector('.tresd div') as HTMLElement;
+                        if (tresdDivElement) {
+                            const links = tresdDivElement.innerText?.split('\n').filter(item => item.trim() !== '') || [];
+                            return links;
+                        } else {
+                            const blocxElement = document.querySelector('.blocx span span') as HTMLElement;
+                            if (blocxElement) {
+                                const links = blocxElement.innerText?.split('\n').filter(item => item.trim() !== '') || [];
+                                return links;
+                            }
+                        }
+                    }
+                }
+                return [];
+            });
+
 
             //codecanyon scrap
             const linkText = await page.evaluate(() => {

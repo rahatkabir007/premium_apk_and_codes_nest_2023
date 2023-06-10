@@ -94,6 +94,9 @@ export class CodesService {
               console.log('Skipping scraping for this page, moving to the next page');
               continue; // Move on to the next iteration of the loop
             }
+            if (objResult.downloadLinks.length === 0) {
+              continue;
+            }
             objResult.page = i
             console.log("🚀 ~ file: codes.service.ts:98 ~ CodesService ~ setTimeout ~ objResult:", objResult)
             codeObjArray.push(objResult)
