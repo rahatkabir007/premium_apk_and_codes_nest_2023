@@ -12,6 +12,18 @@ export class PdfBooksController {
     return await this.pdfBooksService.postPdfBookDatas(res);
   }
 
+  @Post('/updatePdfBooks')
+  async updatePdfBooks(@Res() res: Response) {
+    return await this.pdfBooksService.updatePdfBookDatas(res);
+  }
+
+  @Post('/updatePdfBookAuthorDatas')
+  async updatePdfBookAuthorDatas(@Res() res: Response) {
+    return await this.pdfBooksService.updatePdfBookAuthorDatas(res);
+  }
+
+
+
   @Post('/postPdfBooksFromFirst')
   async postPdfBooksFromFirst(@Res() res: Response) {
     return await this.pdfBooksService.postPdfBookDatasFromFirst(res);

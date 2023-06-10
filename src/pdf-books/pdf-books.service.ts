@@ -10,6 +10,7 @@ import { bookScrappingPageNumber } from 'src/utils/PdfBookScrapping/BookScrappin
 import { bookScrappingAllItems } from 'src/utils/PdfBookScrapping/BookScrappingAllItems';
 import { bookAuthorScrapping } from 'src/utils/PdfBookScrapping/BookAuthorScrapping';
 import { bookDetailsScrapping } from 'src/utils/PdfBookScrapping/BookDetailsScrapping';
+import { downloadImageImgbb } from 'src/utils/ImgBB/DownloadImgbb';
 
 
 export interface pdfBookDataType {
@@ -85,6 +86,10 @@ export class PdfBooksService {
                 continue;
               }
               const authorDatas = await bookAuthorScrapping(authorYesPdfIdArray, page);
+              //imgbb
+              // const imgbbImage = await downloadImageImgbb(page, authorDatas.img);
+              // authorDatas.imgbbImage = imgbbImage;
+              //imgbb
               authorDatas.authorYesPdfId = authorYesPdfIdArray
               await this.pdfBookAuthorModel.create(authorDatas);
               const authorCollection = await this.pdfBookAuthorModel.find({ authorYesPdfId: authorYesPdfIdArray })
@@ -94,7 +99,10 @@ export class PdfBooksService {
               }
               authorData.push(authorObj);
             }
-
+            //  imgbb
+            // const imgbbImage = await downloadImageImgbb(page, bookDetails.img);
+            // bookDetails.imgbbImage = imgbbImage;
+            //  imgbb
             bookDetails.page = i
             bookDetails.authors = authorData
             bookObjArray.push(bookDetails)
@@ -369,4 +377,89 @@ export class PdfBooksService {
     return { books, authors }
   }
 
+
+  async updatePdfBookDatas(res) {
+    if (isWorking) {
+      return res.status(409).json({ message: 'Work in progress' });
+    }
+    isWorking = true
+    res.send('Scrapping Initiated');
+    console.log("route hit");
+    setTimeout(async () => {
+      try {
+        console.log('Set Timeout hit');
+
+        // Create a cursor to iterate over the documents in the collection
+        const cursor = await this.pdfBookModel.find().cursor();
+
+        // Process each document in the cursor
+        let processedCount = 0;
+        for await (const book of cursor) {
+          // Customize the image property
+          const customizedImg = await downloadImageImgbb(book.img);
+
+          // Update the document with the new property
+          book.imgbbImage = customizedImg;
+
+          // Save the updated document
+          await book.save();
+
+          // Increment the processed count
+          processedCount++;
+        }
+
+        console.log(`Processed ${processedCount} documents.`);
+
+      }
+      catch (error) {
+        console.error(error);
+        isWorking = false;
+        res.status(500).send('Error occurred during scraping');
+      }
+    }, 3000)
+
+  }
+
+
+  async updatePdfBookAuthorDatas(res) {
+    if (isWorking) {
+      return res.status(409).json({ message: 'Work in progress' });
+    }
+    isWorking = true
+    res.send('Scrapping Initiated');
+    console.log("route hit");
+    setTimeout(async () => {
+      try {
+        console.log('Set Timeout hit');
+
+        // Create a cursor to iterate over the documents in the collection
+        const cursor = await this.pdfBookAuthorModel.find().cursor();
+
+        // Process each document in the cursor
+        let processedCount = 0;
+        for await (const author of cursor) {
+          // Customize the image property
+          const customizedImg = await downloadImageImgbb(author.img);
+
+          // Update the document with the new property
+          author.imgbbImage = customizedImg;
+
+          // Save the updated document
+          await author.save();
+
+          // Increment the processed count
+          processedCount++;
+        }
+
+        console.log(`Processed ${processedCount} documents.`);
+
+      }
+      catch (error) {
+        console.error(error);
+        isWorking = false;
+        res.status(500).send('Error occurred during scraping');
+      }
+    }, 3000)
+
+  }
 }

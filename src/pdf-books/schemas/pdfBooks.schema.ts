@@ -26,6 +26,9 @@ export class PdfBook {
     img: string;
 
     @Prop()
+    imgbbImage: string;
+
+    @Prop()
     downloadLink: string;
 
     @Prop()

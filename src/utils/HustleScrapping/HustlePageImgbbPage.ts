@@ -24,17 +24,8 @@ export const hustlePageImgbbPage = async (): Promise<any> => {
 
 
             const page = await context.newPage();
-            // await page.goto('https://www.freecoursesonline.me/?10');
-            // await page.waitForTimeout(3000);
-            // // await page.goto("https://codelist.cc/en/")
-            // // await page.waitForTimeout(2000);
-            // let totalP = await page.evaluate(() => {
-            //     const lastPage = document.getElementsByClassName('page-numbers')[3].textContent
-            //     // const nextDivText = dotsSpan.nextElementSibling.textContent;
-            //     // console.log('nextDivText', nextDivText)
-            //     // return parseInt(nextDivText.replace(',', ''))
-            //     return parseInt(lastPage)
-            // })
+
+
             const result = { page }
             resolve(result);
 

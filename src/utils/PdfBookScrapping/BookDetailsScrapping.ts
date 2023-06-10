@@ -1,3 +1,4 @@
+import { downloadImageImgbb } from "../ImgBB/DownloadImgbb";
 
 export const bookDetailsScrapping = async (bookData, page): Promise<any> => {
     return new Promise<any>(async (resolve, reject) => {
@@ -82,8 +83,6 @@ export const bookDetailsScrapping = async (bookData, page): Promise<any> => {
                         metadata[key] = value;
                     }
                 }
-
-
 
 
                 return {

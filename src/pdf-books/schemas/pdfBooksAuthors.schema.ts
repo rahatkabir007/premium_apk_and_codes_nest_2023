@@ -17,6 +17,9 @@ export class PdfBookAuthor {
     img: string;
 
     @Prop()
+    imgbbImage: string;
+
+    @Prop()
     authorYesPdfId: string;
 
     @Prop()
