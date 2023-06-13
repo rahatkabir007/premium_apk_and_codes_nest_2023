@@ -116,7 +116,11 @@ export const apkScrappingSingleItem = async (page: any, lastDate: any, allReadMo
       const downloadButtons = await page.$$('.download_button');
       if (downloadButtons.length > 0) {
         await downloadButtons[0].click();
+<<<<<<< HEAD
         await page.waitForTimeout(5000); // Add a delay to allow time for new tab to open
+=======
+        await page.waitForTimeout(3000); // Add a delay to allow time for new tab to open
+>>>>>>> 7c9ddf7fca53850dea999bf07c9395456627e4d0
         // Get the newly opened page
 
 
