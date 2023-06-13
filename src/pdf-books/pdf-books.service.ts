@@ -448,8 +448,6 @@ export class PdfBooksService {
             const customizedImg = "https://i.ibb.co/XxLkfT7/image.png";
             author.imgbbImage = customizedImg;
             await author.save();
-            // Increment the processed count
-            processedCount++;
           }
           else {
             // Customize the image property
@@ -460,10 +458,9 @@ export class PdfBooksService {
 
             // Save the updated document
             await author.save();
-
-            // Increment the processed count
-            processedCount++;
           }
+          // Increment the processed count
+          processedCount++;
         }
 
         console.log(`Processed ${processedCount} documents.`);
